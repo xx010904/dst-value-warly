@@ -2,13 +2,13 @@ local isCh = locale == "zh" or locale == "zhr"
 version = "1.0.0"
 name = isCh and "数值怪沃利" or "The Value Monster: Warly"
 description = isCh and 
-"科雷行，我也行。希望科雷不要剽窃我的创意~"..
+"大厨有三弱。一弱是能力可以被他人共享，因此我设计了一些必须大厨出场才能触发的技能点；二弱是回血能力有限，因此我增加了一些防御相关的技能点；三弱是获取buff料理不易，所以我加入了一些新的buff料理。当然啦，数值增强技能点也是很重要的，比如直接加buff时长的..."..
 "\n󰀐感谢赏玩！"..
 "\n\n〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓"..
 "\n󰀅完整更新日志可以在创意工坊查看"..
 "\n"
 or
-"Klei can, I can. Hope that Klei won't plagiarize my ideas~ "..
+"Warly has 3 weaknesses. First, his abilities can be shared, so I added skill points that only trigger when he’s present. Second, his healing is limited, so I included defense-focused skill points. Third, buff dishes are hard to get, so I added some new ones. Of course, Direct buff-duration boosts are important too..."..
 "\n󰀐Thanks to enjoy!"..
 "\n\n〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓"..
 "\n󰀅Full changelog available on the Workshop"..
@@ -52,122 +52,64 @@ configuration_options =
         },
         default = "default",
     },
-    Subtitle(isCh and "火炬设置" or "Torch Settings"),
-    {
-        name = "TorchFuelConsumption",
-        label = isCh and "火炬耐久时间" or "Torch Time",
-        hover = isCh and "火炬技能树的持续时长的倍率" or "Torch Fuel Time Multiplier",
-        options =
-        {
-            { description = "1", data = 1, hover = isCh and "原本" or "Original" },
-            { description = "2", data = 2, hover = isCh and "2倍" or "2 times" },
-            { description = "3", data = 3, hover = isCh and "3倍" or "3 times" },
-        },
-        default = 3,
-    },
-    
-    {
-        name = "TorchRadius",
-        label = isCh and "火炬光照范围" or "Torch Radius",
-        hover = isCh and "火炬技能树的照明范围的倍率" or "Torch Radius Multiplier",
-        options =
-        {
-            { description = "1", data = 1, hover = isCh and "原本" or "Original" },
-            { description = "2", data = 2, hover = isCh and "2倍" or "2 times" },
-            { description = "3", data = 3, hover = isCh and "3倍" or "3 times" },
-        },
-        default = 3,
-    },
-    
-    {
-        name = "TorchToss",
-        label = isCh and "火炬投掷距离" or "Torch Toss Distance",
-        hover = isCh and "火炬投掷的最大距离" or "Torch Toss Distance Multiplier",
-        options =
-        {
-            { description = "1", data = 1, hover = isCh and "原本" or "Original" },
-            { description = "2", data = 2, hover = isCh and "2倍" or "2 times" },
-            { description = "3", data = 3, hover = isCh and "3倍" or "3 times" },
-        },
-        default = 3,
-    },
-    
-    Subtitle(isCh and "胡须设置" or "Beard Settings"),
-    {
-		name = "BeardDropBit",
-		label = isCh and "胡须掉落" or "Beard Drop",
-		hover = isCh and "刮胡须的时候掉落倍率" or "Beard Drop Multiplier", --原版是1/2/3级1/3/9个胡须
-		options =
-		{
-			{ description = "1", data = 1, hover = isCh and "原本" or "Original" },
-            { description = "2", data = 2, hover = isCh and "2倍" or "2 times" },
-            { description = "3", data = 3, hover = isCh and "3倍" or "3 times" },
-		},
-		default = 3,
-	},
 
+    Subtitle(isCh and "机制开关" or "Mechanism Switches"),
     {
-        name = "BeardInsulation",
-        label = isCh and "胡须保暖" or "Beard Insulation",
-        hover = isCh and "胡须保暖技能树的倍率" or "Beard Insulation Multiplier",
+        name = "lonely_eater_switch",
+        label = isCh and "吃独食" or "Eat Alone",
+        hover = isCh and "启用沃利的吃独食技能树" or "Enable Warly's 'Eat Alone'  Skill Tree",
         options =
         {
-            { description = "1", data = 1, hover = isCh and "原本" or "Original" },
-            { description = "2", data = 2, hover = isCh and "2倍" or "2 times" },
-            { description = "3", data = 3, hover = isCh and "3倍" or "3 times" },
+            { description = isCh and "开" or "On", data = true,  hover = isCh and "启用" or "Enable" },
+            { description = isCh and "关" or "Off", data = false, hover = isCh and "关闭" or "Disable" },
         },
-        default = 3,
+        default = true,
     },
 
     {
-        name = "BeardGrowth",
-        label = isCh and "胡须生长" or "Beard Growth",
-        hover = isCh and "胡须生长速度的倍率" or "Beard Growth Accumulation Multiplier",
+        name = "funny_cooker_switch",
+        label = isCh and "下饭操作" or "Meal-worthy Play",
+        hover = isCh and "启用沃利的下饭操作技能树" or "Enable Warly's 'Meal-worthy Play' Skill Tree",
         options =
         {
-            { description = "1", data = 1, hover = isCh and "原本" or "Original" },
-            { description = "2", data = 2, hover = isCh and "2倍" or "2 times" },
-            { description = "3", data = 3, hover = isCh and "3倍" or "3 times" },
+            { description = isCh and "开" or "On", data = true,  hover = isCh and "启用" or "Enable" },
+            { description = isCh and "关" or "Off", data = false, hover = isCh and "关闭" or "Disable" },
         },
-        default = 3,
+        default = true,
     },
 
     {
-        name = "BeardSlots",
-        label = isCh and "胡须格子" or "Beard Slots",
-        hover = isCh and "胡须格子的倍率" or "Beard Slots Multiplier",
+        name = "crockpot_carrier_switch",
+        label = isCh and "背锅侠" or "Crockpot Carrier",
+        hover = isCh and "启用沃利的背锅侠技能树" or "Enable Warly's 'Crockpot Carrier' Skill Tree",
         options =
         {
-            { description = "1", data = 1, hover = isCh and "原本" or "Original" },
-            { description = "2", data = 2, hover = isCh and "2倍" or "2 times" },
-            { description = "3", data = 3, hover = isCh and "3倍" or "3 times" },
+            { description = isCh and "开" or "On", data = true,  hover = isCh and "启用" or "Enable" },
+            { description = isCh and "关" or "Off", data = false, hover = isCh and "关闭" or "Disable" },
         },
-        default = 3,
+        default = true,
     },
 
-    Subtitle(isCh and "炼金术设置" or "Alchemy Settings"),
     {
-        name = "TransmuteNumber",
-        label = isCh and "转换数量" or "Transmute Number",
-        hover = isCh and "炼金术一次性转换的数量的倍率" or "Alchemy transmute quantity multiplier",
+        name = "lunar_switch",
+        label = isCh and "月亮机制" or "Lunar System",
+        hover = isCh and "启用月亮主题的强化机制" or "Enable lunar-themed enhancement system",
         options =
         {
-            { description = "1", data = 1, hover = isCh and "原本" or "Original" },
-            { description = "2", data = 2, hover = isCh and "2倍" or "2 times" },
-            { description = "3", data = 3, hover = isCh and "3倍" or "3 times" },
+            { description = isCh and "开" or "On", data = true,  hover = isCh and "启用" or "Enable" },
+            { description = isCh and "关" or "Off", data = false, hover = isCh and "关闭" or "Disable" },
         },
-        default = 3,
+        default = true,
     },
 
-    Subtitle(isCh and "新机制" or "New Mechanism"),
     {
-        name = "IsNewTree",
-        label = isCh and "新技能树" or "New Skill Tree",
-        hover = isCh and "每种炼金术少消耗1级，可学习炼金术的终极技能可逆转换。月亮亲和强化火炬，暗影亲和强化胡须。" or "Each type of alchemy consumes one less level, and the ultimate skill of alchemy allows for reverse transformation.Lunar affinity enhances torches, shadow affinity enhances beards",
+        name = "shadow_switch",
+        label = isCh and "暗影机制" or "Shadow System",
+        hover = isCh and "启用暗影主题的强化机制" or "Enable shadow-themed enhancement system",
         options =
         {
-            { description = isCh and "真" or "True", data = true, hover = isCh and "真" or "True" },
-            { description = isCh and "假" or "False", data = false, hover = isCh and "假" or "False" },
+            { description = isCh and "开" or "On", data = true,  hover = isCh and "启用" or "Enable" },
+            { description = isCh and "关" or "Off", data = false, hover = isCh and "关闭" or "Disable" },
         },
         default = true,
     },
