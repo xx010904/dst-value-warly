@@ -78,7 +78,7 @@ local function AddListener(inst)
             OnEat(inst, data.food)
         end
         inst:ListenForEvent("oneat", inst._warly_food_listener)
-        print("[Warly Buff] 食物监听已启用")
+        -- print("[Warly Buff] 食物监听已启用")
     end
 end
 

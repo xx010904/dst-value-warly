@@ -1,8 +1,8 @@
 -- 背锅侠 Crockpot Carrier
--- 1 制作黑锅：100%承受伤害，648耐久，额外受到25%精神损失25%饥饿损失，100%伤害转移
--- 2 消耗减少到15%
--- 3.1 概率产生替罪羊 3.2 替罪羊带电 3.3 残忍杀替罪羊
--- 4.1 6个方向甩锅 4.2 甩锅二段跳 4.3 破锅返回材料
+-- 1 制作黑锅：100%承受伤害，648耐久，额外受到15%精神损失15%饥饿损失，
+-- 2 100%伤害转移
+-- 3.1 概率产生替罪羊 3.2 替罪羊带电 3.3 对替罪羊致命一击
+-- 4.1 6个方向甩锅，伤害关联转移值 4.2 摔不坏的锅 4.3 二段跳炸锅（摔坏了就没有二段炸了啊）
 
 --========================================================
 -- 统一给所有电羊添加替罪羊逻辑
@@ -22,18 +22,19 @@ AddPrefabPostInit("lightninggoat", function(goat)
 
             -- 玩家攻击加倍伤害
             goat:ListenForEvent("attacked", function(goat, data)
-                if data and data.attacker and data.attacker:HasTag("player") then
-                    if goat.components.health and not goat.components.health:IsDead() then
-                        local dmg = data.damage or 0
-                        local weapon = data.weapon
-                        goat.components.health:DoDelta(dmg * 2)
+                if true then -- 技能树控制3倍伤害
+                    if data and data.attacker and data.attacker:HasTag("player") then
+                        if goat.components.health and not goat.components.health:IsDead() then
+                            local dmg = data.damage or 0
+                            goat.components.health:DoDelta(-dmg * 2)
+                        end
                         -- print(string.format("[Scapegoat] 玩家攻击替罪羊，伤害加倍 %.2f", dmg*2))
                     end
                 end
             end)
 
-            -- 2.5天后快速死亡
-            local seconds = 16 * 60 * 2.5
+            -- 1.2天后快速死亡
+            local seconds = 16 * 60 * 1.2
             goat._scapegoat_killtime = GetTime() + seconds
             goat._scapegoat_task = goat:DoTaskInTime(seconds, function()
                 if goat.components.health and not goat.components.health:IsDead() then

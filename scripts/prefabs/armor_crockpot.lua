@@ -1,10 +1,10 @@
 local SCAN_RADIUS = 10
-local SANITY_RATIO = 0.25
-local HUNGER_RATIO = 0.25
+local SANITY_RATIO = 0.15
+local HUNGER_RATIO = 0.15
 local GOAT_CHANCE = 0.10
 
 local function OnBlocked(owner)
-    owner.SoundEmitter:PlaySound("dontstarve/wilson/hit_armour")
+    owner.SoundEmitter:PlaySound("dontstarve/common/together/portable/cookpot/collapse")
 end
 
 -- 护甲自身承伤扣精神饥饿
@@ -91,9 +91,13 @@ local function ApplyDamageRedirect(inst, teammate)
                     goat:AddTag("scapegoat")
                     goat.Transform:SetPosition(x, y, z)
                     goat.components.combat:SuggestTarget(attacker)
-                    goat.sg:GoToState("shocked")
-                    if goat.setcharged then
-                        goat:setcharged()
+                    -- 替罪羊带点(技能树控制)
+                    local gotShocked = true
+                    if gotShocked then
+                        goat.sg:GoToState("shocked")
+                        if goat.setcharged then
+                            goat:setcharged()
+                        end
                     end
                     if goat.components.health then
                         goat.components.health:SetPercent(math.random()) -- 随机生命比例 0~1
@@ -160,57 +164,153 @@ local function ScanNearbyPlayers(inst)
     end
 end
 
--- 破碎逻辑：向6个方向投掷亮茄炸弹
+-- 破碎逻辑：向6个方向甩锅，可控制是否二段甩，方向带随机旋转偏移，锅有概率敲坏掉落材料
 local function OnArmorBroke(owner, data)
     local inst = data.armor
-    if inst and inst:IsValid() then
-        local x, y, z = owner.Transform:GetWorldPosition()
-        local angles = {0, math.pi/3, 2*math.pi/3, math.pi, 4*math.pi/3, 5*math.pi/3}
-        local radius = 6 -- 投掷距离
+    if not (inst and inst:IsValid()) then return end
 
-        for _, a in ipairs(angles) do
-            local bomb = SpawnPrefab("bomb_lunarplant")
-            if bomb then
-                -- 保存原始 OnHit
-                local old_OnHit = bomb.components.complexprojectile and bomb.components.complexprojectile.onhitfn or nil
+    local x, y, z = owner.Transform:GetWorldPosition()
+    local radius = 6 -- 投掷距离，可根据需求修改
 
-                -- 重写 OnHit
-                local function NewOnHit(bomb, attacker, target)
-                    -- 调用原始逻辑
-                    if old_OnHit then
-                        old_OnHit(bomb, attacker, target)
-                    end
-                    -- 获取当前位置
-                    local bx, by, bz = bomb.Transform:GetWorldPosition()
-                    -- 在爆炸位置生成锅
-                    local pot = SpawnPrefab("portablecookpot_item")
-                    if pot then
-                        pot.Transform:SetPosition(bx, by, bz)
-                    end
-                end
+    -- 播放爆炸效果
+    local efx = SpawnPrefab("balloon_pop_body")
+    local ex, ey, ez = inst.Transform:GetWorldPosition()
+    if efx then efx.Transform:SetPosition(ex, ey, ez) end
 
-                -- 设置新的 OnHit
-                if bomb.components.complexprojectile then
-                    bomb.components.complexprojectile:SetOnHit(NewOnHit)
-                end
+    -- 🔹 随机旋转起始角度
+    local offset_angle = math.random() * 6 * math.pi
+    local angles = {}
+    for i = 0, 5 do
+        table.insert(angles, offset_angle + i * math.pi / 3)
+    end
 
-                -- 从玩家位置生成炸弹
-                bomb.Transform:SetPosition(x, y + 1, z)
-                if bomb.components.complexprojectile then
-                    local tx = x + radius * math.cos(a)
-                    local tz = z + radius * math.sin(a)
-                    local ty = y
-                    local targetPos = Vector3(tx, ty, tz)
-                    bomb.components.complexprojectile:Launch(targetPos, owner, nil)
+    -- 是否整组触发二段甩（可由技能树控制）
+    local will_second = true -- 改成 false 就只炸一段
+
+    -- 🔹 函数：生成锅实体并有概率敲坏掉落材料
+    local function TrySpawnPotWithSmash(bomb, bx, by, bz, owner)
+        -- 处理敲坏概率
+        if not bomb:IsValid() then return end
+
+        local do_smash = false -- 是否触发坏锅（可由技能树控制）
+        local loot_list = {}
+
+        if do_smash then
+            -- 坏锅：掉落固定原材料
+            loot_list = {
+                {name="goldnugget", count=1},
+                {name="charcoal", count=3},
+                {name="twigs", count=3},
+            }
+        else
+            -- 没坏锅：掉落锅本身
+            loot_list = {
+                {name="portablecookpot_item", count=1},
+            }
+        end
+
+        -- 投掷掉落物
+        for _, loot in ipairs(loot_list) do
+            for i = 1, loot.count do
+                local item = SpawnPrefab(loot.name)
+                if item then
+                    LaunchAt(item, bomb, owner, -1, 0.5, 0, 0)
                 end
             end
         end
+    end
+
+    -- 🔹 通用甩炸弹逻辑
+    local function ThrowBomb(dirx, dirz)
+        local bomb = SpawnPrefab("bomb_crockpot")
+        if not bomb then
+            print("[BackArmor] Spawn bomb failed")
+            return
+        end
+
+        bomb._throw_dir = Vector3(dirx, 0, dirz)
+        bomb._is_second = false
+        bomb.should_spawn_pot = not will_second -- ❗️如果不会触发二段，就在一段生成锅
+
+        local old_onhit = bomb.components.complexprojectile and bomb.components.complexprojectile.onhitfn or nil
+
+        -- 第一段 OnHit
+        local function FirstOnHit(bomb_inst, attacker, target)
+            if old_onhit then
+                pcall(old_onhit, bomb_inst, attacker, target)
+            end
+
+            local bx, by, bz = bomb_inst.Transform:GetWorldPosition()
+
+            -- 没有触发二段：直接生成锅
+            if bomb_inst.should_spawn_pot then
+                TrySpawnPotWithSmash(bomb, bx, by, bz, owner)
+                return
+            end
+
+            -- 有触发二段：生成第二段炸弹
+            local second = SpawnPrefab("bomb_crockpot")
+            if not second then
+                print("[BackArmor] Spawn second bomb failed")
+                return
+            end
+
+            second._is_second = true
+            second._throw_dir = bomb_inst._throw_dir
+            second.should_spawn_pot = true -- 第二段一定生成锅
+
+            local second_old_onhit = second.components.complexprojectile and second.components.complexprojectile.onhitfn or nil
+
+            -- 第二段 OnHit
+            local function SecondOnHit(sec_inst, att2, tgt2)
+                if second_old_onhit then
+                    pcall(second_old_onhit, sec_inst, att2, tgt2)
+                end
+                if sec_inst.should_spawn_pot then
+                    local sx, sy, sz = sec_inst.Transform:GetWorldPosition()
+                    TrySpawnPotWithSmash(sec_inst, sx, sy, sz, owner)
+                end
+            end
+
+            if second.components.complexprojectile then
+                second.components.complexprojectile:SetOnHit(SecondOnHit)
+            end
+
+            -- 发射第二段炸弹
+            second.Transform:SetPosition(bx, by + 1, bz)
+            if second.components.complexprojectile then
+                local tx = bx + dirx * radius
+                local tz = bz + dirz * radius
+                local targetPos = Vector3(tx, by, tz)
+                second.components.complexprojectile:Launch(targetPos, owner, nil)
+            end
+        end
+
+        -- 设置第一段 OnHit
+        if bomb.components.complexprojectile then
+            bomb.components.complexprojectile:SetOnHit(FirstOnHit)
+        end
+
+        -- 发射第一段炸弹
+        bomb.Transform:SetPosition(x, y + 1, z)
+        if bomb.components.complexprojectile then
+            local tx = x + radius * dirx
+            local tz = z + radius * dirz
+            local targetPos = Vector3(tx, y, tz)
+            bomb.components.complexprojectile:Launch(targetPos, owner, nil)
+        end
+    end
+
+    -- 🔹 向6个方向投掷
+    for _, a in ipairs(angles) do
+        local dirx, dirz = math.cos(a), math.sin(a)
+        ThrowBomb(dirx, dirz)
     end
 end
 
 -- 装备
 local function onequip(inst, owner)
-    owner.AnimState:OverrideSymbol("swap_body", "armor_wood", "swap_body")
+    owner.AnimState:OverrideSymbol("swap_body_tall", "armor_onemanband", "swap_body_tall")
     inst:ListenForEvent("blocked", OnBlocked, owner)
 
     -- 监听破碎
@@ -222,22 +322,16 @@ end
 
 -- 卸下
 local function onunequip(inst, owner)
-    owner.AnimState:ClearOverrideSymbol("swap_body")
-    owner:RemoveEventCallback("armorbroke", OnArmorBroke)
+    owner.AnimState:ClearOverrideSymbol("swap_body_tall")
     inst:RemoveEventCallback("blocked", OnBlocked, owner)
 
+    -- 监听破碎
+    owner:RemoveEventCallback("armorbroke", OnArmorBroke)
+
+    -- 定期扫描队友
     if inst._scantask then
         inst._scantask:Cancel()
         inst._scantask = nil
-    end
-
-    if inst._teammates then
-        for p, _ in pairs(inst._teammates) do
-            if p.components.combat then
-                p.components.combat.externaldamagetakenmultipliers:SetModifier(inst, 1)
-            end
-        end
-        inst._teammates = nil
     end
 end
 
@@ -248,8 +342,8 @@ local function fn()
     inst.entity:AddNetwork()
 
     MakeInventoryPhysics(inst)
-    inst.AnimState:SetBank("armor_wood")
-    inst.AnimState:SetBuild("armor_wood")
+    inst.AnimState:SetBank("onemanband")
+    inst.AnimState:SetBuild("armor_onemanband")
     inst.AnimState:PlayAnimation("anim")
     inst.entity:SetPristine()
 
@@ -257,6 +351,9 @@ local function fn()
 
     inst:AddComponent("inspectable")
     inst:AddComponent("inventoryitem")
+    inst.components.inventoryitem.imagename = "onemanband"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages2.xml"
+
     inst:AddComponent("armor")
     inst.components.armor:InitCondition(648, 0.99999)
     inst.components.armor.ontakedamage = OnTakeDamage

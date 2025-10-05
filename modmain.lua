@@ -12,6 +12,7 @@ PrefabFiles = {
 	"warly_potato_buff",
 	"warly_seafood_buff",
 	"armor_crockpot",
+	"bomb_crockpot",
     -- 其他 prefab 名称...
 }
 
