@@ -1,8 +1,10 @@
 GLOBAL.setmetatable(env,{__index=function(t,k) return GLOBAL.rawget(GLOBAL,k) end})--GLOBAL 相关照抄
 
 Assets = {
+    Asset("ANIM", "anim/armor_crockpot.zip"),
 	-- Asset("ANIM", "anim/ui_beard_3x1.zip"),
-
+    Asset("IMAGE", "images/inventoryimages/armor_crockpot.tex"),
+	Asset("ATLAS", "images/inventoryimages/armor_crockpot.xml"),
 }
 
 PrefabFiles = {
@@ -13,6 +15,8 @@ PrefabFiles = {
 	"warly_seafood_buff",
 	"armor_crockpot",
 	"bomb_crockpot",
+	"shadow_hook_head_fx",
+	"shadow_hook_link_fx",
     -- 其他 prefab 名称...
 }
 

@@ -1,19 +1,40 @@
-STRINGS.NAMES.FIX_WATCH_TOOL = "Watchmaker's Wrench"
+STRINGS.NAMES.ARMOR_CROCKPOT = "Burdened Pot"
+STRINGS.RECIPE_DESC.ARMOR_CROCKPOT = "Blacken your pot, so you can take the blame."
+STRINGS.CHARACTERS.WARLY.DESCRIBE.ARMOR_CROCKPOT = "Your pot's all black now —— guess who's taking the blame?"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.ARMOR_CROCKPOT = "A pot for taking all the blame."
 
-STRINGS.RECIPE_DESC.FIX_WATCH_TOOL = "As a watchmaker, it only makes sense to carry your tools with you!"
-
-STRINGS.SKILLTREE.PANELS.HORRORGRANNY = "HORRORGRANNY"
-STRINGS.SKILLTREE.PANELS.CLOCKMAKER = "CLOCKMAKER"
-STRINGS.SKILLTREE.PANELS.CHRONOFLORIST = "CHRONOFLORIST"
-STRINGS.SKILLTREE.WANDA = {}
-STRINGS.SKILLTREE.WANDA.WANDA_WATCHMAKER_1_TITLE = "Cruel Watchmaker I"
-STRINGS.SKILLTREE.WANDA.WANDA_WATCHMAKER_1_DESC = "Learn to craft a watchmaker's tool."
-
-STRINGS.SKILLTREE.WANDA.WANDA_ALLEGIANCE_SHADOW_BEARD_TITLE = "Shadowspace Thief"
-STRINGS.SKILLTREE.WANDA.WANDA_ALLEGIANCE_SHADOW_BEARD_DESC = "Use shadow magic to forcibly alter your position in time and space."
-STRINGS.SKILLTREE.WANDA.WANDA_ALLEGIANCE_LUNAR_TORCH_TITLE = "Lunar Time Master"
-STRINGS.SKILLTREE.WANDA.WANDA_ALLEGIANCE_LUNAR_TORCH_DESC = "Harness lunar power to control the flow of time."
-STRINGS.SKILLTREE.WANDA.WANDA_ALLEGIANCE_LOCK_LUNAR_DESC = "Find and defeat the ancient Weaver of Shadows.\nNo skills from the Lunar faction."
-STRINGS.SKILLTREE.WANDA.WANDA_ALLEGIANCE_LOCK_SHADOW_DESC = "Find and defeat the Celestial Hero.\nNo skills from the Shadow faction."
-
-STRINGS.ACTIONS.REWIND = "Clockwork Rewind"
+STRINGS.CHARACTERS.GENERIC.ANNOUNCE_EATS_SMALL_RECOVERY =
+{
+    "I suggest you don't eat this, I can make something much more delicious.",
+    "You better keep it and don't eat it."
+}
+STRINGS.CHARACTERS.GENERIC.ANNOUNCE_EATS_LARGE_RECOVERY =
+{
+    "I have to say, you're really hungry to eat this!",
+    "This really lifts your spirits.",
+    "Watching this meal prep, I'm full just from looking at it."
+}
+STRINGS.CHARACTERS.GENERIC.ANNOUNCE_EATS_NORMAL_RECOVERY =
+{
+    "Don't eat this, it has a better use.",
+    "Are you really that hungry?",
+    "Don't eat this, how about I cook it for you?"
+}
+STRINGS.CHARACTERS.GENERIC.ANNOUNCE_EATS_BY_ANIMAL =
+{
+    "Get away! Don't eat that!",
+    "Get away! This is really raising my blood pressure.",
+    "Get away! I'm so full from just watching this!"
+}
+STRINGS.CHARACTERS.GENERIC.ANNOUNCE_COOKS_FOOD =
+{
+    "Don't roast this! I'm a master chef, I can cook anything you want!",
+    "Why not keep it for something else, why roast it!"
+}
+STRINGS.CHARACTERS.GENERIC.ANNOUNCE_HARVESTS_POT =
+{
+    "This is an insult to cooking!",
+    "What is this cooking, this really raises my blood pressure!",
+    "This operation is just so appetizing!",
+    "What is this cooking, it really makes my muscles tense!"
+}

@@ -5,12 +5,10 @@ local defs = require("prefabs/skilltree_defs")
 local data = BuildSkillsData(defs.FN)
 
 -- 技能树用到的图标
-table.insert(Assets, Asset("ATLAS", "images/skilltree/wilson_alchemy_reverse_1.xml"))
-table.insert(Assets, Asset("ATLAS", "images/skilltree/wilson_allegiance_shadow_beard.xml"))
-table.insert(Assets, Asset("ATLAS", "images/skilltree/wilson_allegiance_lunar_torch.xml"))
-RegisterSkilltreeIconsAtlas("images/skilltree/wilson_alchemy_reverse_1.xml", "wilson_alchemy_reverse_1.tex")
-RegisterSkilltreeIconsAtlas("images/skilltree/wilson_allegiance_shadow_beard.xml", "wilson_allegiance_shadow_beard.tex")
-RegisterSkilltreeIconsAtlas("images/skilltree/wilson_allegiance_lunar_torch.xml", "wilson_allegiance_lunar_torch.tex")
+table.insert(Assets, Asset("ATLAS", "images/skilltree/warly_bonesoup_buff.xml"))
+table.insert(Assets, Asset("ATLAS", "images/skilltree/warly_crepes_buff.xml"))
+RegisterSkilltreeIconsAtlas("images/skilltree/warly_bonesoup_buff.xml", "warly_bonesoup_buff.tex")
+RegisterSkilltreeIconsAtlas("images/skilltree/warly_crepes_buff.xml", "warly_crepes_buff.tex")
 
 defs.CreateSkillTreeFor("warly", data.SKILLS)
 defs.SKILLTREE_ORDERS["warly"] = data.ORDERS

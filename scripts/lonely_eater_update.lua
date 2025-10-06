@@ -3,8 +3,8 @@
 -- 2 鲜果可丽饼：获得5分钟锁定85%san
 -- 3 海鲜杂烩：获得5分钟敌人越多移速越快
 -- 4 蓬松土豆蛋奶酥：获得5分钟攻击力加成（200以上两倍，50-200线性变化，50以下1倍）
--- 5 怪物鞑靼：同时雇佣5个猪人，满时间2.5天
--- 6.1 分享效果 6.2 分享效果
+-- 5 怪物鞑靼：同时额外雇佣5个猪人，满时间2.5天
+-- 6.1 分享玩家 6.2 分享？
 -- 7.1 独食效果 7.2 独食效果
 
 --========================================================
@@ -21,11 +21,37 @@ local POTATO_BUFF_TIME      = 300
 -- 食物 → Buff 映射表
 --========================================================
 local FOOD_BUFF_MAP = {
-    bonesoup          = { buffname = "warly_bonesoup_buff",    time = BONESOUP_BUFF_TIME },
-    freshfruitcrepes  = { buffname = "warly_crepes_buff",      time = CROISSANT_BUFF_TIME },
-    moqueca           = { buffname = "warly_seafood_buff",     time = SEAFOOD_BUFF_TIME },
-    potatosouffle     = { buffname = "warly_potato_buff",      time = POTATO_BUFF_TIME },
+    bonesoup = {
+        buffname = "warly_bonesoup_buff",
+        time = BONESOUP_BUFF_TIME,
+        required_skill = "warly_bonesoup_buff",
+    },
+    freshfruitcrepes = {
+        buffname = "warly_crepes_buff",
+        time = CROISSANT_BUFF_TIME,
+        required_skill = "warly_crepes_buff",
+    },
+    moqueca = {
+        buffname = "warly_seafood_buff",
+        time = SEAFOOD_BUFF_TIME,
+        required_skill = "warly_seafood_buff",
+    },
+    potatosouffle = {
+        buffname = "warly_potato_buff",
+        time = POTATO_BUFF_TIME,
+        required_skill = "warly_potato_buff",
+    },
 }
+
+--========================================================
+-- 技能检测函数
+--========================================================
+local function HasWarlySkill(inst, skillname)
+    if inst.components.skilltreeupdater then
+        return inst.components.skilltreeupdater:IsActivated(skillname)
+    end
+    return false
+end
 
 --========================================================
 -- 吃食物时触发
@@ -47,6 +73,12 @@ local function OnEat(inst, food)
         return
     end
 
+    local required_skill = buffdata.required_skill
+    if required_skill and not HasWarlySkill(inst, required_skill) then
+        print("[Warly Buff] Missing skill:", required_skill, "- Buff not applied.")
+        return
+    end
+
     local buffname = buffdata.buffname
     local bufftime = buffdata.time
 
@@ -54,16 +86,15 @@ local function OnEat(inst, food)
         inst:AddDebuff(buffname, buffname)
         print("[Warly Buff] Added:", buffname, "for", bufftime, "seconds")
     else
-        -- 先删除已有的 buff
         inst:RemoveDebuff(buffname)
-        print("[Warly Buff] Removed existing buff:", buffname)
-
-        -- 添加新的 buff
         inst:AddDebuff(buffname, buffname)
-        print("[Warly Buff] Added new buff:", buffname, "for", bufftime, "seconds")
+        print("[Warly Buff] Refreshed:", buffname, "for", bufftime, "seconds")
     end
-
 end
+
+-- 记得在初始化时绑定
+-- inst:ListenForEvent("oneat", OnEat)
+
 
 --========================================================
 -- 添加监听

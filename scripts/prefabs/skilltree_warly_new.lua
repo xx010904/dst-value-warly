@@ -1,6 +1,6 @@
 local ORDERS =
 {
-    {"horrorgranny",           { -214+18   , 176 + 30 }},
+    {"eatalone",           { -214+18   , 176 + 30 }},
     {"clockmaker",         { -62       , 176 + 30 }},
     {"farmer",           { 66+18     , 176 + 30 }},
     {"allegiance",      { 204       , 176 + 30 }},
@@ -11,32 +11,24 @@ local ORDERS =
 local function BuildSkillsData(SkillTreeFns)
     local skills = 
     {
-        wilson_alchemy_1 = {
+        warly_bonesoup_buff = {
             title = STRINGS.SKILLTREE.WILSON.WILSON_ALCHEMY_1_TITLE, 
             desc = STRINGS.SKILLTREE.WILSON.WILSON_ALCHEMY_1_DESC, 
-            icon = "wilson_alchemy_1",
+            icon = "warly_bonesoup_buff",
             pos = {-63,176},
             --pos = {1,0},
-            group = "horrorgranny",
-            tags = {"alchemy", "alchemy1"},
+            group = "eatalone",
+            tags = {"eatalone", "eatalone1"},
             root = true,
-            connects = {
-                "wilson_alchemy_gem_1",
-                "wilson_alchemy_ore_1",
-                "wilson_alchemy_iky_1",
-            },
         },
-        wilson_alchemy_gem_1 = {
+        warly_crepes_buff = {
             title = STRINGS.SKILLTREE.WILSON.WILSON_ALCHEMY_GEM_1_TITLE, 
             desc = STRINGS.SKILLTREE.WILSON.WILSON_ALCHEMY_GEM_1_DESC, 
-            icon = "wilson_alchemy_gem_2",
+            icon = "warly_crepes_buff",
             pos = {-63,176-54},        
             --pos = {0,-1},
-            group = "horrorgranny",
-            tags = {"alchemy", "alchemy1"},
-            connects = {
-                "wilson_alchemy_gem_2",
-            },
+            group = "eatalone",
+            tags = {"eatalone", "eatalone1"},
         },
         wilson_alchemy_gem_2 = {
             title = STRINGS.SKILLTREE.WILSON.WILSON_ALCHEMY_GEM_2_TITLE, 

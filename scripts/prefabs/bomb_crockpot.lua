@@ -10,15 +10,18 @@ local function OnHit(inst, attacker, target)
 	inst.AnimState:PlayAnimation("hit_cooking", false)
 	-- inst.AnimState:PlayAnimation("projectile_impact", false)
 	inst.SoundEmitter:KillSound("toss")
-	inst.SoundEmitter:PlaySound("dontstarve/common/together/portable/cookpot/place") -- ✅ 增加爆炸音效
+	inst.SoundEmitter:PlaySound("dontstarve_DLC001/creatures/bearger/groundpound") -- ✅ 增加爆炸音效
 
-	local fx = SpawnPrefab("lucy_transform_fx")
+	local fx = SpawnPrefab("groundpoundring_fx")
 	if fx then
-		fx.Transform:SetPosition(x, y + 1, z)
+		fx.Transform:SetScale(0.75, 0.75, 0.75)
+		fx.Transform:SetPosition(x, y, z)
+		fx:FastForward()
 	end
 
-	local fx2 = SpawnPrefab("slurper_respawn")
+	local fx2 = SpawnPrefab("groundpound_fx")
 	if fx2 then
+		-- fx2.Transform:SetScale(0.5,0.5,0.5)
 		fx2.Transform:SetPosition(x, y, z)
 	end
 
@@ -73,7 +76,7 @@ local function onthrown(inst, attacker)
 	inst.AnimState:PushAnimation("idle_ground", true)
 	inst.Transform:SetScale(0.9, 0.9, 0.9)
 
-	inst.SoundEmitter:PlaySound("dontstarve/common/cookingpot_rattle", "toss")
+	inst.SoundEmitter:PlaySound("dontstarve/common/together/portable/cookpot/place", "toss")
 
 	inst.Physics:SetMass(1)
 	inst.Physics:SetFriction(0)

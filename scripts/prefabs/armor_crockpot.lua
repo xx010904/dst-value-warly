@@ -4,7 +4,7 @@ local HUNGER_RATIO = 0.15
 local GOAT_CHANCE = 0.10
 
 local function OnBlocked(owner)
-    owner.SoundEmitter:PlaySound("dontstarve/common/together/portable/cookpot/collapse")
+    owner.SoundEmitter:PlaySound("dontstarve/wilson/hit_metal")
 end
 
 -- 护甲自身承伤扣精神饥饿
@@ -66,15 +66,16 @@ local function ApplyDamageRedirect(inst, teammate)
             end
 
             -- 判断是否触发闪避替罪羊逻辑
-            if math.random() < GOAT_CHANCE + (damage or 0) / 1000 then
+            local activeGoat = true -- 技能树控制是否开启
+            if activeGoat and (math.random() < (GOAT_CHANCE + (damage or 0) / 1000)) then
                 local x, y, z = owner.Transform:GetWorldPosition()
 
-                -- 随机安全偏移位置 (避免传送进墙)
+                -- 随机安全偏移位置
                 local offset = FindWalkableOffset(Vector3(x, y, z), math.random() * 2 * PI, 3 + math.random() * 2, 8, true, true)
                 if offset then
                     local newpos = Vector3(x + offset.x, y, z + offset.z)
                     owner.Transform:SetPosition(newpos.x, newpos.y, newpos.z)
-                    print(string.format("[BackArmor] 玩家闪避到新位置 (%.2f, %.2f, %.2f)", newpos.x, newpos.y, newpos.z))
+                    -- print(string.format("[BackArmor] 玩家闪避到新位置 (%.2f, %.2f, %.2f)", newpos.x, newpos.y, newpos.z))
                 else
                     print("[BackArmor] 未找到安全位置，玩家未移动")
                 end
@@ -91,7 +92,7 @@ local function ApplyDamageRedirect(inst, teammate)
                     goat:AddTag("scapegoat")
                     goat.Transform:SetPosition(x, y, z)
                     goat.components.combat:SuggestTarget(attacker)
-                    -- 替罪羊带点(技能树控制)
+                    -- 替罪羊带电(技能树控制)
                     local gotShocked = true
                     if gotShocked then
                         goat.sg:GoToState("shocked")
@@ -102,8 +103,7 @@ local function ApplyDamageRedirect(inst, teammate)
                     if goat.components.health then
                         goat.components.health:SetPercent(math.random()) -- 随机生命比例 0~1
                     end
-                    print(string.format("[BackArmor] ⚡ 替罪羊电羊生成成功！位置(%.2f, %.2f, %.2f) 目标=%s (GUID=%d)",
-                        x, y, z, attacker.prefab or "nil", attacker.GUID or 0))
+                    -- print(string.format("[BackArmor] ⚡ 替罪羊电羊生成成功！位置(%.2f, %.2f, %.2f) 目标=%s (GUID=%d)", x, y, z, attacker.prefab or "nil", attacker.GUID or 0))
                     return goat -- 电羊承伤
                 else
                     print("[BackArmor] 替罪羊生成失败！")
@@ -150,7 +150,7 @@ local function ScanNearbyPlayers(inst)
         if not still_near then
             RemoveDamageRedirect(p)
             inst._teammates[p] = nil
-            print("[BackArmor] Removed damage modifier and redirect from:", tostring(p))
+            -- print("[BackArmor] Removed damage modifier and redirect from:", tostring(p))
         end
     end
 
@@ -159,7 +159,7 @@ local function ScanNearbyPlayers(inst)
         if p ~= owner and not inst._teammates[p] then
             ApplyDamageRedirect(inst, p)
             inst._teammates[p] = true
-            print("[BackArmor] Applied damage modifier and redirect to:", tostring(p))
+            -- print("[BackArmor] Applied damage modifier and redirect to:", tostring(p))
         end
     end
 end
@@ -310,14 +310,18 @@ end
 
 -- 装备
 local function onequip(inst, owner)
-    owner.AnimState:OverrideSymbol("swap_body_tall", "armor_onemanband", "swap_body_tall")
+    owner.AnimState:OverrideSymbol("swap_body_tall", "armor_crockpot", "swap_body_tall")
     inst:ListenForEvent("blocked", OnBlocked, owner)
 
     -- 监听破碎
-    owner:ListenForEvent("armorbroke", OnArmorBroke)
+    if true then -- 技能树控制是否开启
+        owner:ListenForEvent("armorbroke", OnArmorBroke)
+    end
 
     -- 定期扫描队友
-    inst._scantask = inst:DoPeriodicTask(1, ScanNearbyPlayers)
+    if true then -- 技能树控制是否开启
+        inst._scantask = inst:DoPeriodicTask(1, ScanNearbyPlayers)
+    end
 end
 
 -- 卸下
@@ -326,12 +330,25 @@ local function onunequip(inst, owner)
     inst:RemoveEventCallback("blocked", OnBlocked, owner)
 
     -- 监听破碎
-    owner:RemoveEventCallback("armorbroke", OnArmorBroke)
+    if true then -- 技能树控制是否开启
+        owner:RemoveEventCallback("armorbroke", OnArmorBroke)
+    end
 
     -- 定期扫描队友
-    if inst._scantask then
-        inst._scantask:Cancel()
-        inst._scantask = nil
+    if true then -- 技能树控制是否开启
+        if inst._scantask then
+            inst._scantask:Cancel()
+            inst._scantask = nil
+        end
+
+        -- 移除所有挡伤害的玩家
+        if inst._teammates then
+            for p, _ in pairs(inst._teammates) do
+                RemoveDamageRedirect(p)
+                inst._teammates[p] = nil
+                -- print("[BackArmor] Removed damage modifier and redirect from:", tostring(p))
+            end
+        end
     end
 end
 
@@ -342,8 +359,10 @@ local function fn()
     inst.entity:AddNetwork()
 
     MakeInventoryPhysics(inst)
-    inst.AnimState:SetBank("onemanband")
-    inst.AnimState:SetBuild("armor_onemanband")
+    -- inst.AnimState:SetBank("onemanband")
+    -- inst.AnimState:SetBuild("armor_onemanband")
+    inst.AnimState:SetBank("armor_crockpot")
+    inst.AnimState:SetBuild("armor_crockpot")
     inst.AnimState:PlayAnimation("anim")
     inst.entity:SetPristine()
 
@@ -351,8 +370,8 @@ local function fn()
 
     inst:AddComponent("inspectable")
     inst:AddComponent("inventoryitem")
-    inst.components.inventoryitem.imagename = "onemanband"
-    inst.components.inventoryitem.atlasname = "images/inventoryimages2.xml"
+    inst.components.inventoryitem.imagename = "armor_crockpot"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/armor_crockpot.xml"
 
     inst:AddComponent("armor")
     inst.components.armor:InitCondition(648, 0.99999)
