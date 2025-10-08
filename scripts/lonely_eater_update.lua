@@ -5,21 +5,12 @@
 -- 4 蓬松土豆蛋奶酥：获得5分钟攻击力加成（200以上两倍，50-200线性变化，50以下1倍）
 -- 5 怪物鞑靼：同时额外雇佣5个猪人，满时间2.5天
 -- 6.1 分享玩家 6.2 分享？
--- 7.1 独食效果 7.2 独食效果
+-- 7.1 独食效果？ 7.2 独食效果？
 
 --========================================================
 -- Warly 专属食物 Buff 系统，4个原版无buff的食物
 --========================================================
 
--- Buff 持续时间（单位：秒）
-local BONESOUP_BUFF_TIME    = 300
-local CROISSANT_BUFF_TIME   = 300
-local SEAFOOD_BUFF_TIME     = 300
-local POTATO_BUFF_TIME      = 300
-
---========================================================
--- 食物 → Buff 映射表
---========================================================
 local FOOD_BUFF_MAP = {
     bonesoup = {
         buffname = "warly_bonesoup_buff",
@@ -47,10 +38,11 @@ local FOOD_BUFF_MAP = {
 -- 技能检测函数
 --========================================================
 local function HasWarlySkill(inst, skillname)
-    if inst.components.skilltreeupdater then
-        return inst.components.skilltreeupdater:IsActivated(skillname)
-    end
-    return false
+    -- if inst.components.skilltreeupdater then
+    --     return inst.components.skilltreeupdater:IsActivated(skillname)
+    -- end
+    -- return false
+    return true
 end
 
 --========================================================
@@ -80,15 +72,14 @@ local function OnEat(inst, food)
     end
 
     local buffname = buffdata.buffname
-    local bufftime = buffdata.time
 
     if not inst:HasDebuff(buffname) then
         inst:AddDebuff(buffname, buffname)
-        print("[Warly Buff] Added:", buffname, "for", bufftime, "seconds")
+        -- print("[Warly Buff] Added:", buffname)
     else
         inst:RemoveDebuff(buffname)
         inst:AddDebuff(buffname, buffname)
-        print("[Warly Buff] Refreshed:", buffname, "for", bufftime, "seconds")
+        -- print("[Warly Buff] Refreshed:", buffname)
     end
 end
 

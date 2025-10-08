@@ -5,6 +5,8 @@ Assets = {
 	-- Asset("ANIM", "anim/ui_beard_3x1.zip"),
     Asset("IMAGE", "images/inventoryimages/armor_crockpot.tex"),
 	Asset("ATLAS", "images/inventoryimages/armor_crockpot.xml"),
+    Asset("IMAGE", "images/inventoryimages/shadow_battleaxe_young.tex"),
+	Asset("ATLAS", "images/inventoryimages/shadow_battleaxe_young.xml"),
 }
 
 PrefabFiles = {
@@ -17,6 +19,10 @@ PrefabFiles = {
 	"bomb_crockpot",
 	"shadow_hook_head_fx",
 	"shadow_hook_link_fx",
+	"shadow_hook_debuff",
+	"shadow_battleaxe_young",
+	"improv_cookpot_fx",
+	"improv_cookpot_projectile_fx",
     -- 其他 prefab 名称...
 }
 

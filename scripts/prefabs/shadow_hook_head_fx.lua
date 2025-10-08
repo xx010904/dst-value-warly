@@ -6,7 +6,7 @@ local function shadow_fn()
 	inst.entity:AddTransform()
 	inst.entity:AddFollower()
 	inst.entity:AddNetwork()
-
+	inst.entity:AddSoundEmitter()
 
 	inst:AddTag("FX")
 	inst:AddTag("NOCLICK")
@@ -22,7 +22,7 @@ local function shadow_fn()
 
 	inst.AnimState:SetBank("nightmare_axe")
 	inst.AnimState:SetBuild("nightmare_axe")
-	inst.AnimState:PlayAnimation("swap_level4_f1", true)
+	inst.AnimState:PlayAnimation("swap_level1_f1", true)
 	-- inst.AnimState:SetMultColour(1, 1, 1, 1)
 	-- inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
     -- inst.AnimState:SetLayer(LAYER_WORLD_BACKGROUND)

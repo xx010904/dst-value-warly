@@ -105,10 +105,9 @@ local function fn()
 
 	MakeInventoryPhysics(inst)
 
-	inst:AddTag("toughworker")
-	inst:AddTag("explosive")
 	inst:AddTag("projectile")
 	inst:AddTag("complexprojectile")
+	inst:AddTag("NOCLICK")
 
 	inst.AnimState:SetBank("portable_cook_pot")
 	inst.AnimState:SetBuild("portable_cook_pot")
