@@ -7,10 +7,62 @@ local function OnBlocked(owner)
     owner.SoundEmitter:PlaySound("dontstarve/wilson/hit_metal")
 end
 
+-- 生成替罪羊电羊
+local function SpawnScapegoat(owner, attacker)
+    if not owner or not owner:IsValid() then return nil end
+    local x, y, z = owner.Transform:GetWorldPosition()
+
+    -- 随机安全偏移位置
+    local offset = FindWalkableOffset(Vector3(x, y, z), math.random() * 2 * PI, 3 + math.random() * 2, 8, true, true)
+    local goatpos = offset and Vector3(x + offset.x, y, z + offset.z) or Vector3(x, y, z)
+
+    local goat = SpawnPrefab("lightninggoat")
+    if goat then
+        -- 移除 herd 组件
+        if goat.components.herdmember then
+            goat:RemoveComponent("herdmember")
+        end
+        goat:RemoveTag("herdmember")
+        -- 添加替罪羊标签
+        goat:AddTag("scapegoat")
+        goat.Transform:SetPosition(goatpos.x, goatpos.y, goatpos.z)
+
+        if attacker then
+            goat.components.combat:SuggestTarget(attacker)
+        end
+
+        -- 替罪羊带电
+        if goat.sg then
+            goat.sg:GoToState("shocked")
+        end
+        if goat.setcharged then
+            goat:setcharged()
+        end
+
+        -- 随机生命比例
+        -- if goat.components.health then
+        --     goat.components.health:SetPercent(math.random())
+        -- end
+
+        return goat
+    end
+    return nil
+end
+
 -- 护甲自身承伤扣精神饥饿
 local function OnTakeDamage(inst, damage_amount)
     local owner = inst.components.inventoryitem.owner
     if not owner then return end
+
+    -- 自身受伤低概率触发替罪羊
+    local activeGoat = true -- 技能树控制
+    if activeGoat and (math.random() < GOAT_CHANCE) then
+        local goat = SpawnScapegoat(owner)
+        if goat and goat.components.health then
+            goat.components.health:DoDelta(-damage_amount)
+            return
+        end
+    end
 
     -- 计算需要扣除的饥饿和精神
     local hunger_needed = damage_amount * HUNGER_RATIO
@@ -52,71 +104,32 @@ local function OnTakeDamage(inst, damage_amount)
     end
 end
 
+-- 绑定队友 redirectdamagefn
 local function ApplyDamageRedirect(inst, teammate)
     if not teammate._backarmor_redirect then
         local owner = inst.components.inventoryitem ~= nil and inst.components.inventoryitem:GetGrandOwner() or nil
         if not owner or not owner:IsValid() then return end
 
         teammate._backarmor_redirect = function(_, attacker, damage, weapon, stimuli, spdamage)
-            if owner == nil or not owner:IsValid() or owner.components.health == nil or owner.components.health:IsDead() then
-                return nil -- 背锅侠无效就不甩锅
+            if not owner:IsValid() or not owner.components.health or owner.components.health:IsDead() then
+                return nil
             end
             if attacker.prefab == "lightninggoat" then
                 return owner -- 电羊伤害不甩锅
             end
 
-            -- 判断是否触发闪避替罪羊逻辑
-            local activeGoat = true -- 技能树控制是否开启
+            local activeGoat = true -- 技能树控制
             if activeGoat and (math.random() < (GOAT_CHANCE + (damage or 0) / 1000)) then
-                local x, y, z = owner.Transform:GetWorldPosition()
-
-                -- 随机安全偏移位置
-                local offset = FindWalkableOffset(Vector3(x, y, z), math.random() * 2 * PI, 3 + math.random() * 2, 8, true, true)
-                if offset then
-                    local newpos = Vector3(x + offset.x, y, z + offset.z)
-                    owner.Transform:SetPosition(newpos.x, newpos.y, newpos.z)
-                    -- print(string.format("[BackArmor] 玩家闪避到新位置 (%.2f, %.2f, %.2f)", newpos.x, newpos.y, newpos.z))
-                else
-                    print("[BackArmor] 未找到安全位置，玩家未移动")
-                end
-
-                -- 在原位置生成电羊替罪羊
-                local goat = SpawnPrefab("lightninggoat")
+                local goat = SpawnScapegoat(owner, attacker)
                 if goat then
-                    -- 移除 herd 组件
-                    if goat.components.herdmember then
-                        goat:RemoveComponent("herdmember")
-                    end
-                    goat:RemoveTag("herdmember")
-                    -- 添加替罪羊标签
-                    goat:AddTag("scapegoat")
-                    goat.Transform:SetPosition(x, y, z)
-                    goat.components.combat:SuggestTarget(attacker)
-                    -- 替罪羊带电(技能树控制)
-                    local gotShocked = true
-                    if gotShocked then
-                        goat.sg:GoToState("shocked")
-                        if goat.setcharged then
-                            goat:setcharged()
-                        end
-                    end
-                    if goat.components.health then
-                        goat.components.health:SetPercent(math.random()) -- 随机生命比例 0~1
-                    end
-                    -- print(string.format("[BackArmor] ⚡ 替罪羊电羊生成成功！位置(%.2f, %.2f, %.2f) 目标=%s (GUID=%d)", x, y, z, attacker.prefab or "nil", attacker.GUID or 0))
-                    return goat -- 电羊承伤
-                else
-                    print("[BackArmor] 替罪羊生成失败！")
+                    return goat
                 end
             end
-
-            -- 未触发闪避或生成失败，玩家自己承伤
             return owner
         end
 
         if teammate.components.combat then
             teammate.components.combat.redirectdamagefn = teammate._backarmor_redirect
-            print(string.format("[BackArmor] 已为 %s 绑定 redirectdamagefn", teammate.prefab or "unknown"))
         end
     end
 end

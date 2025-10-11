@@ -23,6 +23,8 @@ PrefabFiles = {
 	"shadow_battleaxe_young",
 	"improv_cookpot_fx",
 	"improv_cookpot_projectile_fx",
+	"packaged_cookedmeal",
+	"prepack_foodbag",
     -- 其他 prefab 名称...
 }
 

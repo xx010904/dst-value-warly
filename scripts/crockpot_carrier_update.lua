@@ -1,8 +1,9 @@
+-- 炊具改装
 -- 背锅侠 Crockpot Carrier
 -- 1 制作黑锅：100%承受伤害，648耐久，额外受到15%精神损失15%饥饿损失，
 -- 2 100%附近队友伤害转移
--- 3.1 概率产生替罪羊 3.2 替罪羊带电 3.3 对替罪羊致命一击
--- 4.1 6个方向甩锅 4.2 摔不坏的锅 4.3 二段跳炸锅（摔坏了就没有二段炸了啊）
+-- 3.1 概率产生替罪羊 3.2 屠杀额外掉落
+-- 4.1 6个方向甩锅 4.2 二段跳炸锅（摔坏了就没有二段炸了啊）
 
 
 --========================================================
@@ -32,7 +33,6 @@ AddRecipeToFilter("armor_crockpot", "CHARACTER")
 AddPrefabPostInit("lightninggoat", function(goat)
     if not TheWorld.ismastersim then return end
 
-    -- 延迟执行确保标签已经加上
     goat:DoTaskInTime(0, function()
         if goat:HasTag("scapegoat") then
             -- 移除 herd 组件和 herd 标签
@@ -40,30 +40,28 @@ AddPrefabPostInit("lightninggoat", function(goat)
                 goat:RemoveComponent("herdmember")
             end
             goat:RemoveTag("herdmember")
-            -- print("[Scapegoat] 已移除 herd 组件和标签")
 
-            -- 玩家攻击加倍伤害
+            -- 玩家攻击加倍伤害 + 死亡额外掉落羊角
             goat:ListenForEvent("attacked", function(goat, data)
-                if true then -- 技能树控制4倍伤害
-                    if data and data.attacker and data.attacker:HasTag("player") then
-                        if goat.components.health and not goat.components.health:IsDead() then
-                            local dmg = data.damage or 0
-                            goat.components.health:DoDelta(-dmg * 3) -- 额外扣除3倍
+                if data and data.attacker and data.attacker:HasTag("player") then
+                    if goat.components.health and not goat.components.health:IsDead() then
+                        local dmg = data.damage or 0
+                        goat.components.health:DoDelta(-dmg * 3) -- 额外扣除3倍
+
+                        -- 检查是否被击杀
+                        if goat.components.health:IsDead() and math.random() > 0.5 then
+                            -- 生成羊角
+                            local horn = SpawnPrefab("lightninggoathorn")
+                            if horn then
+                                Launch(horn, goat)
+                            end
                         end
-                        -- print(string.format("[Scapegoat] 玩家攻击替罪羊，伤害加倍 %.2f", dmg*2))
                     end
                 end
             end)
 
-            -- 1.2天后快速死亡
-            local seconds = 16 * 60 * 1.2
-            goat._scapegoat_killtime = GetTime() + seconds
-            goat._scapegoat_task = goat:DoTaskInTime(seconds, function()
-                if goat.components.health and not goat.components.health:IsDead() then
-                    goat.components.health:Kill()
-                    -- print("[Scapegoat] 替罪羊时间到，自动死亡")
-                end
-            end)
+            -- 替罪羊每秒掉血
+            goat.components.health:StartRegen(-2, 2)
         end
     end)
 
@@ -73,9 +71,6 @@ AddPrefabPostInit("lightninggoat", function(goat)
         if old_OnSave then old_OnSave(goat, data) end
         if goat:HasTag("scapegoat") then
             data.is_scapegoat = true
-            if goat._scapegoat_killtime then
-                data.scapegoat_killtime = goat._scapegoat_killtime - GetTime()
-            end
         end
     end
 
@@ -89,17 +84,6 @@ AddPrefabPostInit("lightninggoat", function(goat)
                 goat:RemoveComponent("herdmember")
             end
             goat:RemoveTag("herdmember")
-
-            if data.scapegoat_killtime then
-                local seconds = data.scapegoat_killtime
-                goat._scapegoat_killtime = GetTime() + seconds
-                goat._scapegoat_task = goat:DoTaskInTime(seconds, function()
-                    if goat.components.health and not goat.components.health:IsDead() then
-                        goat.components.health:Kill()
-                        -- print("[Scapegoat] 替罪羊时间到，自动死亡")
-                    end
-                end)
-            end
         end
     end
 end)

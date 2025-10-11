@@ -26,7 +26,7 @@ local function UpdateSpeed(inst)
         count = math.min(count, 25)
 
         -- 平方根非线性加速
-        local mult = 1 + 0.2 * math.sqrt(count)
+        local mult = 1 + 0.25 * math.sqrt(count)
 
         inst.components.locomotor:SetExternalSpeedMultiplier(inst, "warly_seafood_buff", mult)
 

@@ -68,6 +68,16 @@ local function GetUnmemorizedFoods(doer)
     return valid
 end
 
+local function GetFoods()
+    local allfoods = GetAllCookableFoods()
+    local result = {}
+
+    for prefab in pairs(allfoods) do
+        table.insert(result, prefab)
+    end
+    return result
+end
+
 local function SetProductSymbol(inst, product, overridebuild)
     local recipe = cooking.GetRecipe("portablecookpot", product)
     local potlevel = recipe ~= nil and recipe.potlevel or nil
@@ -145,8 +155,10 @@ local function fn()
                 --------------------------------------------------
                 -- 🍲 煮好 → hit_full 显示食物
                 --------------------------------------------------
-                local unmemorized = GetUnmemorizedFoods(inst.doer)
-                local product = unmemorized[math.random(#unmemorized)]
+                -- local unmemorized = GetUnmemorizedFoods(inst.doer)
+                -- local product = unmemorized[math.random(#unmemorized)]
+                local allFoods = GetFoods()
+                local product = allFoods[math.random(#allFoods)]
                 local diaplay_product = GetBaseFood(product)
 
                 inst.AnimState:PlayAnimation("hit_full", true)
@@ -155,11 +167,11 @@ local function fn()
                 --------------------------------------------------
                 -- ⏳ 展示1秒后 → 弹出食物 & 播放 hit_empty
                 --------------------------------------------------
-                inst:DoTaskInTime(1, function()
+                inst:DoTaskInTime(0.7, function()
                     inst.AnimState:PlayAnimation("hit_empty", false)
 
                     -- 🎁 扔出食物实体
-                    local loot = SpawnPrefab(math.random() > 0.9 and product or diaplay_product) -- 大概率是未调味的原料理
+                    local loot = SpawnPrefab(math.random() > 0.9 and product or diaplay_product) -- 技能树控制：调味的料理
                     if loot then
                         local x, y, z = inst.Transform:GetWorldPosition()
                         loot.Transform:SetPosition(x, y + 1, z)

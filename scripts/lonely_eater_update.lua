@@ -1,11 +1,13 @@
--- 吃独食 Eat Alone
+-- 美食鉴赏
+-- 孤独的美食家可以尝出来食物中的深层底蕴，对每道菜都有自己独到的深层次的见解，也能将其分享给伙伴
+-- Section 1：吃独食 Eat Alone 
 -- 1 骨头汤：获得5分钟概率骨甲效果
 -- 2 鲜果可丽饼：获得5分钟锁定85%san
 -- 3 海鲜杂烩：获得5分钟敌人越多移速越快
 -- 4 蓬松土豆蛋奶酥：获得5分钟攻击力加成（200以上两倍，50-200线性变化，50以下1倍）
--- 5 怪物鞑靼：同时额外雇佣5个猪人，满时间2.5天
--- 6.1 分享玩家 6.2 分享？
--- 7.1 独食效果？ 7.2 独食效果？
+-- Section 2：分享食物 Share Food 
+-- 5.1 怪物鞑靼：同时额外雇佣5个猪人，满时间2.5天
+-- 5.2 分享buff
 
 --========================================================
 -- Warly 专属食物 Buff 系统，4个原版无buff的食物
@@ -34,78 +36,53 @@ local FOOD_BUFF_MAP = {
     },
 }
 
---========================================================
--- 技能检测函数
---========================================================
-local function HasWarlySkill(inst, skillname)
-    -- if inst.components.skilltreeupdater then
-    --     return inst.components.skilltreeupdater:IsActivated(skillname)
-    -- end
-    -- return false
-    return true
-end
 
 --========================================================
--- 吃食物时触发
+-- 吃食物时触发新的4个buff
 --========================================================
-local function OnEat(inst, food)
-    if inst.prefab ~= "warly" or not (food and food.prefab) then
-        return
-    end
-
-    local buffdata
-    for name, data in pairs(FOOD_BUFF_MAP) do
-        if string.find(food.prefab, name) then
-            buffdata = data
-            break
-        end
-    end
-
-    if not buffdata then
-        return
-    end
-
-    local required_skill = buffdata.required_skill
-    if required_skill and not HasWarlySkill(inst, required_skill) then
-        print("[Warly Buff] Missing skill:", required_skill, "- Buff not applied.")
-        return
-    end
-
-    local buffname = buffdata.buffname
-
-    if not inst:HasDebuff(buffname) then
-        inst:AddDebuff(buffname, buffname)
-        -- print("[Warly Buff] Added:", buffname)
-    else
-        inst:RemoveDebuff(buffname)
-        inst:AddDebuff(buffname, buffname)
-        -- print("[Warly Buff] Refreshed:", buffname)
-    end
-end
-
--- 记得在初始化时绑定
--- inst:ListenForEvent("oneat", OnEat)
-
-
---========================================================
--- 添加监听
---========================================================
-local function AddListener(inst)
+AddPlayerPostInit(function(inst)
     if inst.prefab ~= "warly" then
         return
     end
 
-    if not inst._warly_food_listener then
-        inst._warly_food_listener = function(inst, data)
-            OnEat(inst, data.food)
+    inst:ListenForEvent("oneat", function(inst, data)
+        local food = data.food
+        if inst.prefab ~= "warly" or not (food and food.prefab) then
+            return
         end
-        inst:ListenForEvent("oneat", inst._warly_food_listener)
-        -- print("[Warly Buff] 食物监听已启用")
-    end
-end
 
-AddPlayerPostInit(AddListener)
+        local buffdata
+        for name, data2 in pairs(FOOD_BUFF_MAP) do
+            if string.find(food.prefab, name) then
+                buffdata = data2
+                break
+            end
+        end
 
+        if not buffdata then
+            return
+        end
+
+        local required_skill = buffdata.required_skill
+        if required_skill 
+            -- and inst.components.skilltreeupdater and inst.components.skilltreeupdater:IsActivated(required_skill) 
+        then
+            print("[Warly Buff] Missing skill:", required_skill, "- Buff not applied.")
+            return
+        end
+
+        local buffname = buffdata.buffname
+
+        if not inst:HasDebuff(buffname) then
+            inst:AddDebuff(buffname, buffname)
+            -- print("[Warly Buff] Added:", buffname)
+        else
+            inst:RemoveDebuff(buffname)
+            inst:AddDebuff(buffname, buffname)
+            -- print("[Warly Buff] Refreshed:", buffname)
+        end
+    end)
+end)
 
 
 --========================================================
@@ -113,7 +90,7 @@ AddPlayerPostInit(AddListener)
 --========================================================
 local function HireNearbyPigmen(inst, giver)
     local x, y, z = inst.Transform:GetWorldPosition()
-    -- 搜索25格范围内的猪人（排除守卫和狼人）
+    -- 搜索25格范围内的猪人（排除守卫和疯猪）
     local ents = TheSim:FindEntities(x, y, z, 25, { "pig" }, { "guard", "werepig" })
 
     -- 先排序：按忠诚度从低到高排列（没有follower组件的排在最前）
@@ -215,6 +192,7 @@ local function ShareFoodEffects(eater, food)
                         -- local food_name = food:GetDisplayName() or food.prefab
                         -- local text = string.format("I received a buff from %s!", food_name)
                         -- ally.components.talker:Say(text)
+                        SpawnPrefab("boss_ripple_fx").Transform:SetPosition(ally.Transform:GetWorldPosition())
                     else
                         dummy:Remove()
                         -- print("[Warly Buff] Failed to share food effect to", ally:GetDisplayName() or ally.prefab)
@@ -239,5 +217,3 @@ AddComponentPostInit("eater", function(self)
         return result
     end
 end)
-
-

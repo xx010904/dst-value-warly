@@ -42,17 +42,6 @@ USESHADOWHOOK.fn = function(act)
     local start_pos = doer and doer:GetPosition()
     local inst = act.invobject -- 玩家使用的物品
 
-    -- 耐久检查并消耗
-    if inst and inst.components.finiteuses then
-        if inst.components.finiteuses:GetUses() < 16 then
-            if inst._classified then
-                local list2 = STRINGS.SHADOW_BATTLEAXE_TALK["hook_use_up"]
-                inst._classified:Say(list2, math.random(#list2), "rifts4/nightmare_axe/lvl" .. inst.level .. "_talk_LP")
-            end
-        end
-        inst.components.finiteuses:Use(8) -- 消耗耐久
-    end
-
     -- 安全检查
     if not start_pos then
         print("[ShadowHook] Error: start_pos is invalid or nil!")
@@ -68,6 +57,11 @@ USESHADOWHOOK.fn = function(act)
     end
 
     doer:AddTag("is_using_shadow_hook")
+
+    -- 耐久检查并消耗
+    if inst and inst.components.finiteuses then
+        inst.components.finiteuses:Use(8) -- 消耗耐久
+    end
 
     if doer.prefab == "warly" then
         local shadow_hook_head_fx = SpawnPrefab("shadow_hook_head_fx")

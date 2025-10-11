@@ -9,35 +9,32 @@ STRINGS.CHARACTERS.GENERIC.DESCRIBE.ARMOR_CROCKPOT = "A pot for taking all the b
 STRINGS.CHARACTERS.WARLY.DESCRIBE.SHADOW_BATTLEAXE_YOUNG = "Not fully done, but still quite usable."
 STRINGS.CHARACTERS.GENERIC.DESCRIBE.SHADOW_BATTLEAXE_YOUNG = "The chef's youthful version of the Shadow Maul."
 
-STRINGS.CHARACTERS.GENERIC.ANNOUNCE_EATS_SMALL_RECOVERY =
+STRINGS.CHARACTERS.GENERIC.ANNOUNCE_BAD_EAT_COMMOM =
 {
-    "I suggest you don't eat this, I can make something much more delicious.",
-    "You better keep it and don't eat it."
+    "I've got to say, you must be really hungry to eat that!",
+    "That's... surprisingly invigorating.",
+    "Just watching that meal makes me feel full already.",
+    "Don't eat that, it's useful for something else.",
+    "Are you that desperate for food?",
 }
-STRINGS.CHARACTERS.GENERIC.ANNOUNCE_EATS_LARGE_RECOVERY =
+STRINGS.CHARACTERS.GENERIC.ANNOUNCE_BAD_EAT_BY_PLAYER =
 {
-    "I have to say, you're really hungry to eat this!",
-    "This really lifts your spirits.",
-    "Watching this meal prep, I'm full just from looking at it."
+    "I'd advise against eating that — I can cook something tastier.",
+    "You'd better save that and not eat it.",
+    "Don't eat that, let me cook for you instead.",
 }
-STRINGS.CHARACTERS.GENERIC.ANNOUNCE_EATS_NORMAL_RECOVERY =
-{
-    "Don't eat this, it has a better use.",
-    "Are you really that hungry?",
-    "Don't eat this, how about I cook it for you?"
-}
-STRINGS.CHARACTERS.GENERIC.ANNOUNCE_EATS_BY_ANIMAL =
+STRINGS.CHARACTERS.GENERIC.ANNOUNCE_BAD_EAT_BY_ANIMAL =
 {
     "Get away! Don't eat that!",
     "Get away! This is really raising my blood pressure.",
     "Get away! I'm so full from just watching this!"
 }
-STRINGS.CHARACTERS.GENERIC.ANNOUNCE_COOKS_FOOD =
+STRINGS.CHARACTERS.GENERIC.ANNOUNCE_BAD_COOKS_FOOD =
 {
     "Don't roast this! I'm a master chef, I can cook anything you want!",
     "Why not keep it for something else, why roast it!"
 }
-STRINGS.CHARACTERS.GENERIC.ANNOUNCE_HARVESTS_POT =
+STRINGS.CHARACTERS.GENERIC.ANNOUNCE_BAD_HARVESTS_POT =
 {
     "This is an insult to cooking!",
     "What is this cooking, this really raises my blood pressure!",
@@ -76,13 +73,6 @@ STRINGS.SHADOW_BATTLEAXE_TALK.hook_throwing =
     "Not ready yet!",
     "Let me reel it back!",
     "Reel it in first!"
-}
-STRINGS.SHADOW_BATTLEAXE_TALK.hook_use_up =
-{
-    "Repair it!",
-    "Out of energy!",
-    "Tired!",
-    "Not playing anymore!"
 }
 STRINGS.MEAL_WORTH_ACTIONS = 
 {
