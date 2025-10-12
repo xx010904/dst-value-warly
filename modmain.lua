@@ -2,11 +2,16 @@ GLOBAL.setmetatable(env,{__index=function(t,k) return GLOBAL.rawget(GLOBAL,k) en
 
 Assets = {
     Asset("ANIM", "anim/armor_crockpot.zip"),
+    Asset("ANIM", "anim/warly_sky_pie.zip"),
 	-- Asset("ANIM", "anim/ui_beard_3x1.zip"),
     Asset("IMAGE", "images/inventoryimages/armor_crockpot.tex"),
 	Asset("ATLAS", "images/inventoryimages/armor_crockpot.xml"),
     Asset("IMAGE", "images/inventoryimages/shadow_battleaxe_young.tex"),
 	Asset("ATLAS", "images/inventoryimages/shadow_battleaxe_young.xml"),
+    Asset("IMAGE", "images/inventoryimages/warly_sky_pie.tex"),
+	Asset("ATLAS", "images/inventoryimages/warly_sky_pie.xml"),
+    Asset("IMAGE", "images/inventoryimages/portablecookpot_item_actived.tex"),
+	Asset("ATLAS", "images/inventoryimages/portablecookpot_item_actived.xml"),
 }
 
 PrefabFiles = {
@@ -25,12 +30,16 @@ PrefabFiles = {
 	"improv_cookpot_projectile_fx",
 	"packaged_cookedmeal",
 	"prepack_foodbag",
+	"warly_sky_pie",
+	"warly_sky_pie_buff",
+	"warly_sky_pie_inspire_buff",
     -- 其他 prefab 名称...
 }
 
-RegisterInventoryItemAtlas("images/inventoryimages/shadow_beardhair.xml", "shadow_beardhair.tex")
-RegisterInventoryItemAtlas("images/inventoryimages/shadow_beardhair_open.xml", "shadow_beardhair_open.tex")
-RegisterInventoryItemAtlas("images/inventoryimages/lunar_torch.xml", "lunar_torch.tex")
+RegisterInventoryItemAtlas("images/inventoryimages/armor_crockpot.xml", "armor_crockpot.tex")
+RegisterInventoryItemAtlas("images/inventoryimages/shadow_battleaxe_young.xml", "shadow_battleaxe_young.tex")
+RegisterInventoryItemAtlas("images/inventoryimages/warly_sky_pie.xml", "warly_sky_pie.tex")
+RegisterInventoryItemAtlas("images/inventoryimages/portablecookpot_item_actived.xml", "portablecookpot_item_actived.tex")
 
 
 --Make Global

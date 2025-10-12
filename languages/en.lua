@@ -1,8 +1,10 @@
 STRINGS.NAMES.ARMOR_CROCKPOT = "Burdened Pot"
 STRINGS.NAMES.SHADOW_BATTLEAXE_YOUNG = "Half-Baked Shadow Mace"
+STRINGS.NAMES.WARLY_SKY_PIE = "Pie In The Sky"
 
 STRINGS.RECIPE_DESC.ARMOR_CROCKPOT = "Blacken your pot, so you can take the blame."
 STRINGS.RECIPE_DESC.SHADOW_BATTLEAXE_YOUNG = "It will never wake up again."
+STRINGS.RECIPE_DESC.WARLY_SKY_PIE = "Dream pies can actually fill your stomach."
 
 STRINGS.CHARACTERS.WARLY.DESCRIBE.ARMOR_CROCKPOT = "Your pot's all black now —— guess who's taking the blame?"
 STRINGS.CHARACTERS.GENERIC.DESCRIBE.ARMOR_CROCKPOT = "A pot for taking all the blame."
@@ -89,5 +91,22 @@ STRINGS.MEAL_WORTH_ACTIONS =
     "Genuine spiritual cuisine!",
 }
 
+STRINGS.CHARACTERS.GENERIC.ANNOUNCE_EAT_PIE_REPEATLY =
+{
+    "My stomach protests…",
+    "Even my appetite fears this",
+    "No more pie, please"
+}
+STRINGS.CHARACTERS.WARLY.TALK_HUNGRY_FRIEND =
+{
+    "Who needs a motivational pie?",
+    "Everyone’s hungry… for now.",
+    "Who wouldn’t want a pie right now?",
+    "Someone’s hungry—time to paint a pie!",
+    "Looks like it’s pie-o’clock!",
+    "An empty stomach brings inspiration!",
+}
+
 STRINGS.ACTIONS.USESHADOWHOOK = "Shadow Hook"
-STRINGS.ACTIONS.GIVEFOODTOBATTLEAXE = "Feed"
+STRINGS.ACTIONS.GIVEFOODTOBATTLEAXE = "Breed"
+STRINGS.ACTIONS.ACTIVATE_POT_PIE = "Inspire Pie"

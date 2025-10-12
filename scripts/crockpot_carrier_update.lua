@@ -19,7 +19,7 @@ AddRecipe2("armor_crockpot",
         product = "armor_crockpot", -- 唯一id
         atlas = "images/inventoryimages/armor_crockpot.xml",
         image = "armor_crockpot.tex",
-        builder_tag = "expertchef",
+        builder_tag = "masterchef",
         builder_skill= nil, -- 可选：指定技能树才能做（技能树指定标签）
         description = "armor_crockpot", -- 描述的id，而非本身
         numtogive = 1,
@@ -47,21 +47,33 @@ AddPrefabPostInit("lightninggoat", function(goat)
                     if goat.components.health and not goat.components.health:IsDead() then
                         local dmg = data.damage or 0
                         goat.components.health:DoDelta(-dmg * 3) -- 额外扣除3倍
+                    end
+                end
+            end)
 
-                        -- 检查是否被击杀
-                        if goat.components.health:IsDead() and math.random() > 0.5 then
-                            -- 生成羊角
-                            local horn = SpawnPrefab("lightninggoathorn")
-                            if horn then
-                                Launch(horn, goat)
-                            end
+            -- 替罪羊被击杀后可能掉落羊角
+            goat:ListenForEvent("death", function(goat, data)
+                if math.random() > 0.5 then --技能树控制
+                    return
+                end
+                -- 查找附近玩家
+                local x, y, z = goat.Transform:GetWorldPosition()
+                local players = TheSim:FindEntities(x, y, z, 10, {"player"})
+                for _, player in ipairs(players) do
+                    -- 检查是否为沃利并且有技能树
+                    if player.prefab == "warly" then
+                        -- 掉落一个羊角
+                        local horn = SpawnPrefab("lightninggoathorn")
+                        if horn then
+                            horn.Transform:SetPosition(x, y, z)
                         end
+                        break
                     end
                 end
             end)
 
             -- 替罪羊每秒掉血
-            goat.components.health:StartRegen(-2, 2)
+            goat.components.health:StartRegen(-3, 1)
         end
     end)
 

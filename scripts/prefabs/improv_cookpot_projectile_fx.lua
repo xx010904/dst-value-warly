@@ -31,6 +31,7 @@ local function OnHit(inst, attacker, target)
     -- ✨ 落地生成烹饪锅特效
     local cookfx = SpawnPrefab("improv_cookpot_fx")
     cookfx.Transform:SetPosition(x, y, z)
+	cookfx.doer = inst.doer
 
     local scorch = SpawnPrefab("fused_shadeling_bomb_scorch")
 	scorch.Transform:SetPosition(x, y, z)
@@ -87,6 +88,8 @@ local function fn()
     inst.components.complexprojectile:SetLaunchOffset(Vector3(0.25, 2.5, 0))
     inst.components.complexprojectile:SetOnLaunch(OnThrown)
     inst.components.complexprojectile:SetOnHit(OnHit)
+
+	inst.doer = nil
 
     inst.persists = false
 

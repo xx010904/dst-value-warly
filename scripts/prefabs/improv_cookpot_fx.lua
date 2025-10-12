@@ -15,9 +15,25 @@ for k in pairs(foods) do
     table.insert(food_list, k)
 end
 
--- 获取基础食物名（去掉调味前缀）
+-- 获取基础食物名（去掉调味前缀/后缀），更稳健地处理 spicedfoods[prefab] 存在但 .basename 为空的情况
 local function GetBaseFood(prefab)
-    return spicedfoods[prefab] ~= nil and spicedfoods[prefab].basename or prefab
+    if not prefab then return prefab end
+
+    -- 优先使用 spicedfoods 表里的 basename
+    local info = spicedfoods[prefab]
+    if info and info.basename and type(info.basename) == "string" and info.basename ~= "" then
+        return info.basename
+    end
+
+    -- 尝试匹配 "_spice_" 及其后所有内容为调味后缀
+    -- 例：koalefig_trunk_spice_jelly -> koalefig_trunk
+    --     frogfishbowl_spice_mandrake_jam -> frogfishbowl
+    local base = prefab:gsub("_spice_.+$", "")
+    if base ~= prefab then
+        return base
+    end
+
+    return prefab
 end
 
 -- 🥔 获取所有食谱产物（包含MOD食谱）
@@ -40,42 +56,33 @@ local function GetUnmemorizedFoods(doer)
     local allfoods = GetAllCookableFoods()
     local valid = {}
 
-    -- ⚠️ 如果 doer 为空或没有 foodmemory 组件，直接返回全部食物
-    if doer == nil or not (doer.components and doer.components.foodmemory) then
+    local skillTreeActive = true -- 技能树控制
+    if skillTreeActive and doer and doer.components.foodmemory then
+        local memory = doer.components.foodmemory
+
+        -- 限制最多排除 10 种食物
+        local excluded = 0
+        for prefab in pairs(allfoods) do
+            local base = GetBaseFood(prefab)
+            -- print("随机烹饪的basename：", base, "，原名：", prefab)
+            local count = memory:GetMemoryCount(base) or 0
+
+            if count <= 0 or excluded >= 10 then
+                table.insert(valid, prefab)
+            else
+                -- print("排除食物", base, "，原名：", prefab)
+                excluded = excluded + 1
+            end
+        end
+    else
+        -- print("doer 为空或没有 foodmemory 组件，直接返回全部食物：", doer)
         for prefab in pairs(allfoods) do
             table.insert(valid, prefab)
         end
         return valid
     end
 
-    local memory = doer.components.foodmemory
-
-    for prefab in pairs(allfoods) do
-        local base = spicedfoods[prefab] ~= nil and spicedfoods[prefab].basename or prefab
-        local count = memory:GetMemoryCount(base) or 0
-        if count <= 0 then
-            table.insert(valid, prefab)
-        end
-    end
-
-    -- 防止全吃过，空表时退回全表
-    if #valid == 0 then
-        for prefab in pairs(allfoods) do
-            table.insert(valid, prefab)
-        end
-    end
-
     return valid
-end
-
-local function GetFoods()
-    local allfoods = GetAllCookableFoods()
-    local result = {}
-
-    for prefab in pairs(allfoods) do
-        table.insert(result, prefab)
-    end
-    return result
 end
 
 local function SetProductSymbol(inst, product, overridebuild)
@@ -155,10 +162,8 @@ local function fn()
                 --------------------------------------------------
                 -- 🍲 煮好 → hit_full 显示食物
                 --------------------------------------------------
-                -- local unmemorized = GetUnmemorizedFoods(inst.doer)
-                -- local product = unmemorized[math.random(#unmemorized)]
-                local allFoods = GetFoods()
-                local product = allFoods[math.random(#allFoods)]
+                local unmemorized = GetUnmemorizedFoods(inst.doer)
+                local product = unmemorized[math.random(#unmemorized)]
                 local diaplay_product = GetBaseFood(product)
 
                 inst.AnimState:PlayAnimation("hit_full", true)
@@ -171,7 +176,8 @@ local function fn()
                     inst.AnimState:PlayAnimation("hit_empty", false)
 
                     -- 🎁 扔出食物实体
-                    local loot = SpawnPrefab(math.random() > 0.9 and product or diaplay_product) -- 技能树控制：调味的料理
+                    -- local loot = SpawnPrefab(math.random() < 0.1 and product or diaplay_product) -- 技能树控制：调味的料理
+                    local loot = SpawnPrefab(product) -- 技能树控制：调味的料理
                     if loot then
                         local x, y, z = inst.Transform:GetWorldPosition()
                         loot.Transform:SetPosition(x, y + 1, z)

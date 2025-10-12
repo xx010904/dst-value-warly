@@ -1,10 +1,10 @@
-local SadowHookTool = Class(function(self, inst)
+local ShadowHookTool = Class(function(self, inst)
 	self.inst = inst
 	inst:AddTag("shadowhooktool")
 end)
 
-function SadowHookTool:OnRemoveFromEntity()
+function ShadowHookTool:OnRemoveFromEntity()
     self.inst:RemoveTag("shadowhooktool")
 end
 
-return SadowHookTool
+return ShadowHookTool

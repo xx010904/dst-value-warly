@@ -3,7 +3,7 @@
 -- Section 1：下饭操作 Meal-worthy Play
 -- 1 “沃利看到别人做出垃圾料理时，被激发厨师灵魂，做出下饭菜”，展示厨艺，当场跟陪一份下饭菜：就地自动烹饪一份随机下饭菜
 --   胡乱烹饪：潮湿黏糊，粉末蛋糕，怪物千层饼，怪物鞑靼，曼德拉草汤
---   胡乱烤：曼德拉草 夜莓 高脚鸟蛋 孵化中的高脚鸟蛋 龙虾 红蘑菇 月亮蘑菇 象鼻、冬象鼻
+--   胡乱烤：曼德拉草 夜莓 高脚鸟蛋 孵化中的高脚鸟蛋 红蘑菇 月亮蘑菇 象鼻、冬象鼻 龙虾 4种季节鱼 鼹鼠
 --   胡乱吃（通用）：独眼巨鹿眼球 守护者之角 蜂王浆 曼德拉草 高脚鸟蛋 孵化中的高脚鸟蛋 格罗姆的黏液 海带补丁 象鼻、冬象鼻
 --   胡乱吃（玩家）：泻根糖浆
 --   胡乱吃（动物）：伏特羊肉冻 彩虹糖豆 鲜果可丽饼 龙虾正餐 华夫饼 黄油 夜莓
@@ -11,12 +11,11 @@
 -- 3 直接回饥饿精神和血量（避免食物记忆）+ 3.1 排除记忆的料理
 -- 4 队友死了烹饪四菜一汤 （开席） + 4.1 复活队友
 
--- Section 2 半成品预制菜
--- 1 料理包准备，把4个食材打包起来，就像烹饪锅一样，打包食材就是一个东西，不堆叠
---    打包好的料理包，可以直接放在火堆上面加热（控制火候的人不会失败），烧烤一次掉1/40耐久，生成1个料理
--- 2 料理包可以包含调味料
--- 3 流水线生产可以让打包可以额外产出一些，总使用次数大于40
--- 4 快速送达，会飞的猪
+-- Section 2 画大饼
+-- 1 锅检测到附近有三维不满的队友，右键点击锅直接补，然后慢慢消耗
+-- 2 沃利可以对自己画饼，真的做一个大饼，大饼吃了也全部回满，同锅补效果，大饼还可以烤
+-- 3 画饼buff期间，可以吃食物来抵消buff，
+-- 4 现烤大饼释放香味（调味料）
 
 
 -- =========================================================
@@ -123,6 +122,7 @@ local function SpawnCookPotFX(doer)
     fx.Follower:FollowSymbol(doer.GUID, "hair", 0, 0, 0)
 
     local proj = SpawnPrefab("improv_cookpot_projectile_fx")
+    proj.doer = doer
     proj.Transform:SetPosition(x, y, z)
     proj.components.complexprojectile:Launch(Vector3(spawn_x, spawn_y, spawn_z), doer)
 end
@@ -270,126 +270,327 @@ end)
 
 
 -- =========================================================
--- SECTION2 打包预制菜
+-- SECTION2 可以右键点击动作“画饼”的锅
 -- =========================================================
-local containers = require("containers")
-local params = containers.params
-local cooking = require("cooking")
--- =========================================================
--- 🍱 四格打包袋 prepack_foodbag_4
--- =========================================================
-params.prepack_foodbag_4 = {
-    widget =
-    {
-        slotpos =
-        {
-            Vector3(0, 64 + 32 + 8 + 4, 0),
-            Vector3(0, 32 + 4, 0),
-            Vector3(0, -(32 + 4), 0),
-            Vector3(0, -(64 + 32 + 8 + 4), 0),
-        },
-        slotbg =
-        {
-            { image = "cook_slot_food.tex" },
-            { image = "cook_slot_food.tex" },
-            { image = "cook_slot_food.tex" },
-            { image = "cook_slot_food.tex" },
-        },
-        animbank = "ui_cookpot_1x4",
-        animbuild = "ui_cookpot_1x4",
-        pos = Vector3(200, 0, 0),
-        side_align_tip = 100,
-        buttoninfo =
-        {
-            text = STRINGS.ACTIONS.COOK,
-            position = Vector3(0, -165, 0),
-        }
-    },
-    -- acceptsstacks = false,
-    type = "cooker",
-}
+-- 1) Hook portablecookpot_item prefab，本体逻辑：扫描、激活标志、提示
+AddPrefabPostInit("portablecookpot_item", function(inst)
+    if not TheWorld.ismastersim then
+        return
+    end
 
-function params.prepack_foodbag_4.itemtestfn(container, item, slot)
-    return cooking.IsCookingIngredient(item.prefab) and not container.inst:HasTag("burnt")
-end
+    inst:AddComponent("skypieinspiretool")
 
--- 按钮逻辑：打包触发烹饪
-function params.prepack_foodbag_4.widget.buttoninfo.fn(inst, doer)
-    if inst.components.container ~= nil then
-        -- 服务器端执行打包逻辑
-        if inst.components.packagingstation ~= nil then
-            inst.components.packagingstation:StartPackaging(doer)
+    -- 内部函数：启动 / 停止 检测任务
+    local function StartDetection(inst)
+        if inst._detect_task == nil then
+            inst._detect_task = inst:DoPeriodicTask(1, function()
+                local owner = inst.components.inventoryitem and inst.components.inventoryitem.owner
+                if not (owner and owner:IsValid()) then
+                    inst:RemoveTag("active_pot_pie")
+                    inst.pie_target = nil
+                    if inst.components.inventoryitem then
+                        inst.components.inventoryitem.imagename = "portablecookpot_item"
+                        inst.components.inventoryitem.atlasname = "images/inventoryimages2.xml"
+                    end
+                    return
+                end
+
+                -- 以持有者为中心检测附近玩家
+                local x, y, z = owner.Transform:GetWorldPosition()
+                local players = TheSim:FindEntities(x, y, z, 10, { "player" }, { "playerghost" })
+
+                local should_activate = false
+                for _, p in ipairs(players) do
+                    if p and p:IsValid() and not p:HasDebuff("warly_sky_pie_inspire_buff") then
+                        if (p.components.hunger and p.components.hunger:GetPercent() < 0.5)
+                            or (p.components.sanity and p.components.sanity:GetPercent() < 0.5)
+                            or (p.components.health and p.components.health:GetPercent() < 0.5) then
+                            should_activate = true
+                            inst.pie_target = p
+                            break
+                        end
+                    end
+                end
+
+                if should_activate then
+                    if not inst:HasTag("active_pot_pie") then
+                        inst:AddTag("active_pot_pie")
+                        if inst.components.inventoryitem then
+                            inst.components.inventoryitem.imagename = "portablecookpot_item_actived"
+                            inst.components.inventoryitem.atlasname =
+                            "images/inventoryimages/portablecookpot_item_actived.xml"
+                        end
+                        if owner.components.talker then
+                            owner.components.talker:Say(GetString(owner, "ANNOUNCE_NEED_PIE"))
+                        end
+                    end
+                else
+                    if inst:HasTag("active_pot_pie") then
+                        inst:RemoveTag("active_pot_pie")
+                        inst.pie_target = nil
+                        if inst.components.inventoryitem then
+                            inst.components.inventoryitem.imagename = "portablecookpot_item"
+                            inst.components.inventoryitem.atlasname = "images/inventoryimages2.xml"
+                        end
+                    end
+                end
+            end)
         end
-    elseif inst.replica.container ~= nil and not inst.replica.container:IsBusy() then
-        SendRPCToServer(RPC.DoWidgetButtonAction, ACTIONS.COOK.code, inst, ACTIONS.COOK.mod_name)
     end
-end
 
--- 按钮显示条件：容器满时才显示
-function params.prepack_foodbag_4.widget.buttoninfo.validfn(inst)
-    return inst.replica.container ~= nil and inst.replica.container:IsFull()
-end
-
--- =========================================================
--- 🍱 五格打包袋 prepack_foodbag_5（第五格为调味料）
--- =========================================================
-params.prepack_foodbag_5 = {
-    widget =
-    {
-        slotpos =
-        {
-            -- 四格竖排 + 一格调味料偏右放
-            Vector3(0, 64 + 32 + 8 + 4, 0),
-            Vector3(0, 32 + 4, 0),
-            Vector3(0, -(32 + 4), 0),
-            Vector3(0, -(64 + 32 + 8 + 4), 0),
-            Vector3(64, -(64 + 32 + 8 + 4), 0), -- 调味料格
-        },
-        slotbg =
-        {
-            { image = "cook_slot_food.tex" },
-            { image = "cook_slot_food.tex" },
-            { image = "cook_slot_food.tex" },
-            { image = "cook_slot_food.tex" },
-            { image = "cook_slot_spice.tex" },
-        },
-        animbank = "ui_cookpot_1x4",
-        animbuild = "ui_cookpot_1x4",
-        pos = Vector3(200, 0, 0),
-        side_align_tip = 100,
-        buttoninfo =
-        {
-            text = STRINGS.ACTIONS.COOK,
-            position = Vector3(0, -165, 0),
-        },
-    },
-    -- acceptsstacks = false,
-    type = "cooker",
-}
-
-function params.prepack_foodbag_5.itemtestfn(container, item, slot)
-    return item
-        and not container.inst:HasTag("burnt")
-        and (
-            (slot ~= nil and slot < 5 and cooking.IsCookingIngredient(item.prefab))
-            or (slot == 5 and (((item.prefab or ""):find("^spice_") ~= nil) or item:HasTag("spice")))
-            or (slot == nil and (cooking.IsCookingIngredient(item.prefab) or ((item.prefab or ""):find("^spice_") ~= nil) or item:HasTag("spice")))
-        )
-end
-
--- 按钮逻辑：打包触发烹饪
-function params.prepack_foodbag_5.widget.buttoninfo.fn(inst, doer)
-    if inst.components.container ~= nil then
-        BufferedAction(doer, inst, ACTIONS.COOK):Do()
-    elseif inst.replica.container ~= nil and not inst.replica.container:IsBusy() then
-        SendRPCToServer(RPC.DoWidgetButtonAction, nil, inst, nil)
+    local function StopDetection(inst)
+        if inst._detect_task ~= nil then
+            inst._detect_task:Cancel()
+            inst._detect_task = nil
+        end
+        inst:RemoveTag("active_pot_pie")
+        inst.pie_target = nil
+        if inst.components.inventoryitem then
+            inst.components.inventoryitem.imagename = "portablecookpot_item"
+            inst.components.inventoryitem.atlasname = "images/inventoryimages2.xml"
+        end
     end
-end
 
--- 按钮显示条件：容器满时才显示
-function params.prepack_foodbag_5.widget.buttoninfo.validfn(inst)
-    return inst.replica.container ~= nil and inst.replica.container:IsFull()
-end
+    -- 监听物品拾取 / 丢弃
+    inst:ListenForEvent("onputininventory", function(inst, owner)
+        if owner and owner:HasTag("player") then
+            StartDetection(inst)
+        else
+            StopDetection(inst)
+        end
+    end)
 
--- 更新最大格子数量
-containers.MAXITEMSLOTS = math.max(containers.MAXITEMSLOTS, 5)
+    inst:ListenForEvent("ondropped", function(inst)
+        StopDetection(inst)
+    end)
+
+    -- 如果生成时就在玩家身上，直接启动检测
+    inst:DoTaskInTime(0, function()
+        local owner = inst.components.inventoryitem and inst.components.inventoryitem.owner
+        if owner and owner:HasTag("player") then
+            StartDetection(inst)
+        end
+    end)
+end)
+
+-- 2) 定义自定义 Action
+local ACTIVATE_POT_PIE = AddAction("ACTIVATE_POT_PIE", STRINGS.ACTIONS.ACTIVATE_POT_PIE, function(act)
+    if not act or not act.doer then
+        return
+    end
+
+    local inst = act.invobject -- 背包里的物品
+    local doer = act.doer
+
+    if not inst or not inst:IsValid() or not doer or not doer:IsValid() then
+        return
+    end
+
+    -- 检查激活与冷却标志（以防万一）
+    local target = inst.pie_target
+    if not inst:HasTag("active_pot_pie") or target == nil then
+        if doer.components.talker then
+            doer.components.talker:Say("It's a bug.")
+        end
+        return
+    end
+
+    -- 给持有者添加 debuff（buff）
+    if target.prefab == "warly" then
+        local pie = SpawnPrefab("warly_sky_pie")
+        pie.Transform:SetPosition(target.Transform:GetWorldPosition())
+        Launch(pie, target, 1)
+    else
+        if target:HasDebuff("warly_sky_pie_inspire_buff") then
+            return
+        else
+            target:AddDebuff("warly_sky_pie_inspire_buff", "warly_sky_pie_inspire_buff")
+        end
+
+        -- 效果：动画
+        if target.components.inventory:IsHeavyLifting() and not target.components.rider:IsRiding() then
+            target.AnimState:PlayAnimation("heavy_eat")
+        else
+            target.AnimState:PlayAnimation("eat_pre")
+            target.AnimState:PushAnimation("eat", false)
+        end
+    end
+
+    -- 效果：音效/特效/台词
+    if target.SoundEmitter then
+        target.SoundEmitter:PlaySound("dontstarve/common/cookingpot_finish")
+    end
+    local fx = SpawnPrefab("small_puff")
+    fx.Transform:SetPosition(target.Transform:GetWorldPosition())
+
+    if target.components.talker then
+        target.components.talker:Say(GetString(target, "ANNOUNCE_EAT_PIE_REPEATLY"))
+    end
+
+    -- 物品不能使用
+    inst:RemoveTag("active_pot_pie")
+    inst.pie_target = nil
+    inst.components.inventoryitem.imagename = "portablecookpot_item"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages2.xml"
+
+    return true
+end)
+
+ACTIONS.ACTIVATE_POT_PIE.mount_valid = true
+
+-- 3) 在 inventory 中为目标 prefab 动态添加这个 Action（右键菜单）
+-- 当玩家右键背包物品时，客户端会调用这个 hook 去决定是否显示动作
+AddComponentAction("INVENTORY", "skypieinspiretool", function(inst, doer, actions, right)
+    -- inst：物品实体；doer：玩家实体
+    -- 我们只为 portablecookpot_item 添加动作，且需要 inst._is_activated 为 true 且不在冷却
+    if inst and inst.prefab == "portablecookpot_item" and inst:HasTag("active_pot_pie") then
+        if doer:HasTag("masterchef") then -- 技能树控制
+            table.insert(actions, ACTIONS.ACTIVATE_POT_PIE)
+        end
+    end
+end)
+
+-- 4) 给常见的 StateGraph 注册 ActionHandler
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.ACTIVATE_POT_PIE, "spawn_warly_sky_pie"))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.ACTIVATE_POT_PIE, "spawn_warly_sky_pie"))
+
+-- 5) 画饼的sg
+AddStategraphState("wilson",
+    State {
+        name = "spawn_warly_sky_pie",
+        tags = { "doing", "busy", "nocraftinginterrupt", "nomorph", "keep_pocket_rummage" },
+
+        onenter = function(inst)
+            inst.components.locomotor:Stop()
+            inst.AnimState:PlayAnimation("wormwood_cast_spawn_pre")
+            inst.AnimState:PushAnimation("wormwood_cast_spawn", false)
+            inst.sg.statemem.action = inst.bufferedaction
+        end,
+
+        timeline =
+        {
+            FrameEvent(0, function(inst)
+                inst.SoundEmitter:PlaySound("dontstarve/common/fireAddFuel")
+            end),
+            FrameEvent(24, function(inst)
+                inst:PerformBufferedAction()
+            end),
+            FrameEvent(38, function(inst)
+                inst.sg:RemoveStateTag("busy")
+            end),
+            -- FrameEvent(42, TryResumePocketRummage),
+        },
+
+        events =
+        {
+            EventHandler("animqueueover", function(inst)
+                if inst.AnimState:AnimDone() then
+                    inst.sg:GoToState("idle")
+                end
+            end),
+        },
+
+        onexit = function(inst)
+            if inst.bufferedaction == inst.sg.statemem.action and
+                (not inst.components.playercontroller or inst.components.playercontroller.lastheldaction ~= inst.bufferedaction) then
+                inst:ClearBufferedAction()
+            end
+            -- CheckPocketRummageMem(inst)
+        end,
+    }
+)
+
+AddStategraphState("wilson_client",
+    State {
+        name = "spawn_warly_sky_pie",
+        tags = { "doing", "busy" },
+        server_states = { "spawn_warly_sky_pie" },
+
+        onenter = function(inst)
+            inst.components.locomotor:Stop()
+            inst.AnimState:PlayAnimation("wormwood_cast_spawn_pre")
+            inst.AnimState:PlayAnimation("wormwood_cast_spawn_lag", false)
+
+            inst:PerformPreviewBufferedAction()
+            inst.sg:SetTimeout(1)
+        end,
+
+        onupdate = function(inst)
+            if inst.sg:ServerStateMatches() then
+                if inst.entity:FlattenMovementPrediction() then
+                    inst.sg:GoToState("idle", "noanim")
+                end
+            elseif inst.bufferedaction == nil then
+                inst.AnimState:PlayAnimation("wormwood_cast_spawn")
+                inst.AnimState:SetFrame(37)
+                inst.sg:GoToState("idle", true)
+            end
+        end,
+
+        ontimeout = function(inst)
+            inst:ClearBufferedAction()
+            inst.AnimState:PlayAnimation("wormwood_cast_spawn")
+            inst.AnimState:SetFrame(37)
+            inst.sg:GoToState("idle", true)
+        end,
+    }
+)
+
+-- 6) 过量吃东西抵消画饼buff
+AddComponentPostInit("eater", function(Eater)
+    local old_Eater_Eat_delta_buff = Eater.Eat
+
+    function Eater:Eat(food, feeder)
+        if not food then
+            return old_Eater_Eat_delta_buff(self, food, feeder)
+        end
+
+        local stack_mult = self.eatwholestack and food.components.stackable ~= nil and
+        food.components.stackable:StackSize() or 1
+
+        -- 记录当前属性值
+        local hunger_comp = self.inst.components.hunger
+        local sanity_comp = self.inst.components.sanity
+        local health_comp = self.inst.components.health
+
+        local cur_hunger = hunger_comp and hunger_comp.current or 0
+        local cur_sanity = sanity_comp and sanity_comp.current or 0
+        local cur_health = health_comp and health_comp.currenthealth or 0
+
+        local max_hunger = hunger_comp and hunger_comp.max or 0
+        local max_sanity = sanity_comp and sanity_comp.max or 0
+        local max_health = health_comp and health_comp.maxhealth or 0
+
+        -- 自行计算食物提供量
+        local health_delta = food.components.edible and food.components.edible:GetHealth(self.inst) * stack_mult or 0
+        local hunger_delta = food.components.edible and food.components.edible:GetHunger(self.inst) * stack_mult or 0
+        local sanity_delta = food.components.edible and food.components.edible:GetSanity(self.inst) * stack_mult or 0
+
+        -- 计算溢出量（不计算沃利的食物记忆，给沃利一点空子）
+        local overflow_health = math.max((cur_health + health_delta) - max_health, 0)
+        local overflow_hunger = math.max((cur_hunger + hunger_delta) - max_hunger, 0)
+        local overflow_sanity = math.max((cur_sanity + sanity_delta) - max_sanity, 0)
+
+        -- 调用原始Eat逻辑
+        old_Eater_Eat_delta_buff(self, food, feeder)
+
+        -- 扣除buff待扣量
+        if self.inst:HasDebuff("warly_sky_pie_inspire_buff") then
+            local buff = self.inst:GetDebuff("warly_sky_pie_inspire_buff")
+            if buff then
+                if overflow_hunger > 0 then
+                    buff._restore_hunger = math.max(0, (buff._restore_hunger or 0) - overflow_hunger)
+                    -- print("[SkyPieBuff] 饥饿抵消:", overflow_hunger, "剩余待扣", buff._restore_hunger)
+                end
+                if overflow_sanity > 0 then
+                    buff._restore_sanity = math.max(0, (buff._restore_sanity or 0) - overflow_sanity)
+                    -- print("[SkyPieBuff] 理智抵消:", overflow_sanity, "剩余待扣", buff._restore_sanity)
+                end
+                if overflow_health > 0 then
+                    buff._restore_health = math.max(0, (buff._restore_health or 0) - overflow_health)
+                    -- print("[SkyPieBuff] 生命抵消:", overflow_health, "剩余待扣", buff._restore_health)
+                end
+            end
+        end
+    end
+end)
