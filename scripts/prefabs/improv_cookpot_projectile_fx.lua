@@ -29,9 +29,10 @@ local function OnHit(inst, attacker, target)
     firecrackers.components.burnable:Ignite()
 
     -- ✨ 落地生成烹饪锅特效
-    local cookfx = SpawnPrefab("improv_cookpot_fx")
-    cookfx.Transform:SetPosition(x, y, z)
-	cookfx.doer = inst.doer
+    local cookpotfx = SpawnPrefab("improv_cookpot_fx")
+    cookpotfx.Transform:SetPosition(x, y, z)
+	cookpotfx.doer = inst.doer
+	cookpotfx.meal = inst.meal
 
     local scorch = SpawnPrefab("fused_shadeling_bomb_scorch")
 	scorch.Transform:SetPosition(x, y, z)
@@ -90,6 +91,7 @@ local function fn()
     inst.components.complexprojectile:SetOnHit(OnHit)
 
 	inst.doer = nil
+	inst.meal = nil
 
     inst.persists = false
 

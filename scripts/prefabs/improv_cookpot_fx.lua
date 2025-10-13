@@ -125,7 +125,8 @@ local function fn()
     inst.AnimState:SetFinalOffset(2)
     inst.AnimState:SetMultColour(1, 1, 1, 0.9)
 
-    inst:AddTag("FX")
+    MakeCharacterPhysics(inst, 1000, 0.75)
+
     inst:AddTag("improv_cookpot_fx")
     inst.persists = false
 
@@ -145,6 +146,11 @@ local function fn()
     end
 
     inst.doer = nil
+    inst.meal = nil
+
+    inst:AddComponent("locomotor")
+    inst.components.locomotor.runspeed = 1
+    inst.components.locomotor.walkspeed = 1
 
     inst:ListenForEvent("animover", function()
         if inst.AnimState:IsCurrentAnimation("place") then
@@ -152,6 +158,7 @@ local function fn()
             -- 🍳 开始煮饭阶段
             --------------------------------------------------
             -- local cook_time = math.random(10, 15)
+            inst.components.locomotor:Stop()
             local cook_time = 4.4
             inst.AnimState:PlayAnimation("hit_cooking", true)
             inst.SoundEmitter:PlaySound("dontstarve/common/cookingpot_rattle", "cookloop")
@@ -162,8 +169,15 @@ local function fn()
                 --------------------------------------------------
                 -- 🍲 煮好 → hit_full 显示食物
                 --------------------------------------------------
-                local unmemorized = GetUnmemorizedFoods(inst.doer)
-                local product = unmemorized[math.random(#unmemorized)]
+                local product = nil
+                if inst.meal then
+                    -- 指定食物
+                    product = inst.meal
+                else
+                    -- 随机食物
+                    local unmemorized = GetUnmemorizedFoods(inst.doer)
+                    product = unmemorized[math.random(#unmemorized)]
+                end
                 local diaplay_product = GetBaseFood(product)
 
                 inst.AnimState:PlayAnimation("hit_full", true)

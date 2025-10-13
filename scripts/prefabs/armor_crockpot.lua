@@ -1,7 +1,7 @@
 local SCAN_RADIUS = 10
 local SANITY_RATIO = 0.15
 local HUNGER_RATIO = 0.15
-local GOAT_CHANCE = 0.10
+local GOAT_CHANCE = 0.05
 
 local function OnBlocked(owner)
     owner.SoundEmitter:PlaySound("dontstarve/wilson/hit_metal")
@@ -56,7 +56,7 @@ local function OnTakeDamage(inst, damage_amount)
 
     -- 自身受伤低概率触发替罪羊
     local activeGoat = true -- 技能树控制
-    if activeGoat and (math.random() < GOAT_CHANCE) then
+    if activeGoat and (math.random() < (GOAT_CHANCE + (damage or 0) / 1500)) then
         local goat = SpawnScapegoat(owner)
         if goat and goat.components.health then
             goat.components.health:DoDelta(-damage_amount)
@@ -119,7 +119,7 @@ local function ApplyDamageRedirect(inst, teammate)
             end
 
             local activeGoat = true -- 技能树控制
-            if activeGoat and (math.random() < (GOAT_CHANCE + (damage or 0) / 1000)) then
+            if activeGoat and (math.random() < (GOAT_CHANCE + (damage or 0) / 750)) then
                 local goat = SpawnScapegoat(owner, attacker)
                 if goat then
                     return goat

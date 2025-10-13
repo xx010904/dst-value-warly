@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<spriter_data scml_version="1.0" generator="BrashMonkey Spriter" generator_version="r11">
+    <folder id="0" name="cutstone01">
+        <file id="0" name="cutstone01/cutstone01-0.png" width="272" height="185" pivot_x="0.508772" pivot_y="0.086777"/>
+    </folder>
+    <entity id="0" name="warly_question_mark">
+        <animation id="0" name="idle" length="340" interval="100">
+            <mainline>
+                <key id="0">
+                    <object_ref id="0" timeline="0" key="0" z_index="0"/>
+                </key>
+                <key id="1" time="110">
+                    <object_ref id="0" timeline="0" key="1" z_index="0"/>
+                </key>
+                <key id="2" time="240">
+                    <object_ref id="0" timeline="0" key="2" z_index="0"/>
+                </key>
+                <key id="3" time="340">
+                    <object_ref id="0" timeline="0" key="3" z_index="0"/>
+                </key>
+            </mainline>
+            <timeline id="0" name="cutstone01">
+                <key id="0" spin="-1">
+                    <object folder="0" file="0" x="1.855433" y="-0.962897" angle="0"/>
+                </key>
+                <key id="1" time="110">
+                    <object folder="0" file="0" x="2.035172" y="-10.129563" angle="335.191057"/>
+                </key>
+                <key id="2" time="240" spin="-1">
+                    <object folder="0" file="0" x="5.580924" y="-5.407341" angle="22.636988"/>
+                </key>
+                <key id="3" time="340" spin="0">
+                    <object folder="0" file="0" x="2.410989" y="-29.29623" angle="0"/>
+                </key>
+            </timeline>
+        </animation>
+    </entity>
+</spriter_data>

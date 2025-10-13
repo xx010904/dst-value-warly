@@ -8,8 +8,8 @@
 --   胡乱吃（玩家）：泻根糖浆
 --   胡乱吃（动物）：伏特羊肉冻 彩虹糖豆 鲜果可丽饼 龙虾正餐 华夫饼 黄油 夜莓
 -- 2 随机下饭菜概率含调味料
--- 3 直接回饥饿精神和血量（避免食物记忆）+ 3.1 排除记忆的料理
--- 4 队友死了烹饪四菜一汤 （开席） + 4.1 复活队友
+-- 3 自私回复加强：直接回饥饿精神和血量（避免食物记忆）+ 3.1 排除记忆的料理
+-- 4 团队回复加强：队友死了烹饪四菜一汤 （开席） + 4.1 复活队友
 
 -- Section 2 画大饼
 -- 1 锅检测到附近有三维不满的队友，右键点击锅直接补，然后慢慢消耗
@@ -91,40 +91,26 @@ end
 -- =========================================================
 -- 抛锅函数
 -- =========================================================
-local function SpawnCookPotFX(doer)
-    if not doer then return end
+local function SpawnCookPotFX(chef, idiot, meal)
+    if not chef then return end
 
-    doer:DoTaskInTime(0.1, function()
-        doer.AnimState:PlayAnimation("pyrocast")
+    chef:DoTaskInTime(0.1, function()
+        chef.AnimState:PlayAnimation("pyrocast")
     end)
 
-    local x, y, z = doer.Transform:GetWorldPosition()
-    local spawn_x, spawn_y, spawn_z
-    local found = false
-    for i = 1, 24 do
-        local angle = math.random() * 2 * PI
-        local tx = x + math.cos(angle) * math.random(1, 6)
-        local tz = z + math.sin(angle) * math.random(1, 6)
-        if TheWorld.Map:IsPassableAtPoint(tx, 0, tz) and not TheWorld.Map:IsOceanAtPoint(tx, 0, tz) then
-            local nearby_fx = TheSim:FindEntities(tx, 0, tz, 3.5, { "FX", "improv_cookpot_fx" })
-            if #nearby_fx == 0 then
-                spawn_x, spawn_y, spawn_z = tx, 0, tz
-                found = true
-                break
-            end
-        end
-    end
-    if not found then spawn_x, spawn_y, spawn_z = x, 0, z end
+    local x, y, z = chef.Transform:GetWorldPosition()
+    local spawn_x, spawn_y, spawn_z = idiot.Transform:GetWorldPosition()
 
     local fx = SpawnPrefab("lucy_transform_fx")
-    fx.entity:SetParent(doer.entity)
+    fx.entity:SetParent(chef.entity)
     fx.entity:AddFollower()
-    fx.Follower:FollowSymbol(doer.GUID, "hair", 0, 0, 0)
+    fx.Follower:FollowSymbol(chef.GUID, "hair", 0, 0, 0)
 
     local proj = SpawnPrefab("improv_cookpot_projectile_fx")
-    proj.doer = doer
+    proj.doer = chef
+    proj.meal = meal
     proj.Transform:SetPosition(x, y, z)
-    proj.components.complexprojectile:Launch(Vector3(spawn_x, spawn_y, spawn_z), doer)
+    proj.components.complexprojectile:Launch(Vector3(spawn_x, spawn_y, spawn_z), chef)
 end
 
 local function ApplyTalking(inst, op)
@@ -180,10 +166,28 @@ local function doFunnyCook(inst, doer, food_name, op)
     local values = rec_table and rec_table[food_name]
     if not values then return end
 
+    -- ping个问号❓
+    local playerMark = SpawnPrefab("improv_question_mark_fx")
+    playerMark.entity:SetParent(inst.entity)
+    playerMark.Transform:SetPosition(0, 3, 0)
+    local doerMark = SpawnPrefab("improv_question_mark_fx")
+    doerMark.entity:SetParent(doer.entity)
+    doerMark.Transform:SetPosition(0, 3, 0)
+
     -- 抛锅特效概率控制
     local chance = values.throw_chance or 1
     if math.random() < chance then
-        SpawnCookPotFX(inst)
+        inst:DoTaskInTime(0.5, function(inst)
+            if inst then
+                SpawnCookPotFX(inst, doer)
+                -- puff 特效
+                local puff = SpawnPrefab("small_puff")
+                if puff then
+                    local x, y, z = inst.Transform:GetWorldPosition()
+                    puff.Transform:SetPosition(x, y, z)
+                end
+            end
+        end)
     end
 
     -- 说话逻辑
@@ -191,13 +195,6 @@ local function doFunnyCook(inst, doer, food_name, op)
 
     -- 恢复逻辑
     ApplyRecovery(inst, doer, food_name, op) --技能树控制
-
-    -- puff 特效
-    local puff = SpawnPrefab("small_puff")
-    if puff then
-        local x, y, z = inst.Transform:GetWorldPosition()
-        puff.Transform:SetPosition(x, y, z)
-    end
 end
 
 -- =========================================================
@@ -268,6 +265,52 @@ AddComponentPostInit("edible", function(edible)
     end
 end)
 
+-- =========================================================
+-- 死亡监听开席
+-- =========================================================
+AddPlayerPostInit(function(dead)
+    if not TheWorld.ismastersim then
+        return
+    end
+    -- 监听玩家死亡事件
+    dead:ListenForEvent("death", function(inst, data)
+        local hasSkillTree = true -- 技能树控制
+        if not hasSkillTree then
+            return
+        end
+        -- 遍历所有玩家，找附近的沃利
+        for _, player in ipairs(AllPlayers) do
+            if player.prefab == "warly" and player:IsNear(dead, 12) then
+                -- 沃利发现队友去世，哀悼 + 献上“四菜一汤”
+                -- 打出问号特效
+                local dead_fx = SpawnPrefab("improv_question_mark_fx")
+                if dead_fx then
+                    dead_fx.entity:SetParent(dead.entity)
+                    dead_fx.Transform:SetPosition(0, 3, 0)
+                end
+
+                local warly_fx = SpawnPrefab("improv_question_mark_fx")
+                if warly_fx then
+                    warly_fx.entity:SetParent(player.entity)
+                    warly_fx.Transform:SetPosition(0, 3, 0)
+                end
+
+                -- 菜谱顺序
+                local dishes = { "ratatouille", "ratatouille", "ratatouille", "ratatouille", "bonesoup", }
+
+                -- 逐个生成特效（每0.25秒）
+                for i, prefab in ipairs(dishes) do
+                    player:DoTaskInTime((i - 1) * 0.25, function()
+                        if player:IsValid() and dead:IsValid() then
+                            SpawnCookPotFX(player, dead, prefab)
+                        end
+                    end)
+                end
+            end
+        end
+    end, dead)
+end)
+
 
 -- =========================================================
 -- SECTION2 可以右键点击动作“画饼”的锅
@@ -301,7 +344,7 @@ AddPrefabPostInit("portablecookpot_item", function(inst)
 
                 local should_activate = false
                 for _, p in ipairs(players) do
-                    if p and p:IsValid() and not p:HasDebuff("warly_sky_pie_inspire_buff") then
+                    if p and p:IsValid() and p.prefab ~= "warly" and not p:HasDebuff("warly_sky_pie_inspire_buff") then
                         if (p.components.hunger and p.components.hunger:GetPercent() < 0.5)
                             or (p.components.sanity and p.components.sanity:GetPercent() < 0.5)
                             or (p.components.health and p.components.health:GetPercent() < 0.5) then
@@ -396,24 +439,18 @@ local ACTIVATE_POT_PIE = AddAction("ACTIVATE_POT_PIE", STRINGS.ACTIONS.ACTIVATE_
     end
 
     -- 给持有者添加 debuff（buff）
-    if target.prefab == "warly" then
-        local pie = SpawnPrefab("warly_sky_pie")
-        pie.Transform:SetPosition(target.Transform:GetWorldPosition())
-        Launch(pie, target, 1)
+    if target:HasDebuff("warly_sky_pie_inspire_buff") then
+        return
     else
-        if target:HasDebuff("warly_sky_pie_inspire_buff") then
-            return
-        else
-            target:AddDebuff("warly_sky_pie_inspire_buff", "warly_sky_pie_inspire_buff")
-        end
+        target:AddDebuff("warly_sky_pie_inspire_buff", "warly_sky_pie_inspire_buff")
+    end
 
-        -- 效果：动画
-        if target.components.inventory:IsHeavyLifting() and not target.components.rider:IsRiding() then
-            target.AnimState:PlayAnimation("heavy_eat")
-        else
-            target.AnimState:PlayAnimation("eat_pre")
-            target.AnimState:PushAnimation("eat", false)
-        end
+    -- 效果：动画
+    if target.components.inventory:IsHeavyLifting() and not target.components.rider:IsRiding() then
+        target.AnimState:PlayAnimation("heavy_eat")
+    else
+        target.AnimState:PlayAnimation("eat_pre")
+        target.AnimState:PushAnimation("eat", false)
     end
 
     -- 效果：音效/特效/台词
@@ -546,7 +583,7 @@ AddComponentPostInit("eater", function(Eater)
         end
 
         local stack_mult = self.eatwholestack and food.components.stackable ~= nil and
-        food.components.stackable:StackSize() or 1
+            food.components.stackable:StackSize() or 1
 
         -- 记录当前属性值
         local hunger_comp = self.inst.components.hunger

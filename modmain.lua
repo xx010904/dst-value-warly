@@ -2,6 +2,7 @@ GLOBAL.setmetatable(env,{__index=function(t,k) return GLOBAL.rawget(GLOBAL,k) en
 
 Assets = {
     Asset("ANIM", "anim/armor_crockpot.zip"),
+    Asset("ANIM", "anim/warly_question_mark.zip"),
     Asset("ANIM", "anim/warly_sky_pie.zip"),
 	-- Asset("ANIM", "anim/ui_beard_3x1.zip"),
     Asset("IMAGE", "images/inventoryimages/armor_crockpot.tex"),
@@ -28,8 +29,7 @@ PrefabFiles = {
 	"shadow_battleaxe_young",
 	"improv_cookpot_fx",
 	"improv_cookpot_projectile_fx",
-	"packaged_cookedmeal",
-	"prepack_foodbag",
+	"improv_question_mark_fx",
 	"warly_sky_pie",
 	"warly_sky_pie_buff",
 	"warly_sky_pie_inspire_buff",
