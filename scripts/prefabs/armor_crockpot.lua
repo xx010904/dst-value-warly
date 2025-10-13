@@ -56,7 +56,7 @@ local function OnTakeDamage(inst, damage_amount)
 
     -- 自身受伤低概率触发替罪羊
     local activeGoat = true -- 技能树控制
-    if activeGoat and (math.random() < (GOAT_CHANCE + (damage or 0) / 1500)) then
+    if activeGoat and (math.random() < (GOAT_CHANCE + (damage_amount or 0) / 1500)) then
         local goat = SpawnScapegoat(owner)
         if goat and goat.components.health then
             goat.components.health:DoDelta(-damage_amount)

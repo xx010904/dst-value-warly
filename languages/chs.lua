@@ -91,6 +91,12 @@ STRINGS.MEAL_WORTH_ACTIONS =
     "真·精神料理！",
 }
 
+STRINGS.CHARACTERS.GENERIC.ANNOUNCE_EAT_PIE =
+{
+    "我感到精神百倍！",
+    "我感到充满干劲！",
+    "我感到生龙活虎！",
+}
 STRINGS.CHARACTERS.GENERIC.ANNOUNCE_EAT_PIE_REPEATLY =
 {
     "感觉有点腻……",

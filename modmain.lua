@@ -4,6 +4,7 @@ Assets = {
     Asset("ANIM", "anim/armor_crockpot.zip"),
     Asset("ANIM", "anim/warly_question_mark.zip"),
     Asset("ANIM", "anim/warly_sky_pie.zip"),
+    Asset("ANIM", "anim/warly_sky_pie_inspire_buff.zip"),
 	-- Asset("ANIM", "anim/ui_beard_3x1.zip"),
     Asset("IMAGE", "images/inventoryimages/armor_crockpot.tex"),
 	Asset("ATLAS", "images/inventoryimages/armor_crockpot.xml"),
@@ -33,6 +34,7 @@ PrefabFiles = {
 	"warly_sky_pie",
 	"warly_sky_pie_buff",
 	"warly_sky_pie_inspire_buff",
+	"warly_sky_pie_cook_fx",
     -- 其他 prefab 名称...
 }
 

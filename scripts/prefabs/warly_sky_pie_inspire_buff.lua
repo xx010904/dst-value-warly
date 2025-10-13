@@ -1,6 +1,28 @@
 local assets = {}
 
 local DECAY_INTERVAL = 8 -- 每8秒衰减一次
+local FADE_FRAMES = 5
+local function OnUpdateFade(inst)
+    if inst._fade:value() == FADE_FRAMES or inst._fade:value() > FADE_FRAMES * 2 then
+        inst._fadetask:Cancel()
+        inst._fadetask = nil
+    end
+end
+
+local function OnFadeDirty(inst)
+    if inst._fadetask == nil then
+        inst._fadetask = inst:DoPeriodicTask(FRAMES, OnUpdateFade)
+    end
+    OnUpdateFade(inst)
+end
+
+local function AlignToTarget(inst, target)
+    inst.Transform:SetRotation(target.Transform:GetRotation())
+end
+
+local function OnChangeFollowSymbol(inst, target, followsymbol, followoffset)
+    inst.Follower:FollowSymbol(target.GUID, followsymbol, followoffset.x, followoffset.y, followoffset.z)
+end
 
 ------------------------------------------------------------
 -- 启动逐步衰减任务
@@ -48,7 +70,16 @@ end
 ------------------------------------------------------------
 -- Buff 附着时
 ------------------------------------------------------------
-local function OnAttached(inst, target)
+local function OnAttached(inst, target, followsymbol, followoffset)
+    inst.entity:SetParent(target.entity)
+    OnChangeFollowSymbol(inst, target, followsymbol, Vector3(followoffset.x, -295, followoffset.z)) --y越小，位置越高
+    if inst._followtask ~= nil then
+        inst._followtask:Cancel()
+    end
+    inst._followtask = inst:DoPeriodicTask(0, AlignToTarget, nil, target)
+    AlignToTarget(inst, target)
+
+    -- 自定义效果
     inst.target = target
     if not (target and target:IsValid()) then
         inst:Remove()
@@ -115,9 +146,20 @@ local function fn()
     inst:AddTag("FX")
     inst:AddTag("NOCLICK")
 
-    inst.entity:SetPristine()
+    inst.AnimState:SetBank("warly_sky_pie_inspire_buff")
+    inst.AnimState:SetBuild("warly_sky_pie_inspire_buff")
+    inst.AnimState:PlayAnimation("fx_0", true)
+    local scale = 0.45
+    inst.Transform:SetScale(scale, scale, scale)
+
+    inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+    inst.AnimState:SetFinalOffset(3)
+
+    inst._fade = net_smallbyte(inst.GUID, "sporebomb._fade", "fadedirty")
+    inst._fadetask = inst:DoPeriodicTask(FRAMES, OnUpdateFade)
 
     if not TheWorld.ismastersim then
+        inst:ListenForEvent("fadedirty", OnFadeDirty)
         return inst
     end
 

@@ -91,6 +91,12 @@ STRINGS.MEAL_WORTH_ACTIONS =
     "Genuine spiritual cuisine!",
 }
 
+STRINGS.CHARACTERS.GENERIC.ANNOUNCE_EAT_PIE =
+{
+    "I feel invigorated!",
+    "I feel full of energy!",
+    "I feel alive and kicking!",
+}
 STRINGS.CHARACTERS.GENERIC.ANNOUNCE_EAT_PIE_REPEATLY =
 {
     "My stomach protests…",

@@ -12,9 +12,9 @@
 -- 4 团队回复加强：队友死了烹饪四菜一汤 （开席） + 4.1 复活队友
 
 -- Section 2 画大饼
--- 1 锅检测到附近有三维不满的队友，右键点击锅直接补，然后慢慢消耗
--- 2 沃利可以对自己画饼，真的做一个大饼，大饼吃了也全部回满，同锅补效果，大饼还可以烤
--- 3 画饼buff期间，可以吃食物来抵消buff，
+-- 1 沃利仅仅需要介绍一下他的厨艺，便可让大家饱腹。锅检测到附近有三维不满的队友，右键点击锅直接补，然后慢慢消耗
+-- 2 沃利真的做一个大饼，大饼吃了也全部回满，同锅补效果，大饼还可以烤
+-- 3 画饼buff期间，可以吃食物来抵消buff
 -- 4 现烤大饼释放香味（调味料）
 
 
@@ -457,11 +457,12 @@ local ACTIVATE_POT_PIE = AddAction("ACTIVATE_POT_PIE", STRINGS.ACTIONS.ACTIVATE_
     if target.SoundEmitter then
         target.SoundEmitter:PlaySound("dontstarve/common/cookingpot_finish")
     end
-    local fx = SpawnPrefab("small_puff")
-    fx.Transform:SetPosition(target.Transform:GetWorldPosition())
+    local fx = SpawnPrefab("warly_sky_pie_cook_fx")
+    local x, y, z = doer.Transform:GetWorldPosition()
+    fx.Transform:SetPosition(x, y + 1, z)
 
     if target.components.talker then
-        target.components.talker:Say(GetString(target, "ANNOUNCE_EAT_PIE_REPEATLY"))
+        target.components.talker:Say(GetString(target, "ANNOUNCE_EAT_PIE"))
     end
 
     -- 物品不能使用
@@ -629,5 +630,7 @@ AddComponentPostInit("eater", function(Eater)
                 end
             end
         end
+
+        return true
     end
 end)
