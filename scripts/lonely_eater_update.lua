@@ -1,13 +1,13 @@
--- 美食鉴赏
--- 孤独的美食家可以尝出来食物中的深层底蕴，对每道菜都有自己独到的深层次的见解，也能将其分享给伙伴
+-- 美食鉴赏 (解决做菜下线，解决联机料理太少)
+-- 孤独的美食家可以尝出来食物中的深层底蕴，对每道菜都有自己独到的深层次的见解，也能将感受分享给伙伴
 -- Section 1：吃独食 Eat Alone 
 -- 1 骨头汤：获得5分钟概率骨甲效果
 -- 2 鲜果可丽饼：获得5分钟锁定85%san
 -- 3 海鲜杂烩：获得5分钟敌人越多移速越快
 -- 4 蓬松土豆蛋奶酥：获得5分钟攻击力加成（200以上两倍，50-200线性变化，50以下1倍）
 -- Section 2：分享食物 Share Food 
--- 5.1 怪物鞑靼：同时额外雇佣5个猪人，满时间2.5天
--- 5.2 分享buff
+-- 5.1 怪物鞑靼：额外的，同时雇佣5个猪人，满时间2.5天，也能吃到怪物鞑靼的调味料
+-- 5.2 沃利吃东西时，分享料理和调味料的buff给所有雇佣的猪人，以及附近的玩家
 
 --========================================================
 -- Warly 专属食物 Buff 系统，4个原版无buff的食物
@@ -16,22 +16,18 @@
 local FOOD_BUFF_MAP = {
     bonesoup = {
         buffname = "warly_bonesoup_buff",
-        time = BONESOUP_BUFF_TIME,
         required_skill = "warly_bonesoup_buff",
     },
     freshfruitcrepes = {
         buffname = "warly_crepes_buff",
-        time = CROISSANT_BUFF_TIME,
         required_skill = "warly_crepes_buff",
     },
     moqueca = {
         buffname = "warly_seafood_buff",
-        time = SEAFOOD_BUFF_TIME,
         required_skill = "warly_seafood_buff",
     },
     potatosouffle = {
         buffname = "warly_potato_buff",
-        time = POTATO_BUFF_TIME,
         required_skill = "warly_potato_buff",
     },
 }
@@ -88,7 +84,7 @@ end)
 --========================================================
 -- 怪物鞑靼：同时雇佣5个猪人，满时间2.5天
 --========================================================
-local function HireNearbyPigmen(inst, giver)
+local function HireNearbyPigmen(inst, giver, item)
     local x, y, z = inst.Transform:GetWorldPosition()
     -- 搜索25格范围内的猪人（排除守卫和疯猪）
     local ents = TheSim:FindEntities(x, y, z, 25, { "pig" }, { "guard", "werepig" })
@@ -108,7 +104,6 @@ local function HireNearbyPigmen(inst, giver)
                 giver:PushEvent("makefriend")
                 giver.components.leader:AddFollower(pig)
                 pig.components.follower:AddLoyaltyTime(TUNING.PIG_LOYALTY_MAXTIME)
-                pig.components.follower.maxfollowtime = TUNING.PIG_LOYALTY_MAXTIME
                 pig.components.combat:SetTarget(nil)
 
                 -- 拍手欢呼动画
@@ -118,6 +113,24 @@ local function HireNearbyPigmen(inst, giver)
 
                 -- 发出猪叫声
                 pig.SoundEmitter:PlaySound("dontstarve/pig/oink")
+
+                -- 为了增加怪物鞑靼的调味料buff，技能树控制
+                if pig.components.eater ~= nil then
+                    local dummy = SpawnPrefab(item.prefab)
+                    if dummy then
+                        -- 属性归零，不增加血量/饥饿/精神
+                        if dummy.components.edible ~= nil then
+                            dummy.components.edible.healthvalue = 0
+                            dummy.components.edible.hungervalue = 0
+                            dummy.components.edible.sanityvalue = 0
+                            dummy:AddTag("dummyfood")
+                            local success = pig.components.eater:Eat(dummy)
+                            if not success then
+                                dummy:Remove()
+                            end
+                        end
+                    end
+                end
 
                 count = count + 1
                 if count >= 5 then
@@ -148,9 +161,9 @@ AddPrefabPostInit("pigman", function(inst)
             _old_OnGetItemFromPlayer(inst, giver, item)
         end
 
-        -- 触发怪物鞑靼效果
-        if item ~= nil and item.prefab == "monstertartare" and giver ~= nil then
-            HireNearbyPigmen(inst, giver)
+        -- 触发怪物鞑靼效果，技能树控制
+        if item ~= nil and string.find(item.prefab, "monstertartare") and giver ~= nil then
+            HireNearbyPigmen(inst, giver, item)
         end
     end
 
@@ -162,40 +175,72 @@ end)
 --========================================================
 -- 终极技能：沃利吃东西分享效果给周围友方（dummy 食物方案）
 --========================================================
-local SHARE_RADIUS = 6 -- 分享半径
+local SHARE_RADIUS = 12 -- 分享半径
 
 local function ShareFoodEffects(eater, food)
     if eater == nil or not eater:IsValid() then return end
     if food == nil or not food:IsValid() then return end
 
     local x, y, z = eater.Transform:GetWorldPosition()
-    -- 只搜索玩家
-    local players = TheSim:FindEntities(x, y, z, SHARE_RADIUS, { "player" }, { "playerghost", "INLIMBO" })
 
+    -- 分享给附近玩家
+    local players = TheSim:FindEntities(x, y, z, SHARE_RADIUS, { "player" }, { "playerghost", "INLIMBO" })
     for _, ally in ipairs(players) do
-        if ally ~= eater and ally.prefab ~= "warly" and ally:IsValid() and ally.components.health ~= nil and not ally.components.health:IsDead() then
-            -- 创建 dummy 食物
+        if ally ~= eater
+            and ally.prefab ~= "warly"
+            and ally:IsValid()
+            and ally.components.health ~= nil
+            and not ally.components.health:IsDead()
+        then
             local dummy = SpawnPrefab(food.prefab)
             if dummy ~= nil then
-                -- 属性归零，不增加血量/饥饿/精神
                 if dummy.components.edible ~= nil then
                     dummy.components.edible.healthvalue = 0
                     dummy.components.edible.hungervalue = 0
                     dummy.components.edible.sanityvalue = 0
+                    dummy:AddTag("dummyfood")
                 end
 
-                -- 玩家“吃” dummy
                 if ally.components.eater ~= nil then
                     local success = ally.components.eater:Eat(dummy)
-                    -- 提示获得 buff，显示友好名称
-                    if success and ally.components.talker ~= nil then
-                        -- local food_name = food:GetDisplayName() or food.prefab
-                        -- local text = string.format("I received a buff from %s!", food_name)
-                        -- ally.components.talker:Say(text)
-                        SpawnPrefab("boss_ripple_fx").Transform:SetPosition(ally.Transform:GetWorldPosition())
+                    if success then
+                        SpawnPrefab("winters_feast_depletefood").Transform:SetPosition(ally.Transform:GetWorldPosition())
                     else
                         dummy:Remove()
-                        -- print("[Warly Buff] Failed to share food effect to", ally:GetDisplayName() or ally.prefab)
+                        print("[Warly Buff] Failed to share food effect to", ally:GetDisplayName() or ally.prefab)
+                    end
+                end
+            end
+        end
+    end
+
+    -- 分享给沃利的猪人随从（所有的）
+    if eater.components.leader ~= nil then
+        -- 获取所有跟随者
+        for follower, _ in pairs(eater.components.leader.followers) do
+            if follower ~= nil
+                and follower:IsValid()
+                and follower:HasTag("pig")
+                and follower.components.health ~= nil
+                and not follower.components.health:IsDead()
+            then
+                local dummy = SpawnPrefab(food.prefab)
+                if dummy ~= nil then
+                    if dummy.components.edible ~= nil then
+                        dummy.components.edible.healthvalue = 0
+                        dummy.components.edible.hungervalue = 0
+                        dummy.components.edible.sanityvalue = 0
+                        dummy:AddTag("dummyfood")
+                    end
+
+                    if follower.components.eater ~= nil then
+                        local success = follower.components.eater:Eat(dummy)
+                        if success then
+                            SpawnPrefab("winters_feast_depletefood").Transform:SetPosition(follower.Transform:GetWorldPosition())
+                        else
+                            dummy:Remove()
+                            print("[Warly Buff] Failed to share food effect to follower", follower.prefab)
+                        end
                     end
                 end
             end
@@ -203,17 +248,22 @@ local function ShareFoodEffects(eater, food)
     end
 end
 
--- Hook Eater:Eat 只针对沃利
-AddComponentPostInit("eater", function(self)
-    local _OldEat = self.Eat
-    function self:Eat(food, ...)
-        local result = _OldEat(self, food, ...) -- 原逻辑先执行
 
-        -- 只对沃利生效
-        if self.inst.prefab == "warly" then
-            ShareFoodEffects(self.inst, food)
-        end
+-- 监听吃事件 只针对沃利
+AddPlayerPostInit(function(inst)
+    if not TheWorld.ismastersim then
+        return
+    end
 
-        return result
+    -- 只针对沃利，技能树控制
+    if inst.prefab == "warly" then
+        inst:ListenForEvent("oneat", function(inst, data)
+            if data and data.food ~= nil then
+                local food = data.food
+                -- local feeder = data.feeder
+                -- print("沃利吃食物分享buff", food.prefab)
+                ShareFoodEffects(inst, food)
+            end
+        end)
     end
 end)

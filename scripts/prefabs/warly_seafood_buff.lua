@@ -1,7 +1,7 @@
 local function UpdateSpeed(inst)
     if inst.components.locomotor then
         local x, y, z = inst.Transform:GetWorldPosition()
-        local entities = TheSim:FindEntities(x, y, z, 25, { "_combat" }, { "player", "INLIMBO" })
+        local entities = TheSim:FindEntities(x, y, z, 20, { "_combat" }, { "player", "INLIMBO" })
         local count = 0
         -- local enemy_names = {}
 
@@ -23,10 +23,10 @@ local function UpdateSpeed(inst)
             end
         end
 
-        count = math.min(count, 25)
+        count = math.min(count, 25) --最多25
 
         -- 平方根非线性加速
-        local mult = 1 + 0.25 * math.sqrt(count)
+        local mult = 1 + 0.2 * math.sqrt(count)  --最多1+1倍速度
 
         inst.components.locomotor:SetExternalSpeedMultiplier(inst, "warly_seafood_buff", mult)
 

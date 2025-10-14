@@ -1,4 +1,4 @@
--- 厨艺
+-- 厨艺（解决获取料理调料难）
 -- 拥有精湛厨艺的厨师并不依赖炊具，甚至不依赖食材，随时随地即兴发挥做出一桌好菜
 -- Section 1：下饭操作 Meal-worthy Play
 -- 1 “沃利看到别人做出垃圾料理时，被激发厨师灵魂，做出下饭菜”，展示厨艺，当场跟陪一份下饭菜：就地自动烹饪一份随机下饭菜
@@ -25,7 +25,7 @@ local spicedfoods = require("spicedfoods")
 
 local FOOD_RECOVERY_TABLE = {
 
-    -- 胡乱烹饪（锅收获触发）
+    -- 胡乱烹饪（锅收获触发）一个垃圾料理换一个随机料理
     harvest_pot = {
         wetgoop        = { hunger = 15, sanity = 15, health = 15, throw_chance = 0.7 },
         powdercake     = { hunger = 10, sanity = 10, health = 10, throw_chance = 0.7 },
@@ -34,58 +34,106 @@ local FOOD_RECOVERY_TABLE = {
         mandrakesoup   = { hunger = 60, sanity = 60, health = 60, throw_chance = 1.0 },
     },
 
-    -- 胡乱烤（火堆）
+    -- 胡乱烤（火堆）一个食材换一个随机料理
     cook_fire = {
-        mandrake                 = { hunger = 150, sanity = 150, health = 150, throw_chance = 1.0 },
-        ancientfruit_nightvision = { hunger = 20, sanity = 25, health = 10, throw_chance = 1.0 },
-        tallbirdegg              = { hunger = 25, sanity = 10, health = 20, throw_chance = 1.0 },
-        tallbirdegg_cracked      = { hunger = 20, sanity = 10, health = 20, throw_chance = 1.0 },
-        red_cap                  = { hunger = 5, sanity = 5, health = 5, throw_chance = 0.2 },
-        moon_cap                 = { hunger = 5, sanity = 5, health = 5, throw_chance = 0.2 },
-        trunk_summer             = { hunger = 5, sanity = 5, health = 5, throw_chance = 0.8 },
-        trunk_winter             = { hunger = 10, sanity = 10, health = 10, throw_chance = 1.0 },
-        wobster_sheller_land     = { hunger = 75, sanity = 50, health = 20, throw_chance = 1.0 },
-        oceanfish_small_8_inv    = { hunger = 75, sanity = 50, health = 20, throw_chance = 1.0 },
-        oceanfish_small_7_inv    = { hunger = 75, sanity = 50, health = 20, throw_chance = 1.0 },
-        oceanfish_small_6_inv    = { hunger = 75, sanity = 50, health = 20, throw_chance = 1.0 },
-        oceanfish_medium_8_inv   = { hunger = 75, sanity = 50, health = 20, throw_chance = 1.0 },
-        mole                     = { hunger = 15, sanity = 10, health = 10, throw_chance = 1.0 },
+        mandrake                 = { hunger = 25, sanity = 25, health = 25, throw_chance = 1.0 },
+        ancientfruit_nightvision = { hunger = 5, sanity = 5, health = 5, throw_chance = 0.6 },
+        tallbirdegg              = { hunger = 15, sanity = 5, health = 20, throw_chance = 0.4 },
+        tallbirdegg_cracked      = { hunger = 15, sanity = 5, health = 20, throw_chance = 0.4 },
+        red_cap                  = { hunger = 5, sanity = 1, health = 5, throw_chance = 0.1 },
+        moon_cap                 = { hunger = 5, sanity = 1, health = 5, throw_chance = 0.1 },
+        trunk_summer             = { hunger = 5, sanity = 5, health = 5, throw_chance = 0.4 },
+        trunk_winter             = { hunger = 5, sanity = 5, health = 5, throw_chance = 0.5 },
+        wobster_sheller_land     = { hunger = 15, sanity = 15, health = 15, throw_chance = 0.5 },
+        oceanfish_small_8_inv    = { hunger = 15, sanity = 15, health = 15, throw_chance = 0.5 },
+        oceanfish_small_7_inv    = { hunger = 15, sanity = 15, health = 15, throw_chance = 0.5 },
+        oceanfish_small_6_inv    = { hunger = 15, sanity = 15, health = 15, throw_chance = 0.5 },
+        oceanfish_medium_8_inv   = { hunger = 15, sanity = 15, health = 15, throw_chance = 0.5 },
+        mole                     = { hunger = 15, sanity = 10, health = 10, throw_chance = 0.3 },
     },
 
-    -- 胡乱吃（通用）
+    -- 胡乱吃（通用）一个食材换一个随机料理
     eat_common = {
         deerclops_eyeball   = { hunger = 150, sanity = 150, health = 150, throw_chance = 1.0 },
         minotaurhorn        = { hunger = 150, sanity = 150, health = 150, throw_chance = 1.0 },
-        royal_jelly         = { hunger = 20, sanity = 20, health = 15, throw_chance = 0.8 },
-        mandrake            = { hunger = 150, sanity = 150, health = 150, throw_chance = 1.0 },
-        tallbirdegg         = { hunger = 15, sanity = 15, health = 15, throw_chance = 0.7 },
-        tallbirdegg_cracked = { hunger = 20, sanity = 25, health = 15, throw_chance = 0.9 },
+        royal_jelly         = { hunger = 20, sanity = 20, health = 15, throw_chance = 0.4 },
+        mandrake            = { hunger = 25, sanity = 25, health = 25, throw_chance = 1.0 },
+        tallbirdegg         = { hunger = 15, sanity = 15, health = 15, throw_chance = 0.4 },
+        tallbirdegg_cracked = { hunger = 20, sanity = 25, health = 15, throw_chance = 0.5 },
         glommerfuel         = { hunger = 10, sanity = 15, health = 5, throw_chance = 0.7 },
         boatpatch_kelp      = { hunger = 5, sanity = 10, health = 5, throw_chance = 0.4 },
-        trunk_summer        = { hunger = 20, sanity = 10, health = 10, throw_chance = 0.8 },
-        trunk_winter        = { hunger = 25, sanity = 10, health = 15, throw_chance = 1.0 },
+        trunk_summer        = { hunger = 20, sanity = 10, health = 10, throw_chance = 0.4 },
+        trunk_winter        = { hunger = 25, sanity = 10, health = 15, throw_chance = 0.5 },
     },
 
-    -- 胡乱吃（玩家）
+    -- 胡乱吃（玩家）一个食材换一个随机料理
     eat_player = {
-        ipecacsyrup = { hunger = 15, sanity = 75, health = 10, throw_chance = 1.0 },
+        ipecacsyrup = { hunger = 33, sanity = 33, health = 33, throw_chance = 1.0 },
     },
 
-    -- 胡乱吃（动物）
+    -- 胡乱吃（动物）一个料理换一个随机料理
     eat_animal = {
-        voltgoatjelly            = { hunger = 75, sanity = 75, health = 15, throw_chance = 1.0 },
-        jellybean                = { hunger = 15, sanity = 15, health = 25, throw_chance = 0.4 },
-        freshfruitcrepes         = { hunger = 75, sanity = 10, health = 15, throw_chance = 1.0 },
-        lobsterdinner            = { hunger = 75, sanity = 15, health = 15, throw_chance = 1.0 },
-        waffles                  = { hunger = 75, sanity = 10, health = 15, throw_chance = 1.0 },
-        butter                   = { hunger = 75, sanity = 25, health = 20, throw_chance = 1.0 },
-        ancientfruit_nightvision = { hunger = 10, sanity = 50, health = 10, throw_chance = 1.0 },
+        voltgoatjelly            = { hunger = 15, sanity = 25, health = 15, throw_chance = 1.0 },
+        jellybean                = { hunger = 25, sanity = 15, health = 25, throw_chance = 0.4 },
+        freshfruitcrepes         = { hunger = 25, sanity = 10, health = 15, throw_chance = 1.0 },
+        lobsterdinner            = { hunger = 25, sanity = 15, health = 15, throw_chance = 1.0 },
+        waffles                  = { hunger = 25, sanity = 10, health = 15, throw_chance = 1.0 },
+        butter                   = { hunger = 15, sanity = 25, health = 20, throw_chance = 1.0 },
+        ancientfruit_nightvision = { hunger = 5, sanity = 5, health = 5, throw_chance = 0.6 },
     },
 }
 
--- 获取基础食物名（去掉调味前缀）
+-- 保存沃利抛锅的累计概率
+AddPlayerPostInit(function(inst)
+    if not TheWorld.ismastersim then
+        return
+    end
+
+    -- 只对沃利生效
+    if inst.prefab ~= "warly" then
+        return
+    end
+
+    inst._throw_accumulator = inst._throw_accumulator or 0
+
+    local _OldOnSave_throw = inst.OnSave
+    inst.OnSave = function(inst, data)
+        if _OldOnSave_throw then
+            _OldOnSave_throw(inst, data)
+        end
+        data.throw_accumulator = inst._throw_accumulator
+    end
+
+    local _OldOnLoad_throw = inst.OnLoad
+    inst.OnLoad = function(inst, data)
+        if _OldOnLoad_throw then
+            _OldOnLoad_throw(inst, data)
+        end
+        if data and data.throw_accumulator then
+            inst._throw_accumulator = data.throw_accumulator
+        end
+    end
+end)
+
+-- 获取基础食物名（去掉调味前缀/后缀），更稳健地处理 spicedfoods[prefab] 存在但 .basename 为空的情况
 local function GetBaseFood(prefab)
-    return spicedfoods[prefab] ~= nil and spicedfoods[prefab].basename or prefab
+    if not prefab then return prefab end
+
+    -- 优先使用 spicedfoods 表里的 basename
+    local info = spicedfoods[prefab]
+    if info and info.basename and type(info.basename) == "string" and info.basename ~= "" then
+        return info.basename
+    end
+
+    -- 尝试匹配 "_spice_" 及其后所有内容为调味后缀
+    -- 例：koalefig_trunk_spice_jelly -> koalefig_trunk
+    --     frogfishbowl_spice_mandrake_jam -> frogfishbowl
+    local base = prefab:gsub("_spice_.+$", "")
+    if base ~= prefab then
+        return base
+    end
+
+    return prefab
 end
 
 -- =========================================================
@@ -130,7 +178,7 @@ end
 -- =========================================================
 -- 恢复处理函数
 -- =========================================================
-local function ApplyRecovery(inst, doer, food_name, operation)
+local function ApplyRecovery(inst, idiot, food_name, operation)
     if not inst or not inst.components or not food_name or not operation then return end
 
     local rec_table = FOOD_RECOVERY_TABLE[operation]
@@ -159,7 +207,7 @@ end
 -- =========================================================
 -- 沃利执行动作
 -- =========================================================
-local function doFunnyCook(inst, doer, food_name, op)
+local function doFunnyCook(inst, idiot, food_name, op)
     if inst.prefab ~= "warly" then return end --技能树控制
 
     local rec_table = FOOD_RECOVERY_TABLE[op]
@@ -170,18 +218,28 @@ local function doFunnyCook(inst, doer, food_name, op)
     local playerMark = SpawnPrefab("improv_question_mark_fx")
     playerMark.entity:SetParent(inst.entity)
     playerMark.Transform:SetPosition(0, 3, 0)
-    local doerMark = SpawnPrefab("improv_question_mark_fx")
-    doerMark.entity:SetParent(doer.entity)
-    doerMark.Transform:SetPosition(0, 3, 0)
+    local idiotMark = SpawnPrefab("improv_question_mark_fx")
+    idiotMark.entity:SetParent(idiot.entity)
+    idiotMark.Transform:SetPosition(0, 3, 0)
 
     -- 抛锅特效概率控制
-    local chance = values.throw_chance or 1
-    if math.random() < chance then
+    inst._throw_accumulator = inst._throw_accumulator or 0
+    -- 基础概率
+    local base_chance = values.throw_chance or 1
+    -- 随机浮动范围
+    local min_mult = 0.8
+    local max_mult = 1.2
+    -- 生成一次随机浮动值
+    local chance = base_chance * (math.random() * (max_mult - min_mult) + min_mult)
+    inst._throw_accumulator = inst._throw_accumulator + chance
+    while inst._throw_accumulator >= 1 do
+        inst._throw_accumulator = inst._throw_accumulator - 1
+
         inst:DoTaskInTime(0.5, function(inst)
-            if inst then
-                SpawnCookPotFX(inst, doer)
+            if inst and inst:IsValid() then
+                SpawnCookPotFX(inst, idiot)
                 -- puff 特效
-                local puff = SpawnPrefab("small_puff")
+                local puff = SpawnPrefab("warly_sky_pie_cook_fx")
                 if puff then
                     local x, y, z = inst.Transform:GetWorldPosition()
                     puff.Transform:SetPosition(x, y, z)
@@ -194,7 +252,7 @@ local function doFunnyCook(inst, doer, food_name, op)
     ApplyTalking(inst, op)
 
     -- 恢复逻辑
-    ApplyRecovery(inst, doer, food_name, op) --技能树控制
+    ApplyRecovery(inst, idiot, food_name, op) --技能树控制
 end
 
 -- =========================================================
@@ -207,8 +265,11 @@ AddComponentPostInit("stewer", function(stewer)
         local result = old_Harvest and old_Harvest(self, harvester)
         if product and FOOD_RECOVERY_TABLE.harvest_pot[product] then
             for _, player in ipairs(AllPlayers) do
-                if player.prefab == "warly" and harvester and player:IsNear(harvester, 12) then
+                if player.prefab == "warly" and player.components.health and not player.components.health:IsDead()
+                    and harvester and player:IsNear(harvester, 12)
+                then
                     doFunnyCook(player, harvester, product, "harvest_pot")
+                    break
                 end
             end
         end
@@ -226,8 +287,11 @@ AddComponentPostInit("cookable", function(cookable)
         local product = old_Cook and old_Cook(self, cooker, chef)
         if food_name and FOOD_RECOVERY_TABLE.cook_fire[food_name] then
             for _, player in ipairs(AllPlayers) do
-                if player.prefab == "warly" and chef and player:IsNear(chef, 12) then
+                if player.prefab == "warly" and player.components.health and not player.components.health:IsDead()
+                    and chef and player:IsNear(chef, 12)
+                then
                     doFunnyCook(player, chef, food_name, "cook_fire")
+                    break
                 end
             end
         end
@@ -242,23 +306,27 @@ AddComponentPostInit("edible", function(edible)
     local old_OnEaten = edible.OnEaten
     edible.OnEaten = function(self, eater)
         if old_OnEaten then old_OnEaten(self, eater) end
+        if not self.inst:HasTag("dummyfood") then
+            local food_name = self.inst.prefab
+            food_name = GetBaseFood(food_name)
+            for _, player in ipairs(AllPlayers) do
+                if player.prefab == "warly" and player.components.health and not player.components.health:IsDead()
+                    and eater and player:IsNear(eater, 12)
+                then
+                    local operation = nil
 
-        local food_name = self.inst.prefab
-        food_name = GetBaseFood(food_name)
-        for _, player in ipairs(AllPlayers) do
-            if player.prefab == "warly" and eater and player:IsNear(eater, 12) then
-                local operation = nil
+                    if FOOD_RECOVERY_TABLE.eat_common[food_name] then
+                        operation = "eat_common"
+                    elseif eater:HasTag("player") and FOOD_RECOVERY_TABLE.eat_player[food_name] then
+                        operation = "eat_player"
+                    elseif not eater:HasTag("player") and FOOD_RECOVERY_TABLE.eat_animal[food_name] then
+                        operation = "eat_animal"
+                    end
 
-                if FOOD_RECOVERY_TABLE.eat_common[food_name] then
-                    operation = "eat_common"
-                elseif eater:HasTag("player") and FOOD_RECOVERY_TABLE.eat_player[food_name] then
-                    operation = "eat_player"
-                elseif not eater:HasTag("player") and FOOD_RECOVERY_TABLE.eat_animal[food_name] then
-                    operation = "eat_animal"
-                end
-
-                if operation then
-                    doFunnyCook(player, eater, food_name, operation)
+                    if operation then
+                        doFunnyCook(player, eater, food_name, operation)
+                        break
+                    end
                 end
             end
         end
@@ -280,15 +348,16 @@ AddPlayerPostInit(function(dead)
         end
         -- 遍历所有玩家，找附近的沃利
         for _, player in ipairs(AllPlayers) do
-            if player.prefab == "warly" and player:IsNear(dead, 12) then
+            if player.prefab == "warly" and player.components.health and not player.components.health:IsDead()
+                and dead and player:IsNear(dead, 12)
+            then
                 -- 沃利发现队友去世，哀悼 + 献上“四菜一汤”
-                -- 打出问号特效
+                -- 打出问号特效❓
                 local dead_fx = SpawnPrefab("improv_question_mark_fx")
                 if dead_fx then
                     dead_fx.entity:SetParent(dead.entity)
                     dead_fx.Transform:SetPosition(0, 3, 0)
                 end
-
                 local warly_fx = SpawnPrefab("improv_question_mark_fx")
                 if warly_fx then
                     warly_fx.entity:SetParent(player.entity)
@@ -296,7 +365,8 @@ AddPlayerPostInit(function(dead)
                 end
 
                 -- 菜谱顺序
-                local dishes = { "ratatouille", "ratatouille", "ratatouille", "ratatouille", "bonesoup", }
+                local dishes = { "ratatouille_spice_chili", "ratatouille_spice_garlic", "ratatouille_spice_salt",
+                    "ratatouille_spice_sugar", "bonesoup" }
 
                 -- 逐个生成特效（每0.25秒）
                 for i, prefab in ipairs(dishes) do

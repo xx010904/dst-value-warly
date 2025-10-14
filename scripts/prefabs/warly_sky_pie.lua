@@ -38,6 +38,9 @@ local function OnEaten(inst, eater)
             if eater.components.talker then
                 eater.components.talker:Say(GetString(eater, "ANNOUNCE_EAT_PIE_REPEATLY"))
             end
+            local newPie = SpawnPrefab(inst.prefab)
+            newPie.Transform:SetPosition(eater.Transform:GetWorldPosition())
+            LaunchAt(newPie, eater, eater, nil, nil, eater:GetPhysicsRadius(0) + .25)
         else
             if eater.components.talker then
                 eater.components.talker:Say(GetString(eater, "ANNOUNCE_EAT_PIE"))

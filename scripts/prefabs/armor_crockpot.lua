@@ -1,6 +1,6 @@
 local SCAN_RADIUS = 10
-local SANITY_RATIO = 0.15
-local HUNGER_RATIO = 0.15
+local SANITY_RATIO = 0.1
+local HUNGER_RATIO = 0.1
 local GOAT_CHANCE = 0.05
 
 local function OnBlocked(owner)

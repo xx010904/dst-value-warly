@@ -2,13 +2,13 @@ local isCh = locale == "zh" or locale == "zhr"
 version = "1.0.0"
 name = isCh and "数值怪沃利" or "The Value Monster: Warly"
 description = isCh and 
-"大厨有三弱。一弱是能力可以被他人共享，因此我设计了一些必须大厨出场才能触发的技能点；二弱是回血能力有限，因此我增加了一些防御相关的技能点；三弱是获取buff料理不易，所以我加入了一些新的buff料理。当然啦，数值增强技能点也是很重要的，比如直接加buff时长的..."..
+"大厨有三弱。一弱是能力可以被他人共享，因此我设计了一些必须大厨出场才能触发的技能点；二弱是回血能力有限，因此我增加了一些防御相关的技能点；三弱是获取buff料理不易，再加新料理新调料只会更难玩，所以我加了新的获取方式。当然啦，数值增强技能点也是很重要的，比如直接加buff时长的..."..
 "\n󰀐感谢赏玩！"..
 "\n\n〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓"..
 "\n󰀅完整更新日志可以在创意工坊查看"..
 "\n"
 or
-"Warly has 3 weaknesses. First, his abilities can be shared, so I added skill points that only trigger when he’s present. Second, his healing is limited, so I included defense-focused skill points. Third, buff dishes are hard to get, so I added some new ones. Of course, Direct buff-duration boosts are important too..."..
+"todo"..
 "\n󰀐Thanks to enjoy!"..
 "\n\n〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓"..
 "\n󰀅Full changelog available on the Workshop"..
