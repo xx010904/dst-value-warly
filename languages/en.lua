@@ -112,7 +112,9 @@ STRINGS.CHARACTERS.WARLY.TALK_HUNGRY_FRIEND =
     "Looks like it’s pie-o’clock!",
     "An empty stomach brings inspiration!",
 }
+STRINGS.CHARACTERS.WARLY.ANNOUNCE_SPICEPACK_UPGRADE = "Ah, a little more room to cook with flair!"
 
 STRINGS.ACTIONS.USESHADOWHOOK = "Shadow Hook"
 STRINGS.ACTIONS.GIVEFOODTOBATTLEAXE = "Breed"
 STRINGS.ACTIONS.ACTIVATE_POT_PIE = "Inspire Pie"
+STRINGS.ACTIONS.SPICEPACK_UPGRADE = "Upgrade"

@@ -241,8 +241,8 @@ local function doFunnyCook(inst, idiot, food_name, op)
                 -- puff 特效
                 local puff = SpawnPrefab("warly_sky_pie_cook_fx")
                 if puff then
-                    local x, y, z = inst.Transform:GetWorldPosition()
-                    puff.Transform:SetPosition(x, y, z)
+                    puff.entity:SetParent(inst.entity)
+                    puff.Transform:SetPosition(0, 1, 0)
                 end
             end
         end)
@@ -527,9 +527,6 @@ local ACTIVATE_POT_PIE = AddAction("ACTIVATE_POT_PIE", STRINGS.ACTIONS.ACTIVATE_
     if target.SoundEmitter then
         target.SoundEmitter:PlaySound("dontstarve/common/cookingpot_finish")
     end
-    local fx = SpawnPrefab("warly_sky_pie_cook_fx")
-    local x, y, z = doer.Transform:GetWorldPosition()
-    fx.Transform:SetPosition(x, y + 1, z)
 
     if target.components.talker then
         target.components.talker:Say(GetString(target, "ANNOUNCE_EAT_PIE"))
@@ -579,6 +576,10 @@ AddStategraphState("wilson",
         {
             FrameEvent(0, function(inst)
                 inst.SoundEmitter:PlaySound("dontstarve/common/fireAddFuel")
+                inst.SoundEmitter:PlaySound("dontstarve/wilson/cook")
+                local fx = SpawnPrefab("warly_sky_pie_cook_fx")
+                local x, y, z = inst.Transform:GetWorldPosition()
+                fx.Transform:SetPosition(x, y + 1, z)
             end),
             FrameEvent(24, function(inst)
                 inst:PerformBufferedAction()

@@ -60,9 +60,9 @@ AddPlayerPostInit(function(inst)
         end
 
         local required_skill = buffdata.required_skill
-        if required_skill 
-            -- and inst.components.skilltreeupdater and inst.components.skilltreeupdater:IsActivated(required_skill) 
-        then
+        -- local hasSkill = required_skill and inst.components.skilltreeupdater and inst.components.skilltreeupdater:IsActivated(required_skill)
+        -- if not hasSkill then --技能树控制
+        if not true then
             print("[Warly Buff] Missing skill:", required_skill, "- Buff not applied.")
             return
         end
@@ -82,7 +82,7 @@ end)
 
 
 --========================================================
--- 怪物鞑靼：同时雇佣5个猪人，满时间2.5天
+-- 怪物鞑靼：额外同时雇佣5个猪人，满时间2.5天
 --========================================================
 local function HireNearbyPigmen(inst, giver, item)
     local x, y, z = inst.Transform:GetWorldPosition()
@@ -123,6 +123,7 @@ local function HireNearbyPigmen(inst, giver, item)
                             dummy.components.edible.healthvalue = 0
                             dummy.components.edible.hungervalue = 0
                             dummy.components.edible.sanityvalue = 0
+                            dummy.components.edible.foodtype = FOODTYPE.GENERIC
                             dummy:AddTag("dummyfood")
                             local success = pig.components.eater:Eat(dummy)
                             if not success then
@@ -198,6 +199,7 @@ local function ShareFoodEffects(eater, food)
                     dummy.components.edible.healthvalue = 0
                     dummy.components.edible.hungervalue = 0
                     dummy.components.edible.sanityvalue = 0
+                    dummy.components.edible.foodtype = FOODTYPE.GENERIC
                     dummy:AddTag("dummyfood")
                 end
 
@@ -230,6 +232,7 @@ local function ShareFoodEffects(eater, food)
                         dummy.components.edible.healthvalue = 0
                         dummy.components.edible.hungervalue = 0
                         dummy.components.edible.sanityvalue = 0
+                        dummy.components.edible.foodtype = FOODTYPE.GENERIC
                         dummy:AddTag("dummyfood")
                     end
 
