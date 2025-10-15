@@ -104,24 +104,27 @@ end)
 --========================================================
 -- 改造厨师包
 --========================================================
+-- 定义格子
 local containers = require("containers")
 local params = containers.params
-params.spice_sack = {
+params.spice_sack =
+{
     widget =
     {
         slotpos = {},
         slotbg  = {},
-        animbank  = "ui_icepack_2x3",
-        animbuild = "ui_icepack_2x3",
-        pos = Vector3(75, 195, 0),
+        animbank = "ui_fish_box_5x4",
+        animbuild = "ui_fish_box_5x4",
+        pos = Vector3(0, 220, 0),
         side_align_tip = 160,
     },
     type = "chest",
     lowpriorityselection = true,
 }
-for y = 0, 2 do
-    for x = 0, 1 do
-        table.insert(params.spice_sack.widget.slotpos, Vector3(-163 + (75 * x),   -75 * y + 73,   0))
+
+for y = 2.5, -0.5, -1 do
+    for x = -1, 3 do
+        table.insert(params.spice_sack.widget.slotpos, Vector3(75 * x - 75 * 2 + 75, 75 * y - 75 * 2 + 75, 0))
         table.insert(params.spice_sack.widget.slotbg, { image = "preparedfood_slot.tex", atlas = "images/hud2.xml" })
     end
 end
@@ -132,46 +135,29 @@ function params.spice_sack.itemtestfn(container, item, slot)
 end
 
 
+-- 用齿轮升级
 local function UpgradeSpicePack(inst, doer)
     if doer == nil or doer.prefab ~= "warly" then
         return
     end
 
     local backpack = inst
+    local x, y, z = backpack.Transform:GetWorldPosition()
     if backpack and backpack.prefab == "spicepack" then
-        local pos = doer:GetPosition()
-        local saved_items = {}
         if backpack.components.container ~= nil then
-            for k = 1, backpack.components.container:GetNumSlots() do
-                local item = backpack.components.container:GetItemInSlot(k)
-                if item ~= nil then
-                    table.insert(saved_items, item)
-                end
-            end
+            backpack.components.container:DropEverything()
         end
 
+        -- 最后再安全删除背包本体
         backpack:Remove()
-
         local newbag = SpawnPrefab("spice_sack")
         if newbag ~= nil then
-            -- 把原物品放回新背包
-            if newbag.components.container ~= nil then
-                for _, item in ipairs(saved_items) do
-                    if item and item:IsValid() then
-                        newbag.components.container:GiveItem(item)
-                    end
-                end
-            end
-            local angle = math.random() * 2 * PI
-            local radius = 1 + math.random() * 0.5
-            local drop_x = pos.x + math.cos(angle) * radius
-            local drop_z = pos.z + math.sin(angle) * radius
-            newbag.Transform:SetPosition(drop_x, 0, drop_z)
+            newbag.Transform:SetPosition(x, y, z)
             local fx = SpawnPrefab("small_puff")
             if fx then
-                fx.Transform:SetPosition(drop_x, 0, drop_z)
+                fx.Transform:SetPosition(x, y, z)
             end
-            doer.SoundEmitter:PlaySound("dontstarve/common/teleportworm/travel")
+            doer.SoundEmitter:PlaySound("summerevent/plaza/upgrade_1to2")
             if doer.components.talker then
                 doer.components.talker:Say(GetString(doer, "ANNOUNCE_SPICEPACK_UPGRADE"))
             end

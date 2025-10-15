@@ -1,16 +1,19 @@
-
 -----------------------------------------------------------------------------------------------
 
 local function OnOpen(inst)
+    inst.SoundEmitter:PlaySound("yotb_2021/common/sewing_machine/open")
 end
 
 local function OnClose(inst)
+    inst.SoundEmitter:PlaySound("yotb_2021/common/sewing_machine/stop")
 end
 
 local function OnPutInInventory(inst)
+    inst.components.container:Close()
 end
 
 local function OnRemoveEntity(inst)
+    inst.components.container:DropEverything()
 end
 
 
@@ -56,8 +59,8 @@ local function fn()
 
     inst:AddComponent("container")
     inst.components.container:WidgetSetup("spice_sack")
-    -- inst.components.container.onopenfn = OnOpen
-    -- inst.components.container.onclosefn = OnClose
+    inst.components.container.onopenfn = OnOpen
+    inst.components.container.onclosefn = OnClose
     inst.components.container.skipclosesnd = true
     inst.components.container.skipopensnd = true
     inst.components.container.droponopen = true
@@ -79,4 +82,4 @@ end
 
 
 
-return Prefab( "spice_sack", fn  )
+return Prefab("spice_sack", fn)

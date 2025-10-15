@@ -1,6 +1,7 @@
 STRINGS.NAMES.ARMOR_CROCKPOT = "Burdened Pot"
 STRINGS.NAMES.SHADOW_BATTLEAXE_YOUNG = "Half-Baked Shadow Mace"
 STRINGS.NAMES.WARLY_SKY_PIE = "Pie In The Sky"
+STRINGS.NAMES.SPICE_SACK = "Spice Sack"
 
 STRINGS.RECIPE_DESC.ARMOR_CROCKPOT = "Blacken your pot, so you can take the blame."
 STRINGS.RECIPE_DESC.SHADOW_BATTLEAXE_YOUNG = "It will never wake up again."
