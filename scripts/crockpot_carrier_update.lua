@@ -27,6 +27,7 @@ AddRecipe2("armor_crockpot",
         builder_skill= nil, -- 可选：指定技能树才能做（技能树指定标签）
         description = "armor_crockpot", -- 描述的id，而非本身
         numtogive = 1,
+        no_deconstruction = true, -- 可选：防止分解还原
     }
 )
 AddRecipeToFilter("armor_crockpot", "CHARACTER")

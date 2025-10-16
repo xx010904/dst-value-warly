@@ -83,7 +83,7 @@ local FOOD_RECOVERY_TABLE = {
     },
 }
 
--- 保存沃利抛锅的累计概率
+-- 保存沃利抛锅和烤饼的累计概率
 AddPlayerPostInit(function(inst)
     if not TheWorld.ismastersim then
         return
@@ -95,6 +95,7 @@ AddPlayerPostInit(function(inst)
     end
 
     inst._throw_accumulator = inst._throw_accumulator or 0
+    inst.warly_skypie_accum_chance = inst.warly_skypie_accum_chance or 0
 
     local _OldOnSave_throw = inst.OnSave
     inst.OnSave = function(inst, data)
@@ -102,6 +103,7 @@ AddPlayerPostInit(function(inst)
             _OldOnSave_throw(inst, data)
         end
         data.throw_accumulator = inst._throw_accumulator
+        data.warly_skypie_accum_chance = inst.warly_skypie_accum_chance
     end
 
     local _OldOnLoad_throw = inst.OnLoad
@@ -111,6 +113,9 @@ AddPlayerPostInit(function(inst)
         end
         if data and data.throw_accumulator then
             inst._throw_accumulator = data.throw_accumulator
+        end
+        if data and data.warly_skypie_accum_chance then
+            inst.warly_skypie_accum_chance = data.warly_skypie_accum_chance
         end
     end
 end)
@@ -385,6 +390,34 @@ end)
 -- =========================================================
 -- SECTION2 可以右键点击动作“画饼”的锅
 -- =========================================================
+-- ----------------------------------------------------------
+-- 定义沃利专属的warly_sky_pie配方
+-- ----------------------------------------------------------
+AddRecipe2("warly_sky_pie",
+    {
+        Ingredient("portablecookpot_item", 0),
+        Ingredient(CHARACTER_INGREDIENT.SANITY, 30)
+    },
+    TECH.NONE,
+    {
+        product = "warly_sky_pie",
+        atlas = "images/inventoryimages/warly_sky_pie.xml",
+        image = "warly_sky_pie.tex",
+        builder_tag = "masterchef", -- 仅沃利可做
+        builder_skill= nil, -- 可选：指定技能树才能做（技能树指定标签）
+        description = "warly_sky_pie",
+        numtogive = 3,
+        no_deconstruction = true, -- 可选：防止分解还原
+        sg_state="spawn_warly_sky_pie"
+    }
+)
+
+-- 添加到角色专属标签页
+AddRecipeToFilter("warly_sky_pie", "CHARACTER")
+
+-- ----------------------------------------------------------
+-- 可以右键点击动作“画饼”的锅
+-- ----------------------------------------------------------
 -- 1) Hook portablecookpot_item prefab，本体逻辑：扫描、激活标志、提示
 AddPrefabPostInit("portablecookpot_item", function(inst)
     if not TheWorld.ismastersim then

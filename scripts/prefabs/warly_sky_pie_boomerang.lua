@@ -1,13 +1,34 @@
+local function UpdateDamage(inst)
+    if inst.components.perishable and inst.components.weapon then
+        local freshness = inst.components.perishable:GetPercent()
+
+        -- 发射物数量：新鲜度 0% → 1；100% → 3
+        inst.max_projectiles = math.min(1 + math.floor(freshness * 3), 3)
+
+        -- 伤害随新鲜度变化，最高和51，最低为17
+        local baseDamage = 17
+        inst.components.weapon:SetDamage(inst.max_projectiles * baseDamage)
+
+    end
+end
+
+local function UpdateProjectileDamage(inst, attacker, target, proj)
+    if proj.components.weapon and inst.components.weapon then
+        proj.components.weapon:SetDamage(inst.components.weapon.damage)
+    end
+end
 
 local function OnEquip(inst, owner)
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
 
-    inst:SetFxOwner(owner)    
+    inst:SetFxOwner(owner)
     owner.AnimState:ClearOverrideSymbol("swap_object")
+    UpdateDamage(inst)
 end
 
 local function OnUnequip(inst, owner)
+    UpdateDamage(inst)
     owner.AnimState:Hide("ARM_carry")
     owner.AnimState:Show("ARM_normal")
 
@@ -28,7 +49,6 @@ local function SetFxOwner(inst, owner)
     if owner ~= nil then
         inst.fx.entity:SetParent(owner.entity)
         inst.fx.Follower:FollowSymbol(owner.GUID, "swap_object", nil, nil, nil, true, nil, 2)
-        inst.fx.components.highlightchild:SetOwner(owner)
         inst.fx:ToggleEquipped(true)
 
         if owner.components.colouradder ~= nil then
@@ -38,17 +58,12 @@ local function SetFxOwner(inst, owner)
         inst.fx.entity:SetParent(inst.entity)
         -- For floating.
         inst.fx.Follower:FollowSymbol(inst.GUID, "swap_spear", nil, nil, nil, true, nil, 2)
-        inst.fx.components.highlightchild:SetOwner(inst)
         inst.fx:ToggleEquipped(false)
     end
 end
 
 local function PushIdleLoop(inst)
-    if inst.components.finiteuses:GetUses() > 0 then
-        inst.AnimState:PushAnimation("idle")
-    else
-        inst.AnimState:PlayAnimation("broken")
-    end
+    inst.AnimState:PushAnimation("idle")
 end
 
 local function OnStopFloating(inst)
@@ -60,9 +75,6 @@ end
 
 local function SetupComponents(inst)
     inst:AddComponent("equippable")
-    inst.components.equippable.dapperness = -TUNING.DAPPERNESS_MED
-    inst.components.equippable.is_magic_dapperness = true
-    inst.components.equippable.walkspeedmult = TUNING.VOIDCLOTH_BOOMERANG_SPEEDMULT
     inst.components.equippable:SetOnEquip(OnEquip)
     inst.components.equippable:SetOnUnequip(OnUnequip)
 end
@@ -102,6 +114,9 @@ local function OnPreLoad(inst, data, newents)
     end
 end
 
+local function OnLoad(inst, data)
+    UpdateDamage(inst)
+end
 ----------------------------------------------------------------------------------------------------------------
 
 local function fn()
@@ -122,12 +137,9 @@ local function fn()
 
     -- Weapon (from weapon component) added to pristine state for optimization.
     inst:AddTag("weapon")
-
-    -- Shadowlevel (from shadowlevel component) added to pristine state for optimization.
-    inst:AddTag("shadowlevel")
-
     -- Rechargeable (from rechargeable component) added to pristine state for optimization.
     inst:AddTag("rechargeable")
+    inst:AddTag("show_spoilage")
 
     inst.projectiledelay = FRAMES
 
@@ -144,7 +156,7 @@ local function fn()
     end
 
     inst._projectiles = {}
-    inst.max_projectiles = 1
+    inst.max_projectiles = 6
 
     inst.SetFxOwner = SetFxOwner
     inst.OnProjectileCountChanged = OnProjectileCountChanged
@@ -167,20 +179,27 @@ local function fn()
 
     inst:AddComponent("inspectable")
     inst:AddComponent("inventoryitem")
+    inst.components.inventoryitem.imagename = "warly_sky_pie_boomerang"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/warly_sky_pie_boomerang.xml"
 
-    inst:AddComponent("finiteuses")
-    inst.components.finiteuses:SetMaxUses(TUNING.VOIDCLOTH_BOOMERANG_USES)
-    inst.components.finiteuses:SetUses(TUNING.VOIDCLOTH_BOOMERANG_USES)
+    inst:AddComponent("perishable")
+    inst.components.perishable:SetPerishTime(TUNING.PERISH_MED)
+    inst.components.perishable:StartPerishing()
+    inst.components.perishable.onperishreplacement = "spoiled_food"
 
     inst:AddComponent("weapon")
     inst.components.weapon:SetRange(TUNING.VOIDCLOTH_BOOMERANG_ATTACK_DIST, TUNING.VOIDCLOTH_BOOMERANG_ATTACK_DIST_MAX)
     inst.components.weapon:SetProjectile("warly_sky_pie_boomerang_proj")
+    inst.components.weapon:SetDamage(TUNING.HAMBAT_DAMAGE)
+    inst.components.weapon:SetOnAttack(UpdateDamage)
+    inst.components.weapon:SetOnProjectileLaunched(UpdateProjectileDamage)
 
     inst:AddComponent("rechargeable")
     inst.components.rechargeable:SetOnDischargedFn(OnDischarged)
     inst.components.rechargeable:SetOnChargedFn(OnCharged)
 
     inst.OnPreLoad = OnPreLoad
+    inst.OnLoad = OnLoad
 
     MakeHauntableLaunch(inst)
 
@@ -189,12 +208,12 @@ end
 
 ----------------------------------------------------------------------------------------------------------------
 
-local PROJECTILE_COLLECT_DIST_SQ = 1*1
+local PROJECTILE_COLLECT_DIST_SQ = 1 * 1
 
 local PROJECTILE_MAX_SIZE = 1
 local PROJECTILE_MIN_SIZE = .4
 
-local PROJECTILE_RETURN_SPEED_ACCELERATION_RATE = 1/3
+local PROJECTILE_RETURN_SPEED_ACCELERATION_RATE = 1 / 3
 
 local function Projectile_OnRemoved(inst)
     if inst._boomerang ~= nil and inst._boomerang:IsValid() then
@@ -244,7 +263,6 @@ local function Projectile_OnUpdateFn(inst, dt)
 
     if inst._returntarget == nil then
         -- Do nothing!
-
     elseif not inst._returntarget:IsValid() or inst._returntarget:IsInLimbo() then
         inst:Remove()
 
@@ -259,7 +277,8 @@ local function Projectile_OnUpdateFn(inst, dt)
             return
         else
             local direction = (t_pos - p_pos):GetNormalized()
-            local projected_speed = TUNING.VOIDCLOTH_BOOMERANG_PROJECTILE.RETURN_SPEED * TheSim:GetTickTime() * TheSim:GetTimeScale()
+            local projected_speed = TUNING.VOIDCLOTH_BOOMERANG_PROJECTILE.RETURN_SPEED * TheSim:GetTickTime() *
+            TheSim:GetTimeScale()
             local projected = p_pos + direction * projected_speed
 
             if direction:Dot(t_pos - projected) < 0 then
@@ -283,26 +302,20 @@ local function Projectile_OnUpdateFn(inst, dt)
 
     if scalingdata.currenttime >= scalingdata.totaltime then
         inst.scale = scalingdata.finish
-
     else
         inst.scale = Lerp(scalingdata.start, scalingdata.finish, scalingdata.currenttime / scalingdata.totaltime)
     end
 
     if inst.scale ~= nil then
         inst.AnimState:SetScale(inst.scale, inst.scale)
-
-        local damage_scale = Remap(inst.scale, PROJECTILE_MIN_SIZE, PROJECTILE_MAX_SIZE, 0, 1)
-        local bonus_mult = inst._bonusenabled and TUNING.WEAPONS_VOIDCLOTH_SETBONUS_DAMAGE_MULT or 1
-
-        inst.components.weapon:SetDamage(bonus_mult * Lerp(TUNING.VOIDCLOTH_BOOMERANG_DAMAGE.min, TUNING.VOIDCLOTH_BOOMERANG_DAMAGE.max, damage_scale))
     end
 end
 
 local function Projectile_OnThrown(inst, owner, target, attacker)
-    inst.SoundEmitter:PlaySound("rifts4/voidcloth_boomerang/throw_lp", "loop")
+    -- inst.SoundEmitter:PlaySound("rifts4/voidcloth_boomerang/throw_lp", "loop")
+    inst.SoundEmitter:PlaySound("dontstarve/wilson/boomerang_throw", "loop")
 
     inst._boomerang = owner
-    inst._bonusenabled = owner ~= nil and owner._bonusenabled
 
     if owner ~= nil and owner.components.weapon ~= nil then
         owner.components.weapon:OnAttack(attacker, target, inst)
@@ -310,15 +323,6 @@ local function Projectile_OnThrown(inst, owner, target, attacker)
         table.insert(owner._projectiles, inst)
 
         owner:OnProjectileCountChanged()
-    end
-
-    if attacker ~= nil and attacker:IsValid() then
-        local fx = SpawnPrefab("voidcloth_boomerang_launch_fx")
-
-        local pos = target:GetPositionAdjacentTo(attacker, .5)
-
-        fx.Transform:SetPosition(pos:Get())
-        fx.Transform:SetRotation(fx:GetAngleToPoint(target.Transform:GetWorldPosition()) - 90)
     end
 end
 
@@ -344,12 +348,6 @@ local function ProjectileFn()
     inst.AnimState:PlayAnimation("projectile", true)
 
     inst.AnimState:SetScale(PROJECTILE_MIN_SIZE, PROJECTILE_MIN_SIZE)
-
-    inst.AnimState:SetLightOverride(.1)
-    inst.AnimState:SetSymbolLightOverride("lightning", .5)
-
-    inst.AnimState:SetSymbolMultColour("blade", 1, 1, 1, .8)
-    inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
 
     -- weapon (from weapon component) added to pristine state for optimization.
     inst:AddTag("weapon")
@@ -378,7 +376,8 @@ local function ProjectileFn()
     inst.ReturnToThrower = Projectile_ReturnToThrower
 
     inst:AddComponent("weapon")
-    inst.components.weapon:SetDamage(TUNING.VOIDCLOTH_BOOMERANG_DAMAGE.min)
+    -- inst.components.weapon:SetDamage(TUNING.HAMBAT_DAMAGE)
+    -- inst.components.weapon:SetOnAttack(UpdateDamage)
 
     inst:AddComponent("updatelooper")
     inst.components.updatelooper:AddOnUpdateFn(Projectile_OnUpdateFn)
@@ -402,8 +401,8 @@ end
 
 local FX_DEFS =
 {
-    { anim = "f1", frame_begin = 0, frame_end = 2  },
-  --{ anim = "f3", frame_begin = 2                 },
+    { anim = "f1", frame_begin = 0, frame_end = 2 },
+    --{ anim = "f3", frame_begin = 2                 },
 }
 
 local function CreateFxFollowFrame()
@@ -421,7 +420,6 @@ local function CreateFxFollowFrame()
 
     inst.AnimState:SetLightOverride(.1)
 
-    inst:AddComponent("highlightchild")
 
     inst.persists = false
 
@@ -453,13 +451,12 @@ local function FxOnEquipToggle(inst)
             if fx == nil then
                 fx = CreateFxFollowFrame()
                 -- fx.AnimState:PlayAnimation("swap_loop_"..v.anim, true)
-                fx.AnimState:PlayAnimation("idle", true)
+                fx.AnimState:PlayAnimation("idle")
                 inst.fx[i] = fx
             end
             fx.entity:SetParent(owner.entity)
             fx.Follower:FollowSymbol(owner.GUID, "swap_object", nil, nil, nil, true, nil, v.frame_begin, v.frame_end)
             fx.AnimState:SetFrame(frame)
-            fx.components.highlightchild:SetOwner(owner)
         end
         inst.components.colouraddersync:SetColourChangedFn(FxColourChanged)
         inst.OnRemoveEntity = FxRemoveAll
@@ -496,7 +493,6 @@ local function FollowSymbolFxFn()
 
     inst.AnimState:SetLightOverride(.1)
 
-    inst:AddComponent("highlightchild")
     inst:AddComponent("colouraddersync")
 
     inst.equiptoggle = net_bool(inst.GUID, "voidcloth_boomerang_fx.equiptoggle", "equiptoggledirty")
@@ -516,5 +512,5 @@ end
 
 ----------------------------------------------------------------------------------------------------------------
 return Prefab("warly_sky_pie_boomerang", fn),
-    Prefab("warly_sky_pie_boomerang_fx",   FollowSymbolFxFn),
+    Prefab("warly_sky_pie_boomerang_fx", FollowSymbolFxFn),
     Prefab("warly_sky_pie_boomerang_proj", ProjectileFn)

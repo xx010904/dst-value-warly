@@ -38,17 +38,17 @@ end
 
 -- 🥔 获取所有食谱产物（包含MOD食谱）
 local function GetAllCookableFoods()
-    local foods = {}
+    local allCookableFoods = {}
     for cooker, recipes in pairs(cooking.recipes) do
         if type(recipes) == "table" then
             for product, _ in pairs(recipes) do
                 if product ~= nil and product ~= "" then
-                    foods[product] = true
+                    allCookableFoods[product] = true
                 end
             end
         end
     end
-    return foods
+    return allCookableFoods
 end
 
 -- 🍲 根据厨师记忆筛选未吃过的食物（无doer则随机全食谱）
