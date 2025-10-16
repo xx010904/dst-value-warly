@@ -29,7 +29,6 @@ local function StopSanityControl(inst, target)
             inst._crepes_sanity_control_task:Cancel()
             inst._crepes_sanity_control_task = nil
         end
-        target.components.talker:Say("The mind clears...")
     end
 end
 
@@ -38,7 +37,9 @@ local function OnAttached(inst, target)
     target:AddTag("warly_crepes_buff")
 
     StartSanityControl(inst, target)
-    target.components.talker:Say("Sweet clarity fills my mind.")
+    if target.components.talker then
+        target.components.talker:Say(GetString(target, "ANNOUNCE_CREPES_BUFF_ATTACHED"))
+    end
 
     -- Buff持续5分钟
     inst.components.timer:StartTimer("expire", BUFF_DURATION)
@@ -46,6 +47,9 @@ end
 
 local function OnDetached(inst, target)
     StopSanityControl(inst, target)
+    if target.components.talker then
+        target.components.talker:Say(GetString(target, "ANNOUNCE_CREPES_BUFF_DETACHED"))
+    end
     if target then
         target:RemoveTag("warly_crepes_buff")
     end

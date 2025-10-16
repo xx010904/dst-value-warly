@@ -26,7 +26,7 @@ local function UpdateSpeed(inst)
         count = math.min(count, 25) --最多25
 
         -- 平方根非线性加速
-        local mult = 1 + 0.2 * math.sqrt(count)  --最多1+1倍速度
+        local mult = 1 + 0.2 * math.sqrt(count) --最多1+1倍速度
 
         inst.components.locomotor:SetExternalSpeedMultiplier(inst, "warly_seafood_buff", mult)
 
@@ -41,7 +41,9 @@ local function OnAttached(inst, target)
     target:AddTag("warly_seafood_buff")
 
     inst._updatetask = target:DoPeriodicTask(0.5, function() UpdateSpeed(target) end)
-    target.components.talker:Say("The more foes, the faster I flow!")
+    if target.components.talker then
+        target.components.talker:Say(GetString(target, "ANNOUNCE_SEAFOOD_BUFF_ATTACHED"))
+    end
 
     inst.components.timer:StartTimer("expire", 300)
 end
@@ -50,7 +52,9 @@ local function OnDetached(inst, target)
     if target and target.components.locomotor then
         target.components.locomotor:RemoveExternalSpeedMultiplier(inst, "warly_seafood_buff")
         target:RemoveTag("warly_seafood_buff")
-        target.components.talker:Say("The tide of speed recedes...")
+        if target.components.talker then
+            target.components.talker:Say(GetString(target, "ANNOUNCE_SEAFOOD_BUFF_ATTACHED"))
+        end
     end
     if inst._updatetask then
         inst._updatetask:Cancel()

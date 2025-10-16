@@ -52,7 +52,7 @@ local function OnAttached(inst, target)
 
     -- 提示
     if target.components.talker then
-        target.components.talker:Say("I feel nimble!")
+        target.components.talker:Say(GetString(target, "ANNOUNCE_BONESOUP_BUFF_ATTACHED"))
     end
 
     -- buff持续时间
@@ -63,7 +63,7 @@ local function OnDetached(inst, target)
     if target then
         target:RemoveTag("warly_bonesoup_buff")
         if target.components.talker then
-            target.components.talker:Say("My nimbleness fades...")
+            target.components.talker:Say(GetString(target, "ANNOUNCE_BONESOUP_BUFF_DETACHED"))
         end
         if target.components.attackdodger then
             target:RemoveComponent("attackdodger")

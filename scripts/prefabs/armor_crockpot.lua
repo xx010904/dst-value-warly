@@ -53,6 +53,7 @@ end
 local function OnTakeDamage(inst, damage_amount)
     local owner = inst.components.inventoryitem.owner
     if not owner then return end
+    -- print("护甲承受了多少伤害：", damage_amount)
 
     -- 自身受伤低概率触发替罪羊
     local activeGoat = true -- 技能树控制
@@ -387,8 +388,11 @@ local function fn()
     inst.components.inventoryitem.atlasname = "images/inventoryimages/armor_crockpot.xml"
 
     inst:AddComponent("armor")
-    inst.components.armor:InitCondition(648, 0.99999)
+    inst.components.armor:InitCondition(666, 0.99999)
     inst.components.armor.ontakedamage = OnTakeDamage
+
+    inst:AddComponent("planardefense")
+	inst.components.planardefense:SetBaseDefense(99999)
 
     inst:AddComponent("equippable")
     inst.components.equippable.equipslot = EQUIPSLOTS.BODY

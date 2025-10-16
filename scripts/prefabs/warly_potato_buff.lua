@@ -1,4 +1,4 @@
-local BUFF_DURATION = 300      -- buff 持续时间（秒）
+local BUFF_DURATION = 300 -- buff 持续时间（秒）
 
 local function UpdateDamage(inst, target)
     if target.components.combat and target.components.hunger then
@@ -35,8 +35,10 @@ end
 local function OnAttached(inst, target)
     inst.entity:SetParent(target.entity)
     target:AddTag("warly_potato_buff")
+
+    -- 失去思考能力
     if target.components.sanity then
-        target.components.sanity:AddSanityPenalty("warly_potato_buff", 0.85)
+        target.components.sanity:AddSanityPenalty("warly_potato_buff", 0.5)
     end
 
     -- 每帧更新攻击力
@@ -47,7 +49,7 @@ local function OnAttached(inst, target)
     end)
 
     if target.components.talker then
-        target.components.talker:Say("I feel mighty and fluffy!")
+        target.components.talker:Say(GetString(target, "ANNOUNCE_POTATO_BUFF_ATTACHED"))
     end
 
     inst.components.timer:StartTimer("expire", BUFF_DURATION)
@@ -70,7 +72,7 @@ local function OnDetached(inst, target)
         end
 
         if target.components.talker then
-            target.components.talker:Say("The fluffiness fades...")
+            target.components.talker:Say(GetString(target, "ANNOUNCE_POTATO_BUFF_DETACHED"))
         end
     end
 

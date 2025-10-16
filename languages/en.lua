@@ -1,16 +1,31 @@
 STRINGS.NAMES.ARMOR_CROCKPOT = "Burdened Pot"
 STRINGS.NAMES.SHADOW_BATTLEAXE_YOUNG = "Half-Baked Shadow Mace"
 STRINGS.NAMES.WARLY_SKY_PIE = "Pie In The Sky"
+STRINGS.NAMES.WARLY_SKY_PIE_BOOMERANG = "Void Sky Pie"
 STRINGS.NAMES.SPICE_SACK = "Spice Sack"
 
 STRINGS.RECIPE_DESC.ARMOR_CROCKPOT = "Blacken your pot, so you can take the blame."
 STRINGS.RECIPE_DESC.SHADOW_BATTLEAXE_YOUNG = "It will never wake up again."
 STRINGS.RECIPE_DESC.WARLY_SKY_PIE = "Dream pies can actually fill your stomach."
+STRINGS.RECIPE_DESC.SPICE_SACK = "A picky sack that only holds spices."
 
 STRINGS.CHARACTERS.WARLY.DESCRIBE.ARMOR_CROCKPOT = "Your pot's all black now —— guess who's taking the blame?"
 STRINGS.CHARACTERS.GENERIC.DESCRIBE.ARMOR_CROCKPOT = "A pot for taking all the blame."
 STRINGS.CHARACTERS.WARLY.DESCRIBE.SHADOW_BATTLEAXE_YOUNG = "Not fully done, but still quite usable."
 STRINGS.CHARACTERS.GENERIC.DESCRIBE.SHADOW_BATTLEAXE_YOUNG = "The chef's youthful version of the Shadow Maul."
+STRINGS.CHARACTERS.WARLY.DESCRIBE.WARLY_SKY_PIE = "A masterpiece from thin air!"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.WARLY_SKY_PIE = "This might actually fill me up."
+STRINGS.CHARACTERS.WARLY.DESCRIBE.SPICE_SACK = "The aroma of spices invigorates the soul."
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.SPICE_SACK = "It smells wonderfully fragrant inside."
+
+STRINGS.CHARACTERS.WARLY.ANNOUNCE_BONESOUP_BUFF_ATTACHED = "I feel the blessing of my ancestors' bones."
+STRINGS.CHARACTERS.WARLY.ANNOUNCE_BONESOUP_BUFF_DETACHED = "I've lost the blessing of my ancestors' bones."
+STRINGS.CHARACTERS.WARLY.ANNOUNCE_CREPES_BUFF_ATTACHED = "Super sweetness lifts my spirits!"
+STRINGS.CHARACTERS.WARLY.ANNOUNCE_CREPES_BUFF_DETACHED = "The super sweetness has faded away."
+STRINGS.CHARACTERS.WARLY.ANNOUNCE_POTATO_BUFF_ATTACHED = "I can feel the boundless power of the potato!"
+STRINGS.CHARACTERS.WARLY.ANNOUNCE_POTATO_BUFF_DETACHED = "The power of the potato has left me."
+STRINGS.CHARACTERS.WARLY.ANNOUNCE_SEAFOOD_BUFF_ATTACHED = "I feel slippery all over!"
+STRINGS.CHARACTERS.WARLY.ANNOUNCE_SEAFOOD_BUFF_DETACHED = "I've lost that slippery feeling."
 
 STRINGS.CHARACTERS.GENERIC.ANNOUNCE_BAD_EAT_COMMOM =
 {
