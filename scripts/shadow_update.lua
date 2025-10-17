@@ -314,12 +314,24 @@ AddAction("GIVEFOODTOBATTLEAXE", STRINGS.ACTIONS.GIVEFOODTOBATTLEAXE, function(a
         return false
     end
 
+    -- ✅ 限制只能喂怪物肉
+    if item.components.edible.foodtype ~= FOODTYPE.MEAT
+        or item.components.edible.secondaryfoodtype ~= FOODTYPE.MONSTER
+    then
+        return false
+    end
+
     local hunger_component = target.components.hunger
     if not hunger_component then
         return false
     end
 
     local hunger_missing = hunger_component.max - hunger_component.current
+
+    if hunger_missing < 12 and target.level > 1 then
+        return false
+    end
+
     local hunger_per_food = item.components.edible:GetHunger() / 4
 
     if hunger_per_food <= 0 then
@@ -330,17 +342,8 @@ AddAction("GIVEFOODTOBATTLEAXE", STRINGS.ACTIONS.GIVEFOODTOBATTLEAXE, function(a
 
     -- 计算需要消耗多少个食物来喂满
     local needed_food_count = math.ceil(hunger_missing / hunger_per_food)
-    local actual_food_count = math.min(needed_food_count, stack_size)
+    local actual_food_count = math.max(1, math.min(needed_food_count, stack_size)) -- 至少1个
     local total_hunger_delta = actual_food_count * hunger_per_food
-
-    -- 补充，会触发[下饭操作]
-    if valuable_foods[item.prefab] then
-        doer:PushEvent("funny_play_warly", {
-            doer = doer,        -- 吃食物的人
-            item = item.prefab, -- 被吃掉的食物名称
-            operation = "eat"   -- 操作类型，标记为“eat”
-        })
-    end
 
     -- 消耗食物
     if item.components.stackable then
@@ -359,6 +362,7 @@ AddAction("GIVEFOODTOBATTLEAXE", STRINGS.ACTIONS.GIVEFOODTOBATTLEAXE, function(a
         local list = STRINGS.SHADOW_BATTLEAXE_TALK["feed_up"]
         target._classified:Say(list, math.random(#list), "rifts4/nightmare_axe/lvl" .. target.level .. "_talk_LP")
     end
+
     -- 最高喂到2级，可以开始吸血(1到4级，不是0到3)
     if hunger_percent >= 100 and target.level and target.level < 2 then
         target:SetLevel(2)
@@ -367,8 +371,10 @@ AddAction("GIVEFOODTOBATTLEAXE", STRINGS.ACTIONS.GIVEFOODTOBATTLEAXE, function(a
             target._classified:Say(list2, math.random(#list2), "rifts4/nightmare_axe/lvl" .. target.level .. "_talk_LP")
         end
     end
+
     return true
 end)
+
 ACTIONS.GIVEFOODTOBATTLEAXE.mount_valid = true
 
 -- 设置动作组件使用条件

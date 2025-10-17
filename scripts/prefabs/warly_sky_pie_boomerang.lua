@@ -451,7 +451,7 @@ local function FxOnEquipToggle(inst)
             if fx == nil then
                 fx = CreateFxFollowFrame()
                 -- fx.AnimState:PlayAnimation("swap_loop_"..v.anim, true)
-                fx.AnimState:PlayAnimation("idle")
+                fx.AnimState:PlayAnimation("idle", true)
                 inst.fx[i] = fx
             end
             fx.entity:SetParent(owner.entity)
