@@ -56,8 +56,8 @@ local function GetUnmemorizedFoods(doer)
     local allfoods = GetAllCookableFoods()
     local valid = {}
 
-    local skillTreeActive = true -- 技能树控制
-    if skillTreeActive and doer and doer.components.foodmemory then
+    local hasSkill = doer.components.skilltreeupdater and doer.components.skilltreeupdater:IsActivated("warly_funny_cook_memory") -- 技能树控制
+    if hasSkill and doer and doer.components.foodmemory then
         local memory = doer.components.foodmemory
 
         -- 限制最多排除 10 种食物
@@ -189,9 +189,9 @@ local function fn()
                 inst:DoTaskInTime(0.7, function()
                     inst.AnimState:PlayAnimation("hit_empty", false)
 
-                    -- 🎁 扔出食物实体
-                    -- local loot = SpawnPrefab(math.random() < 0.1 and product or diaplay_product) -- 技能树控制：调味的料理
-                    local loot = SpawnPrefab(product) -- 技能树控制：调味的料理
+                    -- 🎁 扔出食物实体，技能树控制
+                    local hasSkill = inst.doer and inst.doer.components.skilltreeupdater and inst.doer.components.skilltreeupdater:IsActivated("warly_funny_cook_spice")
+                    local loot = SpawnPrefab(hasSkill and product or diaplay_product) -- 技能树控制：调味的料理
                     if loot then
                         local x, y, z = inst.Transform:GetWorldPosition()
                         loot.Transform:SetPosition(x, y + 1, z)

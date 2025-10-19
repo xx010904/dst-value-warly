@@ -17,8 +17,8 @@ AddRecipe2("shadow_battleaxe_young",
         atlas = "images/inventoryimages/shadow_battleaxe_young.xml",
         image = "shadow_battleaxe_young.tex",
         builder_tag = "masterchef",
-        builder_skill = nil,                    -- 可选：指定技能树才能做（技能树指定标签）
-        description = "shadow_battleaxe_young", -- 描述的id，而非本身
+        builder_skill = "warly_allegiance_shadow", -- 指定技能树才能做
+        description = "shadow_battleaxe_young",    -- 描述的id，而非本身
         numtogive = 1,
     }
 )
@@ -254,7 +254,7 @@ AddAction(USESHADOWHOOK)
 
 -- 定义动作选择器
 AddComponentAction("EQUIPPED", "shadowhooktool", function(inst, doer, target, actions, right) -- 兼容海上和对物品触发
-    if doer.prefab == "warly" and doer:HasTag("masterchef") then                              -- 技能树控制
+    if doer.prefab == "warly" and doer:HasTag("masterchef") and doer:HasTag("warly_allegiance_shadow") then  -- 技能树控制
         -- 先检查inst是否有 finiteuses 且耐久 > 0
         local has_uses = true
         if inst and inst.components.finiteuses then
@@ -269,7 +269,7 @@ AddComponentAction("EQUIPPED", "shadowhooktool", function(inst, doer, target, ac
     end
 end)
 AddComponentAction("POINT", "shadowhooktool", function(inst, doer, pos, actions, right, target)
-    if doer.prefab == "warly" and doer:HasTag("masterchef") then -- 技能树控制
+    if doer.prefab == "warly" and doer:HasTag("masterchef") and doer:HasTag("warly_allegiance_shadow") then  -- 技能树控制
         -- 先检查inst是否有 finiteuses 且耐久 > 0
         local has_uses = true
         if inst and inst.components.finiteuses then
@@ -302,7 +302,7 @@ AddAction("GIVEFOODTOBATTLEAXE", STRINGS.ACTIONS.GIVEFOODTOBATTLEAXE, function(a
         return false
     end
 
-    if doer.prefab ~= "warly" then -- 技能树标签控制
+    if doer.prefab ~= "warly" or not doer:HasTag("warly_allegiance_shadow") then -- 技能树标签控制
         return false
     end
 
@@ -379,7 +379,7 @@ ACTIONS.GIVEFOODTOBATTLEAXE.mount_valid = true
 
 -- 设置动作组件使用条件
 AddComponentAction("USEITEM", "edible", function(inst, doer, target, actions, right)
-    if target and target.prefab == "shadow_battleaxe" and not target:HasTag("broken") and doer.prefab == "warly" then -- 技能树标签控制
+    if target and target.prefab == "shadow_battleaxe" and not target:HasTag("broken") and doer.prefab == "warly" and doer:HasTag("warly_allegiance_shadow") then -- 技能树标签控制
         table.insert(actions, ACTIONS.GIVEFOODTOBATTLEAXE)
     end
 end)

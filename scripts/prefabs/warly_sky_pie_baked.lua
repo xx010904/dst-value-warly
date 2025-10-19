@@ -1,6 +1,11 @@
 local function OnEaten(inst, eater)
     if eater and eater:IsValid() and eater.components.hunger then
-        eater.components.hunger:DoDelta(10)
+        local skilltreeupdater = eater.components.skilltreeupdater
+        -- 判断技能是否激活
+        local hasSkill = (skilltreeupdater ~= nil and skilltreeupdater:IsActivated("warly_sky_pie_baked"))
+        if hasSkill then
+            eater.components.hunger:DoDelta(10)
+        end
         return true
     end
 end
@@ -23,6 +28,7 @@ local function fn()
 
     inst:AddTag("warly_sky_pie_baked")
     inst:AddTag("preparedfood")
+    inst:AddTag("show_spoilage")
 
     inst.entity:SetPristine()
 
@@ -41,6 +47,11 @@ local function fn()
     inst.components.edible.hungervalue = 0
     inst.components.edible.sanityvalue = 0
     inst.components.edible:SetOnEatenFn(OnEaten)
+
+    inst:AddComponent("perishable")
+    inst.components.perishable:SetPerishTime(TUNING.PERISH_MED)
+    inst.components.perishable:StartPerishing()
+    inst.components.perishable.onperishreplacement = "ash"
 
     inst:AddComponent("stackable")
     inst.components.stackable.maxsize = TUNING.STACK_SIZE_SMALLITEM

@@ -1,7 +1,7 @@
 local SCAN_RADIUS = 10
 local SANITY_RATIO = 0.1
 local HUNGER_RATIO = 0.1
-local GOAT_CHANCE = 0.05
+local GOAT_CHANCE = 0.01
 
 local function OnBlocked(owner)
     owner.SoundEmitter:PlaySound("dontstarve/wilson/hit_metal")
@@ -55,9 +55,9 @@ local function OnTakeDamage(inst, damage_amount)
     if not owner then return end
     -- print("护甲承受了多少伤害：", damage_amount)
 
-    -- 自身受伤低概率触发替罪羊
-    local activeGoat = true -- 技能树控制
-    if activeGoat and (math.random() < (GOAT_CHANCE + (damage_amount or 0) / 1500)) then
+    -- 自身受伤低概率触发替罪羊，技能树控制
+    local hasSkill = owner and owner.components.skilltreeupdater and owner.components.skilltreeupdater:IsActivated("warly_crockpot_scapegoat")
+    if hasSkill and (math.random() < (GOAT_CHANCE + (damage_amount or 0) / 1500)) then
         local goat = SpawnScapegoat(owner)
         if goat and goat.components.health then
             goat.components.health:DoDelta(-damage_amount)
@@ -119,8 +119,9 @@ local function ApplyDamageRedirect(inst, teammate)
                 return owner -- 电羊伤害不甩锅
             end
 
-            local activeGoat = true -- 技能树控制
-            if activeGoat and (math.random() < (GOAT_CHANCE + (damage or 0) / 750)) then
+            -- 技能树控制
+            local hasSkill = owner and owner.components.skilltreeupdater and owner.components.skilltreeupdater:IsActivated("warly_crockpot_scapegoat")
+            if hasSkill and (math.random() < (GOAT_CHANCE + (damage or 0) / 750)) then
                 local goat = SpawnScapegoat(owner, attacker)
                 if goat then
                     return goat
@@ -199,14 +200,15 @@ local function OnArmorBroke(owner, data)
     end
 
     -- 是否整组触发二段甩（可由技能树控制）
-    local will_second = true -- 改成 false 就只炸一段
+    local will_second = owner and owner.components.skilltreeupdater and owner.components.skilltreeupdater:IsActivated("warly_crockpot_jump")
+    -- local will_second = true -- 改成 false 就只炸一段
 
     -- 🔹 函数：生成锅实体并有概率敲坏掉落材料
     local function TrySpawnPotWithSmash(bomb, bx, by, bz, owner)
         -- 处理敲坏概率
         if not bomb:IsValid() then return end
 
-        local do_smash = false -- 是否触发坏锅（可由技能树控制）
+        local do_smash = false -- 是否触发坏锅（可由技能树控制）废案
         local loot_list = {}
 
         if do_smash then
@@ -328,12 +330,14 @@ local function onequip(inst, owner)
     inst:ListenForEvent("blocked", OnBlocked, owner)
 
     -- 监听破碎
-    if true then -- 技能树控制是否开启
+    local hasFlungSkill = owner and owner.components.skilltreeupdater and owner.components.skilltreeupdater:IsActivated("warly_crockpot_flung")
+    if hasFlungSkill then -- 技能树控制是否开启
         owner:ListenForEvent("armorbroke", OnArmorBroke)
     end
 
     -- 定期扫描队友
-    if true then -- 技能树控制是否开启
+    local hasTransferSkill = owner and owner.components.skilltreeupdater and owner.components.skilltreeupdater:IsActivated("warly_crockpot_transfer")
+    if hasTransferSkill then -- 技能树控制是否开启
         inst._scantask = inst:DoPeriodicTask(1, ScanNearbyPlayers)
     end
 end
@@ -343,25 +347,21 @@ local function onunequip(inst, owner)
     owner.AnimState:ClearOverrideSymbol("swap_body_tall")
     inst:RemoveEventCallback("blocked", OnBlocked, owner)
 
-    -- 监听破碎
-    if true then -- 技能树控制是否开启
-        owner:RemoveEventCallback("armorbroke", OnArmorBroke)
+    -- 监听破碎任务关闭
+    owner:RemoveEventCallback("armorbroke", OnArmorBroke)
+
+    -- 定期扫描队友任务关闭
+    if inst._scantask then
+        inst._scantask:Cancel()
+        inst._scantask = nil
     end
 
-    -- 定期扫描队友
-    if true then -- 技能树控制是否开启
-        if inst._scantask then
-            inst._scantask:Cancel()
-            inst._scantask = nil
-        end
-
-        -- 移除所有挡伤害的玩家
-        if inst._teammates then
-            for p, _ in pairs(inst._teammates) do
-                RemoveDamageRedirect(p)
-                inst._teammates[p] = nil
-                -- print("[BackArmor] Removed damage modifier and redirect from:", tostring(p))
-            end
+    -- 移除所有挡伤害的玩家
+    if inst._teammates then
+        for p, _ in pairs(inst._teammates) do
+            RemoveDamageRedirect(p)
+            inst._teammates[p] = nil
+            -- print("[BackArmor] Removed damage modifier and redirect from:", tostring(p))
         end
     end
 end
@@ -392,7 +392,7 @@ local function fn()
     inst.components.armor.ontakedamage = OnTakeDamage
 
     inst:AddComponent("planardefense")
-	inst.components.planardefense:SetBaseDefense(99999)
+	inst.components.planardefense:SetBaseDefense(666)
 
     inst:AddComponent("equippable")
     inst.components.equippable.equipslot = EQUIPSLOTS.BODY

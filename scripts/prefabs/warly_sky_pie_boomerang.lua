@@ -1,14 +1,22 @@
-local function UpdateDamage(inst)
+local function UpdateDamage(inst, attacker)
     if inst.components.perishable and inst.components.weapon then
-        local freshness = inst.components.perishable:GetPercent()
+        local perishable = inst.components.perishable
+        perishable:ReducePercent(math.random() * 0.001)
+
+        local freshness = perishable:GetPercent()
+
+        local hasSkill = attacker and attacker.components.skilltreeupdater and attacker.components.skilltreeupdater:IsActivated("warly_sky_pie_favorite")
 
         -- 发射物数量：新鲜度 0% → 1；100% → 3
-        inst.max_projectiles = math.min(1 + math.floor(freshness * 3), 3)
+        if hasSkill then -- 技能树控制
+            inst.max_projectiles = math.min(1 + math.floor(freshness * 3), 3)
+        else
+            inst.max_projectiles = 1
+        end
 
         -- 伤害随新鲜度变化，最高和51，最低为17
         local baseDamage = 17
         inst.components.weapon:SetDamage(inst.max_projectiles * baseDamage)
-
     end
 end
 
@@ -156,7 +164,7 @@ local function fn()
     end
 
     inst._projectiles = {}
-    inst.max_projectiles = 6
+    inst.max_projectiles = 3
 
     inst.SetFxOwner = SetFxOwner
     inst.OnProjectileCountChanged = OnProjectileCountChanged
@@ -278,7 +286,7 @@ local function Projectile_OnUpdateFn(inst, dt)
         else
             local direction = (t_pos - p_pos):GetNormalized()
             local projected_speed = TUNING.VOIDCLOTH_BOOMERANG_PROJECTILE.RETURN_SPEED * TheSim:GetTickTime() *
-            TheSim:GetTimeScale()
+                TheSim:GetTimeScale()
             local projected = p_pos + direction * projected_speed
 
             if direction:Dot(t_pos - projected) < 0 then

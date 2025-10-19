@@ -1,5 +1,5 @@
 -- 美食鉴赏 (解决做菜下线，解决联机料理太少)
--- 孤独的美食家可以尝出来食物中的深层底蕴，对每道菜都有自己独到的深层次的见解，也能将感受分享给伙伴
+-- 沃利是一个高端寂寞的美食家，只有他可以尝出来某些料理中的深层底蕴；沃利对每道菜都有自己独到的深层次的见解，也能将感受分享给伙伴
 -- Section 1：吃独食 Eat Alone 
 -- 1 骨头汤：获得5分钟概率骨甲效果
 -- 2 鲜果可丽饼：获得5分钟锁定85%san
@@ -61,10 +61,10 @@ AddPlayerPostInit(function(inst)
         end
 
         local required_skill = buffdata.required_skill
-        -- local hasSkill = required_skill and inst.components.skilltreeupdater and inst.components.skilltreeupdater:IsActivated(required_skill)
-        -- if not hasSkill then --技能树控制
-        if not true then
-            print("[Warly Buff] Missing skill:", required_skill, "- Buff not applied.")
+        local hasSkill = required_skill and inst.components.skilltreeupdater and inst.components.skilltreeupdater:IsActivated(required_skill)
+        if not hasSkill then --技能树控制
+        -- if not true then
+            -- print("[Warly Buff] Missing skill:", required_skill, "- Buff not applied.")
             return
         end
 
@@ -115,7 +115,7 @@ local function HireNearbyPigmen(inst, giver, item)
                 -- 发出猪叫声
                 pig.SoundEmitter:PlaySound("dontstarve/pig/oink")
 
-                -- 为了增加怪物鞑靼的调味料buff，技能树控制
+                -- 为了增加怪物鞑靼的调味料buff
                 if pig.components.eater ~= nil then
                     local dummy = SpawnPrefab(item.prefab)
                     if dummy then
@@ -164,7 +164,8 @@ AddPrefabPostInit("pigman", function(inst)
         end
 
         -- 触发怪物鞑靼效果，技能树控制
-        if item ~= nil and string.find(item.prefab, "monstertartare") and giver ~= nil then
+        local hasSkill = giver and giver.components.skilltreeupdater and giver.components.skilltreeupdater:IsActivated("warly_monstertartare_buff")
+        if hasSkill and item and string.find(item.prefab, "monstertartare") then
             HireNearbyPigmen(inst, giver, item)
         end
     end
@@ -200,7 +201,7 @@ local function ShareFoodEffects(eater, food)
                     dummy.components.edible.healthvalue = 0
                     dummy.components.edible.hungervalue = 0
                     dummy.components.edible.sanityvalue = 0
-                    dummy.components.edible.foodtype = FOODTYPE.GENERIC
+                    dummy.components.edible.foodtype = FOODTYPE.GOODIES
                     dummy:AddTag("dummyfood")
                 end
 
@@ -262,7 +263,8 @@ AddPlayerPostInit(function(inst)
     -- 只针对沃利，技能树控制
     if inst.prefab == "warly" then
         inst:ListenForEvent("oneat", function(inst, data)
-            if data and data.food ~= nil then
+            local hasSkill = inst and inst.components.skilltreeupdater and inst.components.skilltreeupdater:IsActivated("warly_share_buff")
+            if data and data.food ~= nil and hasSkill then
                 local food = data.food
                 -- local feeder = data.feeder
                 -- print("沃利吃食物分享buff", food.prefab)

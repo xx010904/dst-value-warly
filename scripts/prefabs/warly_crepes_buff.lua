@@ -38,8 +38,8 @@ local function StartSanityControl(inst, target)
     -- 初始化冷却（0 表示非冷却状态）
     inst._crepes_combat_cooldown = 0
 
-    -- 一开始 san 清零（和你原逻辑一致）
-    target.components.sanity:SetPercent(0)
+    -- 立即重置理智
+    target.components.sanity:SetPercent(0.85)
 
     -- 监听被攻击与攻击事件：被攻击一般发 "attacked"，主动攻击常用 "onattack"
     local attacked_fn = function() _OnCombatEvent(inst, target) end

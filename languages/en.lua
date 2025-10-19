@@ -1,14 +1,113 @@
+-- =============================================================================
+-- Skill tree desc
+-- =============================================================================
+STRINGS.SKILLTREE.PANELS.GOURMET = "GOURMET"
+STRINGS.SKILLTREE.PANELS.CHEF = "CHEF"
+STRINGS.SKILLTREE.PANELS.MULTICOOKER = "MULTICOOKER"
+STRINGS.SKILLTREE.WARLY = {}
+
+-- Eat Alone
+STRINGS.SKILLTREE.WARLY.WARLY_BONESOUP_BUFF_TITLE = "Eat Alone I"
+STRINGS.SKILLTREE.WARLY.WARLY_BONESOUP_BUFF_DESC = "Warly can taste the protection of the bone ancestors from the Bone Bouillon."
+
+STRINGS.SKILLTREE.WARLY.WARLY_CREPES_BUFF_TITLE = "Eat Alone II"
+STRINGS.SKILLTREE.WARLY.WARLY_CREPES_BUFF_DESC = "The sweet and rich flavor of Fresh Fruit Crepes keeps Warly constantly spirited."
+
+STRINGS.SKILLTREE.WARLY.WARLY_POTATO_BUFF_TITLE = "Eat Alone III"
+STRINGS.SKILLTREE.WARLY.WARLY_POTATO_BUFF_DESC = "Even Warly, after eating Puffed Potato Soufflé, finds his mind taken over by potatoes, attacking instead of thinking."
+
+STRINGS.SKILLTREE.WARLY.WARLY_SEAFOOD_BUFF_TITLE = "Eat Alone IV"
+STRINGS.SKILLTREE.WARLY.WARLY_SEAFOOD_BUFF_DESC = "Warly can delicately sense the slippery texture of the Moqueca."
+
+-- Share Food
+STRINGS.SKILLTREE.WARLY.WARLY_MONSTERTARTARE_BUFF_TITLE = "Share Food I"
+STRINGS.SKILLTREE.WARLY.WARLY_MONSTERTARTARE_BUFF_DESC = "Warly doesn’t always eat alone; he’s happy to share his Monster Tartare with his Pigman friends."
+
+STRINGS.SKILLTREE.WARLY.WARLY_SHARE_BUFF_TITLE = "Share Food II"
+STRINGS.SKILLTREE.WARLY.WARLY_SHARE_BUFF_DESC = "The general effects Warly gains from tasting meals can be shared with nearby friends, including Pigman friends."
+
+STRINGS.SKILLTREE.WARLY.WARLY_GOURMET_1_LOCK_DESC = "Learn 2 Gourmet skills to unlock."
+
+-- Meal-worthy Play
+STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_BASE_TITLE = "Meal-worthy Play"
+STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_BASE_DESC = "When Warly sees a teammate's Meal-worthy Play (noob move), he can't help but immediately cook a dish to go with it."
+
+STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_FEAST_TITLE = "The Feast"
+STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_FEAST_DESC = "When a teammate dies, Warly will immediately start the meal, cooking four dishes and a soup."
+
+STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_REVIVE_TITLE = "Reviving Aroma"
+STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_REVIVE_DESC = "After the four dishes and soup from the meal are eaten, the fallen will be revived."
+
+STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_MEMORY_TITLE = "Preferred Dish"
+STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_MEMORY_DESC = "Warly does not cook completely on impulse; he excludes dishes recently in his food memory."
+
+STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_RESTORE_TITLE = "Taste Test"
+STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_RESTORE_DESC = "To avoid creating food memories, Warly immediately restores sanity, hunger, and health before cooking finished."
+
+STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_SPICE_TITLE = "Extra Flavor"
+STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_SPICE_DESC = "Warly improvises by adding a seasoning to the dishes cooked for Meal-worthy Play."
+
+-- Pie In The Sky
+STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_POT_TITLE = "Pie In The Sky"
+STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_POT_DESC = "Warly only needs to shake his portable pot near teammates to temporarily satisfy all their needs, but this false energy will gradually fade."
+
+STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_MAKE_TITLE = "Handmade Pie"
+STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_MAKE_DESC = "Warly can spend sanity to make pies, which, when eaten, will also make teammates completely satisfied."
+
+STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_BAKED_TITLE = "Dense Baked Pie"
+STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_BAKED_DESC = "Warly can put the pie on the fire to bake it, resulting in a Dense Baked Pie that can truly fill the stomach."
+
+STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_FAVORITE_TITLE = "Dream Dish"
+STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_FAVORITE_DESC = "Warly's magical cooking can turn the pie into the favorite food of his teammates, or his own beloved Void Sky Pie."
+
+-- Burdened Pot
+STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_MAKE_TITLE = "Stacked Armor Pot"
+STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_MAKE_DESC = "Warly can stack pots as armor on his back to block all attacks, but it consumes sanity and hunger."
+
+STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_TRANSFER_TITLE = "Take the Blame"
+STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_TRANSFER_DESC = "When Warly carries a pot, nearby teammates’ damage is transferred to him."
+
+STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_FLUNG_TITLE = "Flung Pot"
+STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_FLUNG_DESC = "When the pot reaches its limit, Warly flings it in all directions."
+
+STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_JUMP_TITLE = "Exploding Pot"
+STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_JUMP_DESC = "Warly angrily flings the pot, causing it to perform a double jump."
+
+STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_SCAPEGOAT_TITLE = "Scapegoat"
+STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_SCAPEGOAT_DESC = "While carrying stacked pots, Warly has a chance to summon a scapegoat to take damage when attacked."
+
+STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_LOOTER_TITLE = "Dismember"
+STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_LOOTER_DESC = "Warly the butcher is skilled at handling scapegoats, gaining more loot upon their defeat."
+
+-- Chef Pouch
+STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_UPGRADE_TITLE = "Spice Chef Pouch"
+STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_UPGRADE_DESC = "Warly can use spices to add flavor to his Chef Pouch, granting it various practical functions."
+
+STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_COZY_TITLE = "Cozy Chef Pouch"
+STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_COZY_DESC = "The more seasoned dishes placed in the Chef Pouch, the more comfortable and mentally refreshed Warly feels."
+
+-- Allegiance
+STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LOCK_1_DESC = "Unlocks after learning 12 skills."
+
+STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_SHADOW_TITLE = "Midnight Butcher"
+STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_SHADOW_DESC = "The Queen will reward your loyalty by unlocking power from wielding a Shadow Maul. Warly can use the Maul to unleash a bloody hook, or craft an Half-Baked Shadow Maul."
+
+STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LUNAR_TITLE = "Lunar Swindler"
+STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LUNAR_DESC = "The Cryptic Founder will reward your curiosity by showing you power from wearing a Brightshade Helm or Brightshade Armor. "
+
+
+-- =============================================================================
+-- Item desc
+-- =============================================================================
 STRINGS.NAMES.ARMOR_CROCKPOT = "Burdened Pot"
-STRINGS.NAMES.SHADOW_BATTLEAXE_YOUNG = "Half-Baked Shadow Mace"
+STRINGS.NAMES.SHADOW_BATTLEAXE_YOUNG = "Half-Baked Shadow Maul"
 STRINGS.NAMES.WARLY_SKY_PIE = "Pie In The Sky"
 STRINGS.NAMES.WARLY_SKY_PIE_BAKED = "Dense Baked Pie"
 STRINGS.NAMES.WARLY_SKY_PIE_BOOMERANG = "Void Sky Pie"
-STRINGS.NAMES.SPICE_SACK = "Spice Sack"
 
 STRINGS.RECIPE_DESC.ARMOR_CROCKPOT = "Blacken your pot, so you can take the blame."
 STRINGS.RECIPE_DESC.SHADOW_BATTLEAXE_YOUNG = "It will never wake up again."
 STRINGS.RECIPE_DESC.WARLY_SKY_PIE = "Dream pies can actually fill your stomach."
-STRINGS.RECIPE_DESC.SPICE_SACK = "A picky sack that only holds spices."
 
 STRINGS.CHARACTERS.WARLY.DESCRIBE.ARMOR_CROCKPOT = "Your pot's all black now —— guess who's taking the blame?"
 STRINGS.CHARACTERS.GENERIC.DESCRIBE.ARMOR_CROCKPOT = "A pot for taking all the blame."
@@ -20,8 +119,6 @@ STRINGS.CHARACTERS.WARLY.DESCRIBE.WARLY_SKY_PIE_BAKED = "Baked into solid form!"
 STRINGS.CHARACTERS.GENERIC.DESCRIBE.WARLY_SKY_PIE_BAKED = "The fire revealed its substance."
 STRINGS.CHARACTERS.WARLY.DESCRIBE.WARLY_SKY_PIE_BOOMERANG = "Voidful combat power!"
 STRINGS.CHARACTERS.GENERIC.DESCRIBE.WARLY_SKY_PIE_BOOMERANG = "It looks even more void."
-STRINGS.CHARACTERS.WARLY.DESCRIBE.SPICE_SACK = "The aroma of spices invigorates the soul."
-STRINGS.CHARACTERS.GENERIC.DESCRIBE.SPICE_SACK = "It smells wonderfully fragrant inside."
 
 STRINGS.CHARACTERS.WARLY.ANNOUNCE_BONESOUP_BUFF_ATTACHED = "I feel the blessing of my ancestors' bones."
 STRINGS.CHARACTERS.WARLY.ANNOUNCE_BONESOUP_BUFF_DETACHED = "I've lost the blessing of my ancestors' bones."
@@ -138,9 +235,4 @@ STRINGS.CHARACTERS.WARLY.ANNOUNCE_SPICEPACK_UPGRADE = "Ah, a little more room to
 STRINGS.ACTIONS.USESHADOWHOOK = "Shadow Hook"
 STRINGS.ACTIONS.GIVEFOODTOBATTLEAXE = "Breed"
 STRINGS.ACTIONS.ACTIVATE_POT_PIE = "Inspire Pie"
-STRINGS.ACTIONS.SPICEPACK_UPGRADE = "Expand"
-
-STRINGS.SKILLTREE.PANELS.GOURMET = "GOURMET"
-STRINGS.SKILLTREE.PANELS.CHEF = "CHEF"
-STRINGS.SKILLTREE.PANELS.MULTICOOKER = "MULTICOOKER"
-STRINGS.SKILLTREE.WARLY = {}
+STRINGS.ACTIONS.SPICEPACK_UPGRADE = "Spice"

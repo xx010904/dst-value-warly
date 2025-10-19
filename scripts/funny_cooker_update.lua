@@ -94,7 +94,7 @@ AddPlayerPostInit(function(inst)
         return
     end
 
-    inst._throw_accumulator = inst._throw_accumulator or 0
+    inst.warly_throw_pot_accum_chance = inst.warly_throw_pot_accum_chance or 0
     inst.warly_skypie_accum_chance = inst.warly_skypie_accum_chance or 0
 
     local _OldOnSave_throw = inst.OnSave
@@ -102,7 +102,7 @@ AddPlayerPostInit(function(inst)
         if _OldOnSave_throw then
             _OldOnSave_throw(inst, data)
         end
-        data.throw_accumulator = inst._throw_accumulator
+        data.throw_accumulator = inst.warly_throw_pot_accum_chance
         data.warly_skypie_accum_chance = inst.warly_skypie_accum_chance
     end
 
@@ -112,7 +112,7 @@ AddPlayerPostInit(function(inst)
             _OldOnLoad_throw(inst, data)
         end
         if data and data.throw_accumulator then
-            inst._throw_accumulator = data.throw_accumulator
+            inst.warly_throw_pot_accum_chance = data.throw_accumulator
         end
         if data and data.warly_skypie_accum_chance then
             inst.warly_skypie_accum_chance = data.warly_skypie_accum_chance
@@ -213,8 +213,6 @@ end
 -- 沃利执行动作
 -- =========================================================
 local function doFunnyCook(inst, idiot, food_name, op)
-    if inst.prefab ~= "warly" then return end --技能树控制
-
     local rec_table = FOOD_RECOVERY_TABLE[op]
     local values = rec_table and rec_table[food_name]
     if not values then return end
@@ -228,7 +226,7 @@ local function doFunnyCook(inst, idiot, food_name, op)
     idiotMark.Transform:SetPosition(0, 3, 0)
 
     -- 抛锅特效概率控制
-    inst._throw_accumulator = inst._throw_accumulator or 0
+    inst.warly_throw_pot_accum_chance = inst.warly_throw_pot_accum_chance or 0
     -- 基础概率
     local base_chance = values.throw_chance or 1
     -- 随机浮动范围
@@ -236,9 +234,9 @@ local function doFunnyCook(inst, idiot, food_name, op)
     local max_mult = 1.2
     -- 生成一次随机浮动值
     local chance = base_chance * (math.random() * (max_mult - min_mult) + min_mult)
-    inst._throw_accumulator = inst._throw_accumulator + chance
-    while inst._throw_accumulator >= 1 do
-        inst._throw_accumulator = inst._throw_accumulator - 1
+    inst.warly_throw_pot_accum_chance = inst.warly_throw_pot_accum_chance + chance
+    while inst.warly_throw_pot_accum_chance >= 1 do
+        inst.warly_throw_pot_accum_chance = inst.warly_throw_pot_accum_chance - 1
 
         inst:DoTaskInTime(0.5, function(inst)
             if inst and inst:IsValid() then
@@ -257,7 +255,11 @@ local function doFunnyCook(inst, idiot, food_name, op)
     ApplyTalking(inst, op)
 
     -- 恢复逻辑
-    ApplyRecovery(inst, idiot, food_name, op) --技能树控制
+    local hasSkill = inst.components.skilltreeupdater and
+        inst.components.skilltreeupdater:IsActivated("warly_funny_cook_restore")
+    if hasSkill then
+        ApplyRecovery(inst, idiot, food_name, op) --技能树控制
+    end
 end
 
 -- =========================================================
@@ -270,11 +272,15 @@ AddComponentPostInit("stewer", function(stewer)
         local result = old_Harvest and old_Harvest(self, harvester)
         if product and FOOD_RECOVERY_TABLE.harvest_pot[product] then
             for _, player in ipairs(AllPlayers) do
-                if player.prefab == "warly" and player.components.health and not player.components.health:IsDead()
-                    and harvester and player:IsNear(harvester, 12)
-                then
-                    doFunnyCook(player, harvester, product, "harvest_pot")
-                    break
+                if player.prefab == "warly" and player.components.health and not player.components.health:IsDead() then
+                    if harvester and player:IsNear(harvester, 12) then
+                        local hasSkill = player.components.skilltreeupdater and
+                            player.components.skilltreeupdater:IsActivated("warly_funny_cook_base")
+                        if hasSkill then
+                            doFunnyCook(player, harvester, product, "harvest_pot")
+                            break
+                        end
+                    end
                 end
             end
         end
@@ -292,11 +298,15 @@ AddComponentPostInit("cookable", function(cookable)
         local product = old_Cook and old_Cook(self, cooker, chef)
         if food_name and FOOD_RECOVERY_TABLE.cook_fire[food_name] then
             for _, player in ipairs(AllPlayers) do
-                if player.prefab == "warly" and player.components.health and not player.components.health:IsDead()
-                    and chef and player:IsNear(chef, 12)
-                then
-                    doFunnyCook(player, chef, food_name, "cook_fire")
-                    break
+                if player.prefab == "warly" and player.components.health and not player.components.health:IsDead() then
+                    if chef and player:IsNear(chef, 12) then
+                        local hasSkill = player.components.skilltreeupdater and
+                            player.components.skilltreeupdater:IsActivated("warly_funny_cook_base")
+                        if hasSkill then
+                            doFunnyCook(player, chef, food_name, "cook_fire")
+                            break
+                        end
+                    end
                 end
             end
         end
@@ -315,22 +325,26 @@ AddComponentPostInit("edible", function(edible)
             local food_name = self.inst.prefab
             food_name = GetBaseFood(food_name)
             for _, player in ipairs(AllPlayers) do
-                if player.prefab == "warly" and player.components.health and not player.components.health:IsDead()
-                    and eater and player:IsNear(eater, 12)
-                then
-                    local operation = nil
+                if player.prefab == "warly" and player.components.health and not player.components.health:IsDead() then
+                    if eater and player:IsNear(eater, 12) then
+                        local hasSkill = player.components.skilltreeupdater and
+                            player.components.skilltreeupdater:IsActivated("warly_funny_cook_base")
+                        if hasSkill then
+                            local operation = nil
 
-                    if FOOD_RECOVERY_TABLE.eat_common[food_name] then
-                        operation = "eat_common"
-                    elseif eater:HasTag("player") and FOOD_RECOVERY_TABLE.eat_player[food_name] then
-                        operation = "eat_player"
-                    elseif not eater:HasTag("player") and FOOD_RECOVERY_TABLE.eat_animal[food_name] then
-                        operation = "eat_animal"
-                    end
+                            if FOOD_RECOVERY_TABLE.eat_common[food_name] then
+                                operation = "eat_common"
+                            elseif eater:HasTag("player") and FOOD_RECOVERY_TABLE.eat_player[food_name] then
+                                operation = "eat_player"
+                            elseif not eater:HasTag("player") and FOOD_RECOVERY_TABLE.eat_animal[food_name] then
+                                operation = "eat_animal"
+                            end
 
-                    if operation then
-                        doFunnyCook(player, eater, food_name, operation)
-                        break
+                            if operation then
+                                doFunnyCook(player, eater, food_name, operation)
+                                break
+                            end
+                        end
                     end
                 end
             end
@@ -347,39 +361,40 @@ AddPlayerPostInit(function(dead)
     end
     -- 监听玩家死亡事件
     dead:ListenForEvent("death", function(inst, data)
-        local hasSkillTree = true -- 技能树控制
-        if not hasSkillTree then
-            return
-        end
         -- 遍历所有玩家，找附近的沃利
         for _, player in ipairs(AllPlayers) do
             if player.prefab == "warly" and player.components.health and not player.components.health:IsDead()
                 and dead and player:IsNear(dead, 12)
             then
-                -- 沃利发现队友去世，哀悼 + 献上“四菜一汤”
-                -- 打出问号特效❓
-                local dead_fx = SpawnPrefab("improv_question_mark_fx")
-                if dead_fx then
-                    dead_fx.entity:SetParent(dead.entity)
-                    dead_fx.Transform:SetPosition(0, 3, 0)
-                end
-                local warly_fx = SpawnPrefab("improv_question_mark_fx")
-                if warly_fx then
-                    warly_fx.entity:SetParent(player.entity)
-                    warly_fx.Transform:SetPosition(0, 3, 0)
-                end
+                -- 技能树控制
+                local hasSkill = player.components.skilltreeupdater and
+                    player.components.skilltreeupdater:IsActivated("warly_funny_cook_feast")
+                if hasSkill then
+                    -- 沃利发现队友去世，哀悼 + 献上“四菜一汤”
+                    -- 打出问号特效❓
+                    local dead_fx = SpawnPrefab("improv_question_mark_fx")
+                    if dead_fx then
+                        dead_fx.entity:SetParent(dead.entity)
+                        dead_fx.Transform:SetPosition(0, 3, 0)
+                    end
+                    local warly_fx = SpawnPrefab("improv_question_mark_fx")
+                    if warly_fx then
+                        warly_fx.entity:SetParent(player.entity)
+                        warly_fx.Transform:SetPosition(0, 3, 0)
+                    end
 
-                -- 菜谱顺序
-                local dishes = { "ratatouille_spice_chili", "ratatouille_spice_garlic", "ratatouille_spice_salt",
-                    "ratatouille_spice_sugar", "bonesoup" }
+                    -- 菜谱顺序
+                    local dishes = { "ratatouille_spice_chili", "ratatouille_spice_garlic", "ratatouille_spice_salt",
+                        "ratatouille_spice_sugar", "bonesoup" }
 
-                -- 逐个生成特效（每0.25秒）
-                for i, prefab in ipairs(dishes) do
-                    player:DoTaskInTime((i - 1) * 0.25, function()
-                        if player:IsValid() and dead:IsValid() then
-                            SpawnCookPotFX(player, dead, prefab)
-                        end
-                    end)
+                    -- 逐个生成特效（每0.25秒）
+                    for i, prefab in ipairs(dishes) do
+                        player:DoTaskInTime((i - 1) * 0.25, function()
+                            if player:IsValid() and dead:IsValid() then
+                                SpawnCookPotFX(player, dead, prefab)
+                            end
+                        end)
+                    end
                 end
             end
         end
@@ -403,12 +418,12 @@ AddRecipe2("warly_sky_pie",
         product = "warly_sky_pie",
         atlas = "images/inventoryimages/warly_sky_pie.xml",
         image = "warly_sky_pie.tex",
-        builder_tag = "masterchef", -- 仅沃利可做
-        builder_skill= nil, -- 可选：指定技能树才能做（技能树指定标签）
+        builder_tag = "masterchef",           -- 仅沃利可做
+        builder_skill = "warly_sky_pie_make", -- 指定技能树才能做
         description = "warly_sky_pie",
         numtogive = 3,
         no_deconstruction = true, -- 可选：防止分解还原
-        sg_state="spawn_warly_sky_pie"
+        sg_state = "spawn_warly_sky_pie"
     }
 )
 
@@ -499,7 +514,8 @@ AddPrefabPostInit("portablecookpot_item", function(inst)
 
     -- 监听物品拾取 / 丢弃
     inst:ListenForEvent("onputininventory", function(inst, owner)
-        if owner and owner:HasTag("player") then
+        local hasSkill = owner and owner:HasTag("warly_sky_pie_pot")
+        if hasSkill and owner:HasTag("player") then
             StartDetection(inst)
         else
             StopDetection(inst)
@@ -511,12 +527,17 @@ AddPrefabPostInit("portablecookpot_item", function(inst)
     end)
 
     -- 如果生成时就在玩家身上，直接启动检测
-    inst:DoTaskInTime(0, function()
+    inst:DoTaskInTime(60, function()
         local owner = inst.components.inventoryitem and inst.components.inventoryitem.owner
-        if owner and owner:HasTag("player") then
+        local hasSkill = owner and owner:HasTag("warly_sky_pie_pot")
+        -- print("画饼的锅是否激活：", hasSkill)
+        if hasSkill and owner:HasTag("player") then
             StartDetection(inst)
         end
     end)
+
+    inst.StartDetection = StartDetection
+    inst.StopDetection = StopDetection
 end)
 
 -- 2) 定义自定义 Action
@@ -527,6 +548,11 @@ local ACTIVATE_POT_PIE = AddAction("ACTIVATE_POT_PIE", STRINGS.ACTIONS.ACTIVATE_
 
     local inst = act.invobject -- 背包里的物品
     local doer = act.doer
+
+    local hasSkill = doer and doer:HasTag("warly_sky_pie_pot") -- 技能树控制
+    if not hasSkill then
+        return
+    end
 
     if not inst or not inst:IsValid() or not doer or not doer:IsValid() then
         return
@@ -582,7 +608,7 @@ AddComponentAction("INVENTORY", "skypieinspiretool", function(inst, doer, action
     -- inst：物品实体；doer：玩家实体
     -- 我们只为 portablecookpot_item 添加动作，且需要 inst._is_activated 为 true 且不在冷却
     if inst and inst.prefab == "portablecookpot_item" and inst:HasTag("active_pot_pie") then
-        if doer:HasTag("masterchef") then -- 技能树控制
+        if doer:HasTag("masterchef") and doer:HasTag("warly_sky_pie_pot") then -- 技能树控制
             table.insert(actions, ACTIONS.ACTIVATE_POT_PIE)
         end
     end
@@ -737,4 +763,53 @@ AddComponentPostInit("eater", function(Eater)
 
         return true
     end
+end)
+
+-- 7) 补充逻辑，激活技能点的时候激活锅的扫描
+function UpdatePiePotSpells(inst)
+    -- 获取技能树更新组件
+    local skilltreeupdater = inst.components.skilltreeupdater
+    -- 判断技能是否激活
+    local hasSkill = (skilltreeupdater ~= nil and skilltreeupdater:IsActivated("warly_sky_pie_pot"))
+
+    -- 如果技能激活，激活锅的扫描
+    if hasSkill then
+        -- 获取玩家背包中所有带有"skypieinspiretool"标签的物品
+        local inventory = inst.components.inventory
+        if inventory then
+            local items = inventory:GetItemsWithTag("skypieinspiretool")
+            if items then
+                for _, item in ipairs(items) do
+                    -- 激活锅的扫描功能
+                    if item.StartDetection then
+                        item:StartDetection()
+                    end
+                end
+            end
+        end
+    else
+        -- 如果技能取消，停止锅的扫描
+        local inventory = inst.components.inventory
+        if inventory then
+            local items = inventory:GetItemsWithTag("skypieinspiretool")
+            if items then
+                for _, item in ipairs(items) do
+                    -- 停止锅的扫描功能
+                    if item.StopDetection then
+                        item:StopDetection()
+                    end
+                end
+            end
+        end
+    end
+end
+
+AddPrefabPostInit("warly", function(inst)
+    -- 监听技能激活和取消
+    local onskillrefresh_client = function(inst) UpdatePiePotSpells(inst) end
+    local onskillrefresh_server = function(inst) UpdatePiePotSpells(inst) end
+    inst:ListenForEvent("onactivateskill_server", onskillrefresh_server)
+    inst:ListenForEvent("ondeactivateskill_server", onskillrefresh_server)
+    inst:ListenForEvent("onactivateskill_client", onskillrefresh_client)
+    inst:ListenForEvent("ondeactivateskill_client", onskillrefresh_client)
 end)

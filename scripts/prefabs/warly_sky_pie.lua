@@ -115,50 +115,58 @@ end
 local function MakeSpicedFood(inst, cooker, chef)
     local prefab_to_spawn = "ash"
 
-    if chef and chef.prefab == "warly" then -- 技能树控制，喜好食物
+    local hasBakedSkill = chef and chef.components.skilltreeupdater and
+    chef.components.skilltreeupdater:IsActivated("warly_sky_pie_baked")
+    local hasFavoriteSkill = chef and chef.components.skilltreeupdater and
+    chef.components.skilltreeupdater:IsActivated("warly_sky_pie_favorite")
+    if hasBakedSkill then -- 技能树控制，可以烤饼而不是烤灰
+        -- 就生成烤饼
         prefab_to_spawn = "warly_sky_pie_baked"
-        -- 初始化累积概率
-        chef.warly_skypie_accum_chance = chef.warly_skypie_accum_chance or 0
+        -- 可以烤出梦想料理
+        if hasFavoriteSkill then
+            -- 初始化累积概率
+            chef.warly_skypie_accum_chance = chef.warly_skypie_accum_chance or 0
 
-        -- 累积随机值 0.01 ~ 0.09
-        local increment = math.random() * 0.08 + 0.01
-        chef.warly_skypie_accum_chance = chef.warly_skypie_accum_chance + increment
+            -- 累积随机值 0.01 ~ 0.09
+            local increment = math.random() * 0.08 + 0.01
+            chef.warly_skypie_accum_chance = chef.warly_skypie_accum_chance + increment
 
-        -- 累积触发
-        if chef.warly_skypie_accum_chance >= 1 then
-            chef.warly_skypie_accum_chance = chef.warly_skypie_accum_chance - 1
-            local x, y, z = inst.Transform:GetWorldPosition()
-            local players = TheSim:FindEntities(x, y, z, 6, { "player" }, { "playerghost" })
-            if #players > 0 then
-                local target = players[math.random(#players)]
+            -- 累积触发
+            if chef.warly_skypie_accum_chance >= 1 then
+                chef.warly_skypie_accum_chance = chef.warly_skypie_accum_chance - 1
+                local x, y, z = inst.Transform:GetWorldPosition()
+                local players = TheSim:FindEntities(x, y, z, 6, { "player" }, { "playerghost" })
+                if #players > 0 then
+                    local target = players[math.random(#players)]
 
-                -- ping个问号❓
-                local chefMark = SpawnPrefab("improv_question_mark_fx")
-                chefMark.entity:SetParent(chef.entity)
-                chefMark.Transform:SetPosition(0, 3, 0)
-                local idiotMark = SpawnPrefab("improv_question_mark_fx")
-                idiotMark.entity:SetParent(target.entity)
-                idiotMark.Transform:SetPosition(0, 3, 0)
+                    -- ping个问号❓
+                    local chefMark = SpawnPrefab("improv_question_mark_fx")
+                    chefMark.entity:SetParent(chef.entity)
+                    chefMark.Transform:SetPosition(0, 3, 0)
+                    local idiotMark = SpawnPrefab("improv_question_mark_fx")
+                    idiotMark.entity:SetParent(target.entity)
+                    idiotMark.Transform:SetPosition(0, 3, 0)
 
-                if target == chef then -- 技能树控制（沃利是飞饼）
-                    prefab_to_spawn = "warly_sky_pie_boomerang"
-                else
-                    local affinity = target.components.foodaffinity
-                    if affinity ~= nil and affinity.prefab_affinities ~= nil then
-                        local best_food = nil
-                        local best_mult = 0
+                    if target == chef then -- 技能树控制（沃利是飞饼）
+                        prefab_to_spawn = "warly_sky_pie_boomerang"
+                    else
+                        local affinity = target.components.foodaffinity
+                        if affinity ~= nil and affinity.prefab_affinities ~= nil then
+                            local best_food = nil
+                            local best_mult = 0
 
-                        -- 找到倍率最高的食物
-                        for prefab, mult in pairs(affinity.prefab_affinities) do
-                            if mult > best_mult then
-                                best_food = prefab
-                                best_mult = mult
+                            -- 找到倍率最高的食物
+                            for prefab, mult in pairs(affinity.prefab_affinities) do
+                                if mult > best_mult then
+                                    best_food = prefab
+                                    best_mult = mult
+                                end
                             end
-                        end
 
-                        -- 如果有最喜欢的食物 → 生成那道菜
-                        if best_food ~= nil then
-                            prefab_to_spawn = GetRandomSpicedFoodFromAll(best_food)
+                            -- 如果有最喜欢的食物 → 生成那道菜
+                            if best_food ~= nil then
+                                prefab_to_spawn = GetRandomSpicedFoodFromAll(best_food)
+                            end
                         end
                     end
                 end
