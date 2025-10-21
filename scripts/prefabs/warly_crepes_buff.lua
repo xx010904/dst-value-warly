@@ -3,7 +3,7 @@ local TARGET_SAN_PERCENT = 0.9   -- san目标百分比
 
 -- 每分钟恢复量设定
 local SANITY_RECOVER_COMBAT = 9
-local SANITY_RECOVER_IDLE = 45
+local SANITY_RECOVER_IDLE = 90
 
 -- 每秒更新一次（包括冷却递减与理智恢复）
 local UPDATE_PERIOD = 1

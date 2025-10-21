@@ -116,9 +116,9 @@ local function MakeSpicedFood(inst, cooker, chef)
     local prefab_to_spawn = "ash"
 
     local hasBakedSkill = chef and chef.components.skilltreeupdater and
-    chef.components.skilltreeupdater:IsActivated("warly_sky_pie_baked")
+        chef.components.skilltreeupdater:IsActivated("warly_sky_pie_baked")
     local hasFavoriteSkill = chef and chef.components.skilltreeupdater and
-    chef.components.skilltreeupdater:IsActivated("warly_sky_pie_favorite")
+        chef.components.skilltreeupdater:IsActivated("warly_sky_pie_favorite")
     if hasBakedSkill then -- 技能树控制，可以烤饼而不是烤灰
         -- 就生成烤饼
         prefab_to_spawn = "warly_sky_pie_baked"
@@ -135,9 +135,20 @@ local function MakeSpicedFood(inst, cooker, chef)
             if chef.warly_skypie_accum_chance >= 1 then
                 chef.warly_skypie_accum_chance = chef.warly_skypie_accum_chance - 1
                 local x, y, z = inst.Transform:GetWorldPosition()
-                local players = TheSim:FindEntities(x, y, z, 6, { "player" }, { "playerghost" })
-                if #players > 0 then
-                    local target = players[math.random(#players)]
+
+                local targets = {}  -- 最终参与随机的对象列表
+                local nearby = TheSim:FindEntities(x, y, z, 12)  -- 找附近12格的所有实体
+
+                for _, ent in ipairs(nearby) do
+                    if ent:HasTag("player") and not ent:HasTag("playerghost") then
+                        table.insert(targets, ent)
+                    elseif ent.prefab == "hermitcrab" then
+                        table.insert(targets, ent)
+                    end
+                end
+
+                if #targets > 0 then
+                    local target = targets[math.random(#targets)]
 
                     -- ping个问号❓
                     local chefMark = SpawnPrefab("improv_question_mark_fx")
@@ -149,6 +160,8 @@ local function MakeSpicedFood(inst, cooker, chef)
 
                     if target == chef then -- 技能树控制（沃利是飞饼）
                         prefab_to_spawn = "warly_sky_pie_boomerang"
+                    elseif target.prefab == "hermitcrab" then -- 寄居蟹
+                        prefab_to_spawn = "flowersalad"
                     else
                         local affinity = target.components.foodaffinity
                         if affinity ~= nil and affinity.prefab_affinities ~= nil then

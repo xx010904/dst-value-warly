@@ -1,7 +1,7 @@
 local function UpdateDamage(inst, attacker)
     if inst.components.perishable and inst.components.weapon then
         local perishable = inst.components.perishable
-        perishable:ReducePercent(math.random() * 0.001)
+        perishable:ReducePercent(math.random() * 0.001 + 0.001)
 
         local freshness = perishable:GetPercent()
 
@@ -14,9 +14,9 @@ local function UpdateDamage(inst, attacker)
             inst.max_projectiles = 1
         end
 
-        -- 伤害随新鲜度变化，最高和51，最低为17
+        -- 伤害随新鲜度变化，51 --> 42.5 --> 34
         local baseDamage = 17
-        inst.components.weapon:SetDamage(inst.max_projectiles * baseDamage)
+        inst.components.weapon:SetDamage(inst.max_projectiles * baseDamage / 2 + baseDamage * 1.5)
     end
 end
 
