@@ -48,7 +48,7 @@ local function fn()
 
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
-    -- inst.entity:AddFollower()
+    inst.entity:AddFollower()
     -- inst.entity:AddLight()
     inst.entity:AddNetwork()
 
@@ -60,6 +60,7 @@ local function fn()
     inst.AnimState:OverrideSymbol("swap_food", "cook_pot_food", "meatballs")
 
     inst:AddTag("furnituredecor") -- From "furnituredecor", for optimization
+    inst:AddTag("NOCLICK")
 
     -- inst.Light:SetIntensity(0.4)
     -- inst.Light:SetColour(LAMP_LIGHT_COLOUR.x, LAMP_LIGHT_COLOUR.y, LAMP_LIGHT_COLOUR.z)
