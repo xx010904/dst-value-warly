@@ -196,6 +196,7 @@ local function fn()
 
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
+    inst.entity:AddFollower()
     inst.entity:AddNetwork()
 
     MakeInventoryPhysics(inst)
@@ -208,6 +209,7 @@ local function fn()
 
     inst:AddTag("warly_sky_pie")
     inst:AddTag("cookable")
+    inst:AddTag("furnituredecor") 
 
     inst.entity:SetPristine()
 
@@ -219,6 +221,8 @@ local function fn()
     inst:AddComponent("inventoryitem")
     inst.components.inventoryitem.imagename = "warly_sky_pie"
     inst.components.inventoryitem.atlasname = "images/inventoryimages/warly_sky_pie.xml"
+
+    local furnituredecor = inst:AddComponent("furnituredecor")
 
     inst:AddComponent("edible")
     inst.components.edible.foodtype = FOODTYPE.GOODIES
