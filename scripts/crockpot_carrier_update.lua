@@ -67,7 +67,7 @@ AddPrefabPostInit("lightninggoat", function(goat)
                 for _, player in ipairs(players) do
                     -- 检查是否为沃利并且有技能树
                     local hasSkill = player.components.skilltreeupdater and
-                    player.components.skilltreeupdater:IsActivated("warly_crockpot_scapegoat")
+                        player.components.skilltreeupdater:IsActivated("warly_crockpot_scapegoat")
                     if hasSkill then
                         -- 掉落一个羊角
                         local horn = SpawnPrefab("lightninggoathorn")

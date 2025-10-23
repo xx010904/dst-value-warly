@@ -30,14 +30,16 @@ table.insert(Assets, Asset("ATLAS", "images/skilltree/warly_crockpot_transfer.xm
 RegisterSkilltreeIconsAtlas("images/skilltree/warly_crockpot_transfer.xml", "warly_crockpot_transfer.tex")
 table.insert(Assets, Asset("ATLAS", "images/skilltree/warly_funny_cook_feast.xml"))
 RegisterSkilltreeIconsAtlas("images/skilltree/warly_funny_cook_feast.xml", "warly_funny_cook_feast.tex")
-table.insert(Assets, Asset("ATLAS", "images/skilltree/warly_funny_cook_revive.xml"))
-RegisterSkilltreeIconsAtlas("images/skilltree/warly_funny_cook_revive.xml", "warly_funny_cook_revive.tex")
-table.insert(Assets, Asset("ATLAS", "images/skilltree/warly_funny_cook_memory.xml"))
-RegisterSkilltreeIconsAtlas("images/skilltree/warly_funny_cook_memory.xml", "warly_funny_cook_memory.tex")
-table.insert(Assets, Asset("ATLAS", "images/skilltree/warly_funny_cook_restore.xml"))
-RegisterSkilltreeIconsAtlas("images/skilltree/warly_funny_cook_restore.xml", "warly_funny_cook_restore.tex")
 table.insert(Assets, Asset("ATLAS", "images/skilltree/warly_funny_cook_spice.xml"))
 RegisterSkilltreeIconsAtlas("images/skilltree/warly_funny_cook_spice.xml", "warly_funny_cook_spice.tex")
+
+-- 真香警告
+table.insert(Assets, Asset("ATLAS", "images/skilltree/warly_true_delicious_desk.xml"))
+RegisterSkilltreeIconsAtlas("images/skilltree/warly_true_delicious_desk.xml", "warly_true_delicious_desk.tex")
+table.insert(Assets, Asset("ATLAS", "images/skilltree/warly_true_delicious_restore.xml"))
+RegisterSkilltreeIconsAtlas("images/skilltree/warly_true_delicious_restore.xml", "warly_true_delicious_restore.tex")
+table.insert(Assets, Asset("ATLAS", "images/skilltree/warly_true_delicious_memory.xml"))
+RegisterSkilltreeIconsAtlas("images/skilltree/warly_true_delicious_memory.xml", "warly_true_delicious_memory.tex")
 
 -- 画饼饼
 table.insert(Assets, Asset("ATLAS", "images/skilltree/warly_sky_pie_pot.xml"))

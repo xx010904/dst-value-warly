@@ -95,67 +95,65 @@ local function BuildSkillsData(SkillTreeFns)
             title = STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_BASE_TITLE,
             desc = STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_BASE_DESC,
             icon = "warly_funny_cook_base",
-            pos = { -59 + 42, 176 },
+            pos = { -84, 176 },
             group = "chef",
             tags = { "chef", "chef1" },
             root = true,
             connects = {
-                "warly_funny_cook_feast"
+                "warly_funny_cook_feast", "warly_funny_cook_memory",
             },
         },
         warly_funny_cook_feast = {
             title = STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_FEAST_TITLE,
             desc = STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_FEAST_DESC,
             icon = "warly_funny_cook_feast",
-            pos = { -59 + 42, 176 - 43 },
+            pos = { -84 + 19, 176 - 43 },
+            group = "chef",
+            tags = { "chef", "chef1" },
+            connects = {
+                "warly_funny_cook_revive",
+            },
+        },
+        warly_funny_cook_revive = {
+            title = STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_REVIVE_TITLE,
+            desc = STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_REVIVE_DESC,
+            icon = "warly_funny_cook_revive",
+            pos = { -84 + 19, 176 - 86 },
             group = "chef",
             tags = { "chef", "chef1" },
             connects = {
                 "warly_funny_cook_spice",
             },
         },
-
+        warly_funny_cook_memory = {
+            title = STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_MEMORY_TITLE,
+            desc = STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_MEMORY_DESC,
+            icon = "warly_funny_cook_memory",
+            pos = { -84 - 19, 176 - 43 },
+            group = "chef",
+            tags = { "chef", "chef1" },
+            connects = {
+                "warly_funny_cook_restore",
+            },
+        },
+        warly_funny_cook_restore = {
+            title = STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_RESTORE_TITLE,
+            desc = STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_RESTORE_DESC,
+            icon = "warly_funny_cook_restore",
+            pos = { -84 - 19, 176 - 86 },
+            group = "chef",
+            tags = { "chef", "chef1" },
+            connects = {
+                "warly_funny_cook_spice",
+            },
+        },
         warly_funny_cook_spice = {
             title = STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_SPICE_TITLE,
             desc = STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_SPICE_DESC,
             icon = "warly_funny_cook_spice",
-            pos = { -59 + 42, 176 - 86 },
+            pos = { -84, 176 - 130 },
             group = "chef",
             tags = { "chef", "chef1" },
-        },
-        -- =============================================================================
-        -- 真香警告
-        -- =============================================================================
-        warly_true_delicious_desk = {
-            title = STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_DESK_TITLE,
-            desc = STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_DESK_DESC,
-            icon = "warly_true_delicious_desk",
-            pos = { -59 - 42, 176 },
-            group = "chef",
-            tags = { "chef", "chef3" },
-            root = true,
-            connects = {
-                "warly_true_delicious_restore",
-            },
-        },
-        warly_true_delicious_restore = {
-            title = STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_RESTORE_TITLE,
-            desc = STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_RESTORE_DESC,
-            icon = "warly_true_delicious_restore",
-            pos = { -59 - 42, 176 - 43 },
-            group = "chef",
-            tags = { "chef", "chef3" },
-            connects = {
-                "warly_true_delicious_memory",
-            },
-        },
-        warly_true_delicious_memory = {
-            title = STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_MEMORY_TITLE,
-            desc = STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_MEMORY_DESC,
-            icon = "warly_true_delicious_memory",
-            pos = { -59 - 42, 176 - 86 },
-            group = "chef",
-            tags = { "chef", "chef3" }
         },
         -- =============================================================================
         -- 画饼饼
@@ -164,7 +162,7 @@ local function BuildSkillsData(SkillTreeFns)
             title = STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_POT_TITLE,
             desc = STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_POT_DESC,
             icon = "warly_sky_pie_pot",
-            pos = { -59, 176 },
+            pos = { -20, 176 },
             group = "chef",
             tags = { "chef", "chef2" },
             root = true,
@@ -182,7 +180,7 @@ local function BuildSkillsData(SkillTreeFns)
             title = STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_MAKE_TITLE,
             desc = STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_MAKE_DESC,
             icon = "warly_sky_pie_make",
-            pos = { -59, 176 - 43 },
+            pos = { -20, 176 - 43 },
             group = "chef",
             tags = { "chef", "chef2" },
             connects = {
@@ -193,7 +191,7 @@ local function BuildSkillsData(SkillTreeFns)
             title = STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_BAKED_TITLE,
             desc = STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_BAKED_DESC,
             icon = "warly_sky_pie_baked",
-            pos = { -59, 176 - 86 },
+            pos = { -20, 176 - 86 },
             group = "chef",
             tags = { "chef", "chef2" },
             connects = {
@@ -204,7 +202,7 @@ local function BuildSkillsData(SkillTreeFns)
             title = STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_FAVORITE_TITLE,
             desc = STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_FAVORITE_DESC,
             icon = "warly_sky_pie_favorite",
-            pos = { -59, 176 - 130 },
+            pos = { -20, 176 - 130 },
             group = "chef",
             tags = { "chef", "chef2" },
         },

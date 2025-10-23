@@ -8,20 +8,20 @@ STRINGS.SKILLTREE.WARLY = {}
 
 -- Eat Alone
 STRINGS.SKILLTREE.WARLY.WARLY_BONESOUP_BUFF_TITLE = "Eat Alone I"
-STRINGS.SKILLTREE.WARLY.WARLY_BONESOUP_BUFF_DESC = "Warly can taste the protection of the bone ancestors from the Bone Bouillon."
+STRINGS.SKILLTREE.WARLY.WARLY_BONESOUP_BUFF_DESC = "Warly can taste the protection of the bone ancestors from the 「Bone Bouillon」."
 
 STRINGS.SKILLTREE.WARLY.WARLY_CREPES_BUFF_TITLE = "Eat Alone II"
-STRINGS.SKILLTREE.WARLY.WARLY_CREPES_BUFF_DESC = "The sweet and rich flavor of Fresh Fruit Crepes keeps Warly constantly spirited."
+STRINGS.SKILLTREE.WARLY.WARLY_CREPES_BUFF_DESC = "The sweet and rich flavor of 「Fresh Fruit Crepes」 keeps Warly constantly spirited."
 
 STRINGS.SKILLTREE.WARLY.WARLY_POTATO_BUFF_TITLE = "Eat Alone III"
-STRINGS.SKILLTREE.WARLY.WARLY_POTATO_BUFF_DESC = "Even Warly, after eating Puffed Potato Soufflé, finds his mind taken over by potatoes, attacking instead of thinking."
+STRINGS.SKILLTREE.WARLY.WARLY_POTATO_BUFF_DESC = "Even Warly, after eating 「Puffed Potato Soufflé」, finds his mind taken over by potatoes, attacking instead of thinking."
 
 STRINGS.SKILLTREE.WARLY.WARLY_SEAFOOD_BUFF_TITLE = "Eat Alone IV"
-STRINGS.SKILLTREE.WARLY.WARLY_SEAFOOD_BUFF_DESC = "Warly can delicately sense the slippery texture of the Moqueca."
+STRINGS.SKILLTREE.WARLY.WARLY_SEAFOOD_BUFF_DESC = "Warly can delicately sense the slippery texture of the 「Moqueca」."
 
 -- Share Food
 STRINGS.SKILLTREE.WARLY.WARLY_MONSTERTARTARE_BUFF_TITLE = "Share Food I"
-STRINGS.SKILLTREE.WARLY.WARLY_MONSTERTARTARE_BUFF_DESC = "Warly doesn’t always eat alone; he’s happy to share his Monster Tartare with his Pigman friends."
+STRINGS.SKILLTREE.WARLY.WARLY_MONSTERTARTARE_BUFF_DESC = "Warly doesn’t always eat alone; he’s happy to share his Monster Tartare」 with his Pigman friends."
 
 STRINGS.SKILLTREE.WARLY.WARLY_SHARE_BUFF_TITLE = "Share Food II"
 STRINGS.SKILLTREE.WARLY.WARLY_SHARE_BUFF_DESC = "The general effects Warly gains from tasting meals can be shared with nearby friends, including Pigman friends."
@@ -30,42 +30,43 @@ STRINGS.SKILLTREE.WARLY.WARLY_GOURMET_1_LOCK_DESC = "Learn 2 Gourmet skills to u
 
 -- Meal-worthy Play
 STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_BASE_TITLE = "Meal-worthy Play"
-STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_BASE_DESC = "When Warly sees a teammate's Meal-worthy Play (noob move), he can't help but immediately cook a dish to go with it."
+STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_BASE_DESC = "When Warly sees a friend's Meal-worthy Play (noob move), he can't help but immediately cook a dish to go with it."
 
 STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_FEAST_TITLE = "The Feast"
-STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_FEAST_DESC = "When a teammate dies, Warly will immediately start the meal, cooking four dishes and a soup."
-
-STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_REVIVE_TITLE = "Reviving Aroma"
-STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_REVIVE_DESC = "After the four dishes and soup from the meal are eaten, the fallen will be revived."
-
-STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_MEMORY_TITLE = "Preferred Dish"
-STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_MEMORY_DESC = "Warly does not cook completely on impulse; he excludes dishes recently in his food memory."
-
-STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_RESTORE_TITLE = "Taste Test"
-STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_RESTORE_DESC = "To avoid creating food memories, Warly immediately restores sanity, hunger, and health before cooking finished."
+STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_FEAST_DESC = "When a friend dies, Warly will immediately start the meal, cooking four dishes and a soup."
 
 STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_SPICE_TITLE = "Extra Flavor"
 STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_SPICE_DESC = "Warly improvises by adding a seasoning to the dishes cooked for Meal-worthy Play."
 
+-- True Delicious
+STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_DESK_TITLE = "True Delicious Warning"
+STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_DESK_DESC = "Warly can place his dishes on the table for permanent preservation, and any picky eater will be unable to resist the true delicious when they're hungry."
+
+STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_RESTORE_TITLE = "Lingering Taste"
+STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_RESTORE_DESC = "Picky eaters who try the true delicious dishes on the table will receive continuous healing effects."
+
+STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_MEMORY_TITLE = "Relaxing Memories"
+STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_MEMORY_DESC = "The true delicious dishes makes Warly forget his picky-eating past, continuously erases memories of food."
+
 -- Pie In The Sky
 STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_POT_TITLE = "Pie In The Sky"
-STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_POT_DESC = "Warly only needs to shake his portable pot near teammates to temporarily satisfy all their needs, but this false energy will gradually fade."
+STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_POT_DESC = "Warly only needs to shake his portable pot near friends to temporarily satisfy all their needs, but this false energy will gradually fade."
 
 STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_MAKE_TITLE = "Handmade Pie"
-STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_MAKE_DESC = "Warly can spend sanity to make pies, which, when eaten, will also make teammates completely satisfied."
+STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_MAKE_DESC = "Warly can spend sanity to make pies, which, when eaten, will also make friends completely satisfied."
 
 STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_BAKED_TITLE = "Dense Baked Pie"
 STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_BAKED_DESC = "Warly can put the pie on the fire to bake it, resulting in a Dense Baked Pie that can truly fill the stomach."
 
 STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_FAVORITE_TITLE = "Dream Dish"
-STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_FAVORITE_DESC = "Warly's magical cooking can turn the pie into the favorite food of his teammates, or his own beloved Void Sky Pie."
+STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_FAVORITE_DESC = "Warly's magical cooking can turn the pie into the favorite food of his friends(or Crabby Hermit), or his own beloved Void Sky Pie."
 
 -- Burdened Pot
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_MAKE_TITLE = "Stacked Armor Pot"
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_MAKE_DESC = "Warly can stack pots as armor on his back to block all attacks, but it consumes sanity and hunger."
 
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_TRANSFER_TITLE = "Take the Blame"
-STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_TRANSFER_DESC = "When Warly carries a pot, nearby teammates’ damage is transferred to him."
+STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_TRANSFER_DESC = "When Warly carries a pot, nearby friends’ damage is transferred to him."
 
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_FLUNG_TITLE = "Flung Pot"
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_FLUNG_DESC = "When the pot reaches its limit, Warly flings it in all directions."
@@ -80,7 +81,7 @@ STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_LOOTER_TITLE = "Dismember"
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_LOOTER_DESC = "Warly the butcher is skilled at handling scapegoats, gaining more loot upon their defeat."
 
 -- Chef Pouch
-STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_UPGRADE_TITLE = "Spice Chef Pouch"
+STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_UPGRADE_TITLE = "Spice Pack"
 STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_UPGRADE_DESC = "Warly can use spices to add flavor to his Chef Pouch, granting it various practical functions."
 
 STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_COZY_TITLE = "Cozy Chef Pouch"
@@ -92,8 +93,8 @@ STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LOCK_1_DESC = "Unlocks after learning 1
 STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_SHADOW_TITLE = "Midnight Butcher"
 STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_SHADOW_DESC = "The Queen will reward your loyalty by unlocking power from wielding a Shadow Maul. Warly can use the Maul to unleash a bloody hook, or craft an Half-Baked Shadow Maul."
 
-STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LUNAR_TITLE = "Lunar Swindler"
-STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LUNAR_DESC = "The Cryptic Founder will reward your curiosity by showing you power from wearing a Brightshade Helm or Brightshade Armor. "
+STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LUNAR_TITLE = "Resting Butcher"
+STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LUNAR_DESC = "The Cryptic Founder will reward your curiosity by showing you the power of slaughter. On a full moon night, or after being slain by Warly's Brightshade weapons, pigmen can be revived by Warly to join the fight."
 
 
 -- =============================================================================

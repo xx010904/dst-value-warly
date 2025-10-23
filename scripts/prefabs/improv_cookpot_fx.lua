@@ -56,8 +56,7 @@ local function GetUnmemorizedFoods(doer)
     local allfoods = GetAllCookableFoods()
     local valid = {}
 
-    local hasSkill = doer.components.skilltreeupdater and doer.components.skilltreeupdater:IsActivated("warly_funny_cook_memory") -- 技能树控制
-    if hasSkill and doer and doer.components.foodmemory then
+    if doer and doer.components.foodmemory then
         local memory = doer.components.foodmemory
 
         -- 限制最多排除 10 种食物

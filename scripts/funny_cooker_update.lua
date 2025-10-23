@@ -264,11 +264,7 @@ local function doFunnyCook(inst, idiot, food_name, op)
     ApplyTalking(inst, op)
 
     -- 恢复逻辑
-    local hasSkill = inst.components.skilltreeupdater and
-        inst.components.skilltreeupdater:IsActivated("warly_funny_cook_restore")
-    if hasSkill then
-        ApplyRecovery(inst, idiot, food_name, op) --技能树控制
-    end
+    ApplyRecovery(inst, idiot, food_name, op)
 end
 
 -- =========================================================
