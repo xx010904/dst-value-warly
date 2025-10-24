@@ -137,6 +137,12 @@ local function BuildSkillsData(SkillTreeFns)
             connects = {
                 "warly_true_delicious_restore",
             },
+            onactivate = function(inst, fromload)
+                inst:AddTag("warly_true_delicious_desk")
+            end,
+            ondeactivate = function(inst)
+                inst:RemoveTag("warly_true_delicious_desk")
+            end,
         },
         warly_true_delicious_restore = {
             title = STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_RESTORE_TITLE,

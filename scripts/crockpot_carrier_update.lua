@@ -6,16 +6,16 @@
 -- 4.1 6个方向甩锅 4.2 二段跳炸锅（摔坏了就没有二段炸了啊）
 
 -- Section 2：改造厨师包
--- 1 舒适的厨师袋，料理越多越多回san
--- 2 料理升级厨师袋
+-- 1 料理升级厨师袋，咸加保鲜度，甜加移速，辣加保暖，蒜香加防水防沙
+-- 2 舒适的厨师袋，料理越多越多回san
 
 
 --========================================================
--- 背锅锅制作配方
+-- Section 1：背锅锅制作配方
 --========================================================
 AddRecipe2("armor_crockpot",
     {
-        Ingredient("portablecookpot_item", 6),
+        Ingredient("portablecookpot_item", 0),
         Ingredient("charcoal", 20),
     },
     TECH.NONE,
@@ -27,7 +27,64 @@ AddRecipe2("armor_crockpot",
         builder_skill = "warly_crockpot_make", -- 指定技能树才能做
         description = "armor_crockpot",        -- 描述的id，而非本身
         numtogive = 1,
-        no_deconstruction = true,              -- 可选：防止分解还原
+        no_deconstruction = true,
+        canbuild = function(recipe, builder)
+            if not builder then return nil end
+
+            local required_count = 6 -- 需要的锅数量
+            local x, y, z = builder.Transform:GetWorldPosition()
+            local collected = {}
+            local total = 0
+            local candidates = {}
+
+            -- 1️⃣ 收集地面上的锅
+            local ground_pots = TheSim:FindEntities(x, y, z, 20, nil, nil, nil)
+            for _, pot in ipairs(ground_pots) do
+                if pot.prefab == "portablecookpot_item" then
+                    local px, py, pz = pot.Transform:GetWorldPosition()
+                    local dist = math.sqrt((px - x)^2 + (py - y)^2 + (pz - z)^2)
+                    local count = 1
+                    if pot.components.stackable then
+                        count = pot.components.stackable:StackSize()
+                    end
+                    table.insert(candidates, { pot = pot, count = count, dist = dist })
+                end
+            end
+
+            -- 3️⃣ 按距离从远到近排序
+            table.sort(candidates, function(a, b)
+                return a.dist > b.dist
+            end)
+
+            -- 4️⃣ 消耗锅
+            for _, entry in ipairs(candidates) do
+                if total >= required_count then break end
+
+                local take = math.min(entry.count, required_count - total)
+                table.insert(collected, { pot = entry.pot, amount = take })
+                total = total + take
+            end
+
+            if total < required_count then
+                -- print("建造失败，锅不足，总共找到", total)
+                return false, "NO_COOKPOT_NEARBY"
+            end
+
+            -- 5️⃣ 真正扣除锅
+            for _, entry in ipairs(collected) do
+                local pot = entry.pot
+                local amount = entry.amount
+                SpawnPrefab("lucy_transform_fx").Transform:SetPosition(pot.Transform:GetWorldPosition())
+                if pot.components.stackable then
+                    pot.components.stackable:Get(amount):Remove()
+                else
+                    pot:Remove()
+                end
+            end
+
+            -- print("建造成功，总共消耗锅:", total)
+            return true
+        end
     }
 )
 AddRecipeToFilter("armor_crockpot", "CHARACTER")
@@ -111,10 +168,7 @@ end)
 --========================================================
 -- SECTION2: 改造厨师包
 --========================================================
-
-----------------------------------------------------
--- === 保存与加载 ===
-----------------------------------------------------
+-- === 保存与加载 调味状态 ===
 local function OnSave(inst, data)
     data.spice_upgrade = inst._spice_upgrade
 
@@ -154,21 +208,21 @@ local function OnLoad(inst, data)
             inst.components.insulator:SetWinter()
             inst.components.insulator:SetInsulation(data.insulation or TUNING.INSULATION_LARGE)
 
-            -- 恢复蒜粉标签
+        -- 恢复蒜粉防水防沙
         elseif inst._spice_upgrade == "spice_garlic" then
             inst:AddTag("goggles")
             if data.has_waterproofer and inst.components.waterproofer == nil then
                 inst:AddComponent("waterproofer")
             end
 
-            -- 恢复盐保鲜倍率
+        -- 恢复盐保鲜倍率
         elseif inst._spice_upgrade == "spice_salt" then
             if inst.components.preserver == nil then
                 inst:AddComponent("preserver")
             end
             inst.components.preserver:SetPerishRateMultiplier(data.preserver_mult or TUNING.PERISH_SALTBOX_MULT)
 
-            -- 恢复甜调料速度
+        -- 恢复甜加移速
         elseif inst._spice_upgrade == "spice_sugar" then
             if inst.components.equippable == nil then
                 inst:AddComponent("equippable")
@@ -188,6 +242,70 @@ local function OnLoad(inst, data)
         end
     end
 end
+
+----------------------------------------------------
+-- 舒适厨师包：定期检测owner状态和里面装有多少东西
+----------------------------------------------------
+AddPrefabPostInit("spicepack", function(inst)
+    if not TheWorld.ismastersim then
+        return
+    end
+
+    -- 这里是厨师包保存调味状态
+    inst.OnSave = OnSave
+    inst.OnLoad = OnLoad
+
+    -- 这里是厨师包定期检测owner和容器内容的代码
+    inst:DoPeriodicTask(1, function(inst)
+        local container = inst.components.container
+        local equippable = inst.components.equippable
+        if not container or not equippable then
+            return
+        end
+
+        local owner = inst.components.inventoryitem and inst.components.inventoryitem:GetGrandOwner()
+        if not (owner and owner:HasTag("player")) then
+            equippable.dapperness = 0
+            return
+        end
+
+        local hasSkill = owner.components.skilltreeupdater and
+                         owner.components.skilltreeupdater:IsActivated("warly_spickpack_cozy")
+
+        if not hasSkill then
+            equippable.dapperness = 0
+            return
+        end
+
+        local food_count = {}
+        for k = 1, container.numslots do
+            local item = container:GetItemInSlot(k)
+            if item and item:HasTag("spicedfood") and string.find(item.prefab, "spice_") then
+                local prefab = item.prefab
+                local count = item.components.stackable and item.components.stackable:StackSize() or 1
+                food_count[prefab] = (food_count[prefab] or 0) + count
+                -- print(string.format("[SpicePack] Slot %d 检测到调料食物: %s (数量 %d)", k, prefab, count))
+            end
+        end
+
+        local total = 0
+        for prefab, count in pairs(food_count) do
+            -- 计算递增加成，最多算40个
+            local capped = math.min(count, 40)
+            local extra = (capped - 1) * 0.05
+            total = total + 1 + extra
+
+            -- print(string.format(
+            --     "[SpicePack] 食物种类: %s ×%d → capped=%d → 计入 %.2f",
+            --     prefab, count, capped, 1 + extra
+            -- ))
+        end
+
+        local dapper = TUNING.DAPPERNESS_MED * total
+        equippable.dapperness = dapper
+        -- print(string.format("[SpicePack] 总加成种类数: %.2f，对应理智恢复: %.2f", total, dapper))
+    end)
+end)
 
 -- 公共方法：快速扔地再捡起来，用于刷新UI或重新绑定组件
 local function DropAndPickup(inst, doer)
@@ -227,127 +345,8 @@ local function DropAndPickup(inst, doer)
 end
 
 ----------------------------------------------------
--- prefab 里要注册保存钩子
+-- 香料厨师袋：调味料给厨师包使用
 ----------------------------------------------------
-AddPrefabPostInit("spicepack", function(inst)
-    inst:AddTag("spicepack")
-
-    if not TheWorld.ismastersim then
-        return
-    end
-
-    inst.OnSave = OnSave
-    inst.OnLoad = OnLoad
-
-    -- 缓存监听任务
-    inst._spice_dapper_task = nil
-
-    --==================================================
-    -- 更新背包中调料数量并设置回精神
-    --==================================================
-    local function UpdateDapperness(inst)
-        if inst.components.container == nil or inst.components.equippable == nil then
-            return
-        end
-
-        local owner = inst.components.inventoryitem:GetGrandOwner()
-        local hasSkill = owner.components.skilltreeupdater and
-        owner.components.skilltreeupdater:IsActivated("warly_spickpack_cozy")
-        if owner == nil or not hasSkill then
-            -- 没有技能树，清零
-            inst.components.equippable.dapperness = 0
-            return
-        end
-
-        local total = 0
-        for k = 1, inst.components.container.numslots do
-            local item = inst.components.container:GetItemInSlot(k)
-            if item and item:HasTag("spicedfood") and string.find(item.prefab, "spice_") then
-                total = total + 1
-            end
-        end
-
-        inst.components.equippable.dapperness = TUNING.DAPPERNESS_MED * total
-    end
-
-    ----------------------------------------------------
-    -- 开始监听容器物品变化
-    ----------------------------------------------------
-    local function StartDappernessListener(inst)
-        if inst._spice_dapper_task then
-            return
-        end
-
-        if inst.components.container then
-            inst._spice_dapper_task = function(inst)
-                UpdateDapperness(inst)
-            end
-
-            inst:ListenForEvent("itemget", inst._spice_dapper_task)
-            inst:ListenForEvent("itemlose", inst._spice_dapper_task)
-
-            -- 初始化一次
-            UpdateDapperness(inst)
-        end
-    end
-
-    ----------------------------------------------------
-    -- 停止监听并清理回精神
-    ----------------------------------------------------
-    local function StopDappernessListener(inst)
-        if inst._spice_dapper_task then
-            inst:RemoveEventCallback("itemget", inst._spice_dapper_task)
-            inst:RemoveEventCallback("itemlose", inst._spice_dapper_task)
-            inst._spice_dapper_task = nil
-        end
-
-        if inst.components.equippable then
-            inst.components.equippable.dapperness = 0
-        end
-    end
-
-    ----------------------------------------------------
-    -- onequip / onunequip 绑定
-    ----------------------------------------------------
-    if inst.components.equippable then
-        -- 监听装备事件
-        inst:ListenForEvent("equipped", function(inst, data)
-            local owner = data.owner
-            if owner and owner.prefab == "warly" then -- 只有沃利才监听 技能树控制
-                local hasSkill = owner.components.skilltreeupdater and
-                owner.components.skilltreeupdater:IsActivated("warly_spickpack_cozy")
-                if hasSkill then
-                    StartDappernessListener(inst)
-                end
-            end
-        end)
-
-        inst:ListenForEvent("unequipped", function(inst, data)
-            local owner = data.owner
-            StopDappernessListener(inst)
-        end)
-    end
-
-    -- inst.StartDappernessListener = StartDappernessListener
-    -- inst.StopDappernessListener = StopDappernessListener
-
-    -- 如果生成时就在玩家身上，直接启动检测
-    -- inst:DoTaskInTime(60, function()
-    --     local owner = inst.components.inventoryitem and inst.components.inventoryitem.owner
-    --     local hasSkill = owner and owner:HasTag("warly_spickpack_cozy")
-
-    --     -- 打印是否找到了拥有技能的玩家
-    --     -- print("[Debug] owner:", owner and owner.prefab or "No Owner", "has warly_spickpack_cozy skill:", hasSkill)
-
-    --     if hasSkill and owner:HasTag("player") then
-    --         -- print("[Debug] Player has the skill, updating dapperness.")
-    --         DropAndPickup(inst, owner)
-    --     else
-    --         -- print("[Debug] Player does not have the skill or is not a valid player.")
-    --     end
-    -- end)
-end)
-
 local function ClearSpiceBuff(inst)
     -- print("过期回调：恢复原状", inst._spice_upgrade)
     if inst._spice_upgrade == "spice_chili" and inst.components.insulator then
@@ -510,43 +509,3 @@ AddPrefabPostInit("spice_salt", function(inst)
     end
     inst:AddComponent("spicesacktool")
 end)
-
--- 7) 补充逻辑，激活技能点的时候激活舒适厨师袋的更新
--- function UpdatePiePotSpells(inst)
---     local skilltreeupdater = inst.components.skilltreeupdater
---     local hasSkill = (skilltreeupdater ~= nil and skilltreeupdater:IsActivated("warly_spickpack_cozy"))
-
---     if hasSkill then
---         local inventory = inst.components.inventory
---         if inventory then
---             local items = inventory:GetItemsWithTag("spicepack")
---             if items then
---                 for _, item in ipairs(items) do
---                     DropAndPickup(item, inst)
---                 end
---             end
---         end
---     else
---         local inventory = inst.components.inventory
---         if inventory then
---             local items = inventory:GetItemsWithTag("spicepack")
---             if items then
---                 for _, item in ipairs(items) do
---                     if item.StopDappernessListener then
---                         DropAndPickup(item, inst)
---                     end
---                 end
---             end
---         end
---     end
--- end
-
--- AddPrefabPostInit("warly", function(inst)
---     -- 监听技能激活和取消
---     local onskillrefresh_client = function(inst) UpdatePiePotSpells(inst) end
---     local onskillrefresh_server = function(inst) UpdatePiePotSpells(inst) end
---     inst:ListenForEvent("onactivateskill_server", onskillrefresh_server)
---     inst:ListenForEvent("ondeactivateskill_server", onskillrefresh_server)
---     inst:ListenForEvent("onactivateskill_client", onskillrefresh_client)
---     inst:ListenForEvent("ondeactivateskill_client", onskillrefresh_client)
--- end)

@@ -17,11 +17,11 @@ STRINGS.SKILLTREE.WARLY.WARLY_POTATO_BUFF_TITLE = "Eat Alone III"
 STRINGS.SKILLTREE.WARLY.WARLY_POTATO_BUFF_DESC = "Even Warly, after eating 「Puffed Potato Soufflé」, finds his mind taken over by potatoes, attacking instead of thinking."
 
 STRINGS.SKILLTREE.WARLY.WARLY_SEAFOOD_BUFF_TITLE = "Eat Alone IV"
-STRINGS.SKILLTREE.WARLY.WARLY_SEAFOOD_BUFF_DESC = "Warly can delicately sense the slippery texture of the 「Moqueca」."
+STRINGS.SKILLTREE.WARLY.WARLY_SEAFOOD_BUFF_DESC = "The slippery texture of 「Moqueca」 allows Warly to run faster the more dangerous the situation he encounters."
 
 -- Share Food
 STRINGS.SKILLTREE.WARLY.WARLY_MONSTERTARTARE_BUFF_TITLE = "Share Food I"
-STRINGS.SKILLTREE.WARLY.WARLY_MONSTERTARTARE_BUFF_DESC = "Warly doesn’t always eat alone; he’s happy to share his Monster Tartare」 with his Pigman friends."
+STRINGS.SKILLTREE.WARLY.WARLY_MONSTERTARTARE_BUFF_DESC = "Warly doesn't always eat alone; he's happy to share his Monster Tartare」 with his Pigman friends."
 
 STRINGS.SKILLTREE.WARLY.WARLY_SHARE_BUFF_TITLE = "Share Food II"
 STRINGS.SKILLTREE.WARLY.WARLY_SHARE_BUFF_DESC = "The general effects Warly gains from tasting meals can be shared with nearby friends, including Pigman friends."
@@ -36,14 +36,14 @@ STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_FEAST_TITLE = "The Feast"
 STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_FEAST_DESC = "When a friend dies, Warly will immediately start the meal, cooking four dishes and a soup."
 
 STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_SPICE_TITLE = "Extra Flavor"
-STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_SPICE_DESC = "Warly improvises by adding a seasoning to the dishes cooked for Meal-worthy Play."
+STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_SPICE_DESC = "Warly may improvise by adding a seasoning to the dishes cooked for Meal-worthy Play."
 
 -- True Delicious
 STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_DESK_TITLE = "True Delicious Warning"
-STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_DESK_DESC = "Warly can place his dishes on the table for permanent preservation, and any picky eater will be unable to resist the true delicious when they're hungry."
+STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_DESK_DESC = "Warly can place his dishes on the table for permanent preservation, and his true delicious dishes cure all starving picky eaters."
 
 STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_RESTORE_TITLE = "Lingering Taste"
-STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_RESTORE_DESC = "Picky eaters who try the true delicious dishes on the table will receive continuous healing effects."
+STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_RESTORE_DESC = "Eaters who try the true delicious dishes on the table will receive continuous healing effects."
 
 STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_MEMORY_TITLE = "Relaxing Memories"
 STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_MEMORY_DESC = "The true delicious dishes makes Warly forget his picky-eating past, continuously erases memories of food."
@@ -66,7 +66,7 @@ STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_MAKE_TITLE = "Stacked Armor Pot"
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_MAKE_DESC = "Warly can stack pots as armor on his back to block all attacks, but it consumes sanity and hunger."
 
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_TRANSFER_TITLE = "Take the Blame"
-STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_TRANSFER_DESC = "When Warly carries a pot, nearby friends’ damage is transferred to him."
+STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_TRANSFER_DESC = "When Warly carries a pot, nearby friends' damage is transferred to him."
 
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_FLUNG_TITLE = "Flung Pot"
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_FLUNG_DESC = "When the pot reaches its limit, Warly flings it in all directions."
@@ -90,10 +90,10 @@ STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_COZY_DESC = "The more seasoned dishes pl
 -- Allegiance
 STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LOCK_1_DESC = "Unlocks after learning 12 skills."
 
-STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_SHADOW_TITLE = "Midnight Butcher"
-STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_SHADOW_DESC = "The Queen will reward your loyalty by unlocking power from wielding a Shadow Maul. Warly can use the Maul to unleash a bloody hook, or craft an Half-Baked Shadow Maul."
+STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_SHADOW_TITLE = "Bloody Butcher"
+STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_SHADOW_DESC = "The Queen will reward your loyalty by unlocking power from wielding a Shadow Maul. Warly can wield the Shadow Maul to unleash a bloodied long hook and drag targets, and he can also craft the Half-Baked Shadow Maul."
 
-STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LUNAR_TITLE = "Resting Butcher"
+STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LUNAR_TITLE = "Midnight Butcher"
 STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LUNAR_DESC = "The Cryptic Founder will reward your curiosity by showing you the power of slaughter. On a full moon night, or after being slain by Warly's Brightshade weapons, pigmen can be revived by Warly to join the fight."
 
 
@@ -105,6 +105,7 @@ STRINGS.NAMES.SHADOW_BATTLEAXE_YOUNG = "Half-Baked Shadow Maul"
 STRINGS.NAMES.WARLY_SKY_PIE = "Pie In The Sky"
 STRINGS.NAMES.WARLY_SKY_PIE_BAKED = "Dense Baked Pie"
 STRINGS.NAMES.WARLY_SKY_PIE_BOOMERANG = "Void Sky Pie"
+STRINGS.NAMES.DECOR_FOOD = "Mystery Meal"
 
 STRINGS.RECIPE_DESC.ARMOR_CROCKPOT = "Blacken your pot, so you can take the blame."
 STRINGS.RECIPE_DESC.SHADOW_BATTLEAXE_YOUNG = "It will never wake up again."
@@ -225,15 +226,25 @@ STRINGS.CHARACTERS.GENERIC.ANNOUNCE_EAT_PIE_REPEATLY =
 STRINGS.CHARACTERS.WARLY.TALK_HUNGRY_FRIEND =
 {
     "Who needs a motivational pie?",
-    "Everyone’s hungry… for now.",
-    "Who wouldn’t want a pie right now?",
-    "Someone’s hungry—time to paint a pie!",
-    "Looks like it’s pie-o’clock!",
+    "Everyone's hungry… for now.",
+    "Who wouldn't want a pie right now?",
+    "Someone's hungry—time to paint a pie!",
+    "Looks like it's pie-o'clock!",
     "An empty stomach brings inspiration!",
 }
-STRINGS.CHARACTERS.WARLY.ANNOUNCE_SPICEPACK_UPGRADE = "Ah, a little more room to cook with flair!"
+STRINGS.CHARACTERS.GENERIC.ANNOUNCE_TRUE_DELICIOUS =  "Okay, this slaps!"
+STRINGS.CHARACTERS.GENERIC.ANNOUNCE_FALSE_DELICIOUS = "I'd starve, die outside, leap off this place—never touch a bite of this food!"
+STRINGS.CHARACTERS.GENERIC.ANNOUNCE_FORGET_FOOD =
+{
+    "I'll never get tired of {food}.",
+    "I want {food} again.",
+    "What does {food} taste like again?",
+}
+STRINGS.CHARACTERS.WARLY.ANNOUNCE_SPICEPACK_UPGRADE = "Ah, my magic spice pack!"
+STRINGS.CHARACTERS.WARLY.ACTIONFAIL.BUILD.NO_COOKPOT_NEARBY = "Actually I need 6 Portable Crock Pot!"
 
 STRINGS.ACTIONS.USESHADOWHOOK = "Shadow Hook"
 STRINGS.ACTIONS.GIVEFOODTOBATTLEAXE = "Breed"
 STRINGS.ACTIONS.ACTIVATE_POT_PIE = "Inspire Pie"
+STRINGS.ACTIONS.PLACE_FOOD_ON_TABLE = "Plate"
 STRINGS.ACTIONS.SPICEPACK_UPGRADE = "Spice"

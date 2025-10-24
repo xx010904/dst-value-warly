@@ -44,6 +44,7 @@ PrefabFiles = {
 	"warly_sky_pie_cook_fx",
 	"warly_sky_pie_boomerang",
 	"decor_food",
+	"warly_truedelicious_buff",
     -- 其他 prefab 名称...
 }
 

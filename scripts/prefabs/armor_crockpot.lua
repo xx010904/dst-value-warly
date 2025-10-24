@@ -331,12 +331,14 @@ local function onequip(inst, owner)
 
     -- 监听破碎
     local hasFlungSkill = owner and owner.components.skilltreeupdater and owner.components.skilltreeupdater:IsActivated("warly_crockpot_flung")
+    -- print("甩锅技能树：", hasFlungSkill)
     if hasFlungSkill then -- 技能树控制是否开启
         owner:ListenForEvent("armorbroke", OnArmorBroke)
     end
 
     -- 定期扫描队友
     local hasTransferSkill = owner and owner.components.skilltreeupdater and owner.components.skilltreeupdater:IsActivated("warly_crockpot_transfer")
+    -- print("背黑锅技能树：", hasFlungSkill)
     if hasTransferSkill then -- 技能树控制是否开启
         inst._scantask = inst:DoPeriodicTask(1, ScanNearbyPlayers)
     end
@@ -365,6 +367,40 @@ local function onunequip(inst, owner)
         end
     end
 end
+
+local function Initial(inst)
+    local check_count = 0
+    local max_checks = 12
+
+    inst.check_task = inst:DoPeriodicTask(1, function()
+        if inst._scantask then
+            -- print("扫描任务已经开启，放弃轮询")
+            inst.check_task:Cancel()
+            inst.check_task = nil
+            return
+        end
+
+        check_count = check_count + 1
+
+        local owner = inst.components.inventoryitem and inst.components.inventoryitem.owner
+        local hasSkill = owner
+                        and owner.components.skilltreeupdater
+                        and owner.components.skilltreeupdater:IsActivated("warly_crockpot_make")
+
+        if hasSkill and owner then
+            -- print("技能树激活，执行卸下再装备")
+            onunequip(inst, owner)
+            onequip(inst, owner)
+            inst.check_task:Cancel()
+            inst.check_task = nil
+        elseif check_count >= max_checks then
+            -- print("技能树未激活，达到最大检查次数，放弃")
+            inst.check_task:Cancel()
+            inst.check_task = nil
+        end
+    end)
+end
+
 
 local function fn()
     local inst = CreateEntity()
@@ -398,6 +434,10 @@ local function fn()
     inst.components.equippable.equipslot = EQUIPSLOTS.BODY
     inst.components.equippable:SetOnEquip(onequip)
     inst.components.equippable:SetOnUnequip(onunequip)
+
+    -- 🔹 加载时轮询检查技能树
+    inst.check_task = nil
+    inst:DoTaskInTime(0, Initial)
 
     MakeHauntableLaunch(inst)
 

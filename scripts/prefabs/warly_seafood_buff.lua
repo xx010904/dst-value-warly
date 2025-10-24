@@ -1,3 +1,5 @@
+local BUFF_DURATION = 300 -- buff 持续时间（秒）
+
 local function UpdateSpeed(inst)
     if inst.components.locomotor then
         local x, y, z = inst.Transform:GetWorldPosition()
@@ -45,7 +47,7 @@ local function OnAttached(inst, target)
         target.components.talker:Say(GetString(target, "ANNOUNCE_SEAFOOD_BUFF_ATTACHED"))
     end
 
-    inst.components.timer:StartTimer("expire", 300)
+    inst.components.timer:StartTimer("expire", BUFF_DURATION)
 end
 
 local function OnDetached(inst, target)

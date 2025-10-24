@@ -11,20 +11,20 @@
 -- 3 团队回复加强：队友死了烹饪四菜一汤 （开席） + 4.1 有一道菜是毒菜，吃了的人贡献自己的生命力复活死者
 -- 4 随机下饭菜概率含调味料
 -- 新版
--- 1 下饭操作
+-- 1 下饭操作（包括记忆偏好和直接恢复）
 -- 2 开席
--- 3 喜新厌旧 在烹饪下饭菜时，沃利会进行一次“试味”，略微恢复三维。 若即将产出的菜肴存在于他的食物记忆中，将自动转化为随机未知料理。
--- 4 更加下饭
+-- 3 更加下饭
 
 -- Section 2：画大饼
 -- 1 沃利仅仅需要介绍一下他的厨艺，便可让大家饱腹。锅检测到附近有三维不满的队友，右键点击锅直接补，然后慢慢消耗
--- 2 沃利可以手搓大饼。吃了大饼效果同锅补（给寄居蟹）
+-- 2 沃利可以手搓大饼。吃了大饼效果同锅补
 -- 3 大饼可以烤而不是变成灰烬
--- 4 现烤大饼变成附近玩家最喜欢的食物，或者飞饼
+-- 4 现烤大饼变成附近玩家（寄居蟹）最喜欢的食物，或者飞饼
 
--- Section 3
--- 1 真香警告：可以喂解读挑食角色食物
--- 2 真香警告：可以喂其他角色腐烂物
+-- Section 3：真香警告
+-- 1 可以把食物放在桌上，永鲜，其他角色在饿的时候可以去吃，忽略食物的倍率
+-- 2 可以额外持续恢复
+-- 3 沃利可以持续消除记忆
 
 
 -- =========================================================
@@ -219,7 +219,7 @@ local function ApplyRecovery(inst, idiot, food_name, operation)
 end
 
 -- =========================================================
--- 沃利执行动作
+-- 沃利执行抛锅动作
 -- =========================================================
 local function doFunnyCook(inst, idiot, food_name, op)
     local rec_table = FOOD_RECOVERY_TABLE[op]
@@ -251,7 +251,7 @@ local function doFunnyCook(inst, idiot, food_name, op)
             if inst and inst:IsValid() then
                 SpawnCookPotFX(inst, idiot)
                 -- puff 特效
-                local puff = SpawnPrefab("warly_sky_pie_cook_fx")
+                local puff = SpawnPrefab("firesplash_fx")
                 if puff then
                     puff.entity:SetParent(inst.entity)
                     puff.Transform:SetPosition(0, 1, 0)
@@ -531,14 +531,31 @@ AddPrefabPostInit("portablecookpot_item", function(inst)
         StopDetection(inst)
     end)
 
-    -- 如果生成时就在玩家身上，直接启动检测
-    inst:DoTaskInTime(60, function()
-        local owner = inst.components.inventoryitem and inst.components.inventoryitem.owner
-        local hasSkill = owner and owner:HasTag("warly_sky_pie_pot")
-        -- print("画饼的锅是否激活：", hasSkill)
-        if hasSkill and owner:HasTag("player") then
-            StartDetection(inst)
-        end
+    -- 如果生成时就在玩家身上，直接启动检测（每秒检测一次，最多12次）
+    inst:DoTaskInTime(1, function()
+        local tries = 0
+        inst._skillchecktask = inst:DoPeriodicTask(1, function()
+            tries = tries + 1
+            local owner = inst.components.inventoryitem and inst.components.inventoryitem.owner
+            local hasSkill = owner and owner:HasTag("warly_sky_pie_pot")
+
+            -- print(string.format("[SkillCheck] 第 %d 次检测, owner=%s, hasSkill=%s", tries, owner and owner.prefab or "nil", tostring(hasSkill)))
+
+            if hasSkill and owner and owner:HasTag("player") then
+                -- print("[SkillCheck] 画饼的锅检测成功！启动 StartDetection。")
+                StartDetection(inst)
+                inst._skillchecktask:Cancel()
+                inst._skillchecktask = nil
+            elseif tries >= 12 then
+                -- print("[SkillCheck] 超过12次未检测到技能，停止检测。")
+                inst._skillchecktask:Cancel()
+                inst._skillchecktask = nil
+            elseif inst._detect_task ~= nil then
+                -- print("[SkillCheck] 发现已经启动了任务，停止检测。")
+                inst._skillchecktask:Cancel()
+                inst._skillchecktask = nil
+            end
+        end)
     end)
 
     inst.StartDetection = StartDetection
@@ -821,49 +838,13 @@ end)
 
 
 
--- local function lamp_turnon(inst)
---     -- inst.AnimState:PlayAnimation("idle")
---     -- inst.AnimState:OverrideSymbol("swap_food", "cook_pot_food", "meatballs")
---     --     inst.AnimState:SetBank("flint")
---     -- inst.AnimState:SetBuild("flint")
---     -- inst.AnimState:PlayAnimation("idle")
--- end
-
--- local function lamp_ondropped(inst)
---     -- Works because of the IsEmpty check in turnon
---     -- lamp_turnoff(inst)
---     -- lamp_turnon(inst)
---     inst.AnimState:SetBank("flint")
---     inst.AnimState:SetBuild("flint")
---     inst.AnimState:PlayAnimation("idle", true)
--- end
-
--- AddPrefabPostInit("meatballs", function(inst)
---     inst.entity:AddFollower()
---     inst:AddTag("furnituredecor") 
---     local furnituredecor = inst:AddComponent("furnituredecor")
---     -- furnituredecor.onputonfurniture = lamp_ondropped
--- end)
--- AddPrefabPostInit("flint", function(inst)
---     inst.entity:AddFollower()
---     local furnituredecor = inst:AddComponent("furnituredecor")
---     furnituredecor.onputonfurniture = lamp_ondropped
-
---     -- 🔧 关键：强制刷新显示
-
--- end)
--- AddPrefabPostInit("decor_food", function(inst)
---     inst.entity:AddFollower()
--- end)
--- AddPrefabPostInit("decor_lamp", function(inst)
---     inst.AnimState:SetBank("flint")
---     inst.AnimState:SetBuild("flint")
---     inst.AnimState:PlayAnimation("idle")
--- end)
-
-
--- modmain.lua （或你的主脚本）
-local ACTION_PLACE_FOOD_ON_TABLE = AddAction("PLACE_FOOD_ON_TABLE", "Place on table", -- perform fn:
+-- =========================================================
+-- SECTION3 真香
+-- 1 可以把食物放在桌上，永鲜，其他角色在饿的时候可以去吃，忽略食物的倍率
+-- 2 可以额外持续恢复
+-- 3 沃利可以持续消除记忆
+-- =========================================================
+local ACTION_PLACE_FOOD_ON_TABLE = AddAction("PLACE_FOOD_ON_TABLE", STRINGS.ACTIONS.PLACE_FOOD_ON_TABLE, -- perform fn:
     function(act)
         local doer = act.doer
         local target = act.target
@@ -873,212 +854,80 @@ local ACTION_PLACE_FOOD_ON_TABLE = AddAction("PLACE_FOOD_ON_TABLE", "Place on ta
         if not invobject:HasTag("preparedfood") then return end
         if doer.prefab ~= "warly" then return end
 
-        -- server side logic (this function runs on server)
-        -- ensure table netvars exist (create if missing)
-        if not target.has_table_food then
-            target.has_table_food = net_bool(target.GUID, "decortable.has_table_food")
-            target.table_food_hunger = net_float(target.GUID, "decortable.table_food_hunger")
+        ---- 复制一个假的食物，因为没有办法展示原本的食物
+        local decor = SpawnPrefab("decor_food")
+        if not decor then return nil end
+
+        -- 打印调试信息，检查传递的参数
+        -- print("[DecorFood] 名字prefab: ", invobject.prefab, "food_symbol_build:", invobject.food_symbol_build or "cook_pot_food", "food_basename:", invobject.food_basename)
+        -- 处理调料
+        local spicename = nil
+        if invobject.components and invobject.components.edible and invobject.components.edible.spice then
+            spicename = string.lower(invobject.components.edible.spice)
+        elseif invobject.spice then
+            spicename = string.lower(invobject.spice)
+        end
+        -- print("[DecorFood] 调料: ", spicename)
+
+        -- 技能树控制，食物是否带有持续buff
+        if doer.components.skilltreeupdater and doer.components.skilltreeupdater:IsActivated("warly_true_delicious_restore") then
+            decor.restore_skill = true
         end
 
-        local function SetTableFood(inst, prefabname, hunger)
-            if prefabname and prefabname ~= "" then
-                inst.has_table_food:set(true)
-                inst.table_food_hunger:set(hunger or 0)
-            else
-                inst.has_table_food:set(false)
-                inst.table_food_hunger:set(0)
-            end
+        -- 保存起来
+        decor.food_symbol_build = invobject.food_symbol_build
+        decor.food_basename = invobject.food_basename
+        decor.spicename = spicename
+        decor.mimic_food = invobject.prefab
+
+        -- 设置食物的build和bank
+        if spicename ~= nil then
+            decor.AnimState:SetBuild("plate_food")
+            decor.AnimState:SetBank("plate_food")
+            decor.AnimState:OverrideSymbol("swap_garnish", "spices", spicename)
+            decor:AddTag("spicedfood")
+        else
+            decor.AnimState:SetBuild(invobject.food_symbol_build or "cook_pot_food")
+            decor.AnimState:SetBank("cook_pot_food")
         end
 
-        local function SpawnDecorFoodFor(inst, item)
-            local x, y, z = inst.Transform:GetWorldPosition()
-            local decor = SpawnPrefab("decor_food")
-            if not decor then return nil end
+        decor.AnimState:OverrideSymbol("swap_food", invobject.food_symbol_build or "cook_pot_food",
+            invobject.food_basename or invobject.prefab)
 
-            -- 确保食物存在 AnimState
-            if decor.AnimState then
-                -- 打印调试信息，检查传递的参数
-                print("[DecorFood] 名字prefab: ", item.prefab, "food_symbol_build:", item.food_symbol_build or "cook_pot_food", "food_basename:", item.food_basename)
+        -- 覆盖食物符号
+        if decor.Physics then decor.Physics:SetActive(false) end
+        if decor.Follower then decor.Follower:FollowSymbol(target.GUID, "swap_object") end
 
-                -- 处理调料
-                local spicename = nil
-                if item.components and item.components.edible and item.components.edible.spice then
-                    spicename = string.lower(item.components.edible.spice)
-                elseif item.spice then
-                    spicename = string.lower(item.spice)
-                end
-                print("[DecorFood] 调料: ", spicename)
+        print("[DecorFood] Finished applying symbols.")
 
-                -- 设置食物的build和bank
-                if spicename ~= nil then
-                    decor.AnimState:SetBuild("plate_food")
-                    decor.AnimState:SetBank("plate_food")
-                    decor.AnimState:OverrideSymbol("swap_garnish", "spices", spicename)
-                    decor:AddTag("spicedfood")
-                else
-                    decor.AnimState:SetBuild(item.food_symbol_build or "cook_pot_food")
-                    decor.AnimState:SetBank("cook_pot_food")
-                end
+        -- 用装饰take的逻辑
+        target.components.furnituredecortaker:AcceptDecor(decor, doer)
 
-                decor.AnimState:OverrideSymbol("swap_food", item.food_symbol_build or "cook_pot_food", item.food_basename or item.prefab)
-
-                -- 覆盖食物符号
-                if decor.Physics then decor.Physics:SetActive(false) end
-                if decor.Follower then decor.Follower:FollowSymbol(inst.GUID, "swap_object") end
-                -- decor.components.inventoryitem:DoDropPhysics(x, y, z, 1, 1)
-
-                print("[DecorFood] Finished applying symbols.")
-            else
-                print("[DecorFood] No AnimState found on decor!")
-            end
-
-            -- 返回装饰物
-            return decor
-        end
-
-        -- read hunger
-        local hunger = 0
-        if invobject.components and invobject.components.edible then
-            hunger = invobject.components.edible.hungervalue or 0
-        end
-
-        -- set table state
-        SetTableFood(target, invobject.food_basename or invobject.prefab, hunger)
-
-        -- spawn decor visual and store reference on server
-        local decor = SpawnDecorFoodFor(target, invobject)
-        target._table_decor_food = decor
-
-        -- disable accepting other decor
-        if target.components.furnituredecortaker then
-            target.components.furnituredecortaker:SetEnabled(false)
-        end
-
-        target:AddTag("has_table_food")
-
-        -- play sound
         if target.SoundEmitter then
             target.SoundEmitter:PlaySound("wintersfeast2019/winters_feast/table/food")
         end
 
-        -- remove original food item (stack handling)
         if invobject.components.stackable and invobject.components.stackable:IsStack() then
             invobject.components.stackable:Get():Remove()
         else
             invobject:Remove()
         end
 
-        -- Done
         return true
     end
 )
+ACTION_PLACE_FOOD_ON_TABLE.distance = 1.5
 
 -- Make the action appear when using a preparedfood from inventory onto a table
 AddComponentAction("USEITEM", "inventoryitem", function(inst, doer, target, actions, right)
     if not target or not doer or not inst then return end
-    if not target:HasTag("has_table_food") and not target:HasTag("hasfurnituredecoritem") and target:HasTag("decortable") and target:HasTag("structure") and inst:HasTag("preparedfood") and doer.prefab == "warly" then
-        table.insert(actions, ACTIONS.PLACE_FOOD_ON_TABLE)
+    if doer:HasTag("warly_true_delicious_desk") then
+        if not target:HasTag("hasfurnituredecoritem") and target:HasTag("decortable") and target:HasTag("structure") and inst:HasTag("preparedfood") and doer.prefab == "warly" then
+            table.insert(actions, ACTIONS.PLACE_FOOD_ON_TABLE)
+        end
     end
 end)
 
 -- Add a stategraph action handler so the player plays the short action animation
-AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.PLACE_FOOD_ON_TABLE, "dolongaction"))
-AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.PLACE_FOOD_ON_TABLE, "dolongaction"))
-
-
--- ---- 第二个动作：当桌子被占用且 doer.hunger == 0 时，右键桌子恢复饥饿并释放桌子 ----
-local ACTION_CONSUME_TABLE_FOOD = AddAction("CONSUME_TABLE_FOOD", "Consume table food",
-    function(act)
-        local doer = act.doer
-        local target = act.target
-        if not (doer and target) then return end
-        if not target.has_table_food then
-            -- ensure netvars exist
-            target.has_table_food = net_bool(target.GUID, "decortable.has_table_food")
-            target.table_food_hunger = net_float(target.GUID, "decortable.table_food_hunger")
-        end
-        if not target.has_table_food:value() then
-            return
-        end
-        if not doer.components or not doer.components.hunger then return end
-        -- only allow when hunger is zero (<=0 used for safety)
-        if doer.components.hunger.current > 0 then
-            return
-        end
-
-        -- give hunger
-        local give = target.table_food_hunger:value() or 0
-        if give > 0 then
-            doer.components.hunger:DoDelta(give, true, "table_food_consume")
-        end
-
-        -- clear table visuals & state (server)
-        if target._table_decor_food then
-            if target._table_decor_food.Follower then
-                target._table_decor_food.Follower:StopFollowing()
-            end
-            target._table_decor_food:Remove()
-            target._table_decor_food = nil
-        end
-
-        -- clear netvars
-        target.has_table_food:set(false)
-        target.table_food_hunger:set(0)
-
-        target:RemoveTag("has_table_food")
-
-        if target.components.furnituredecortaker then
-            target.components.furnituredecortaker:SetEnabled(true)
-        end
-
-        if target.SoundEmitter then
-            target.SoundEmitter:PlaySound("dontstarve/common/eat")
-        end
-
-        return true
-    end
-)
-
--- Make the action appear on right-click context if table is occupied and doer hunger == 0
-AddComponentAction("SCENE", "furnituredecortaker", function(inst, doer, actions, right)
-    -- ensure netvars exist
-    if not inst.has_table_food then
-        inst.has_table_food = net_bool(inst.GUID, "decortable.has_table_food")
-        inst.table_food_hunger = net_float(inst.GUID, "decortable.table_food_hunger")
-    end
-    if inst.has_table_food:value() then
-        table.insert(actions, ACTIONS.CONSUME_TABLE_FOOD)
-    end
-end)
-
-AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.CONSUME_TABLE_FOOD, "doshortaction"))
-AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.CONSUME_TABLE_FOOD, "doshortaction"))
-
-
--- ---- 视觉更新的保底（在表实例创建时，确保桌子上显示 swap_object 为 table_food_prefab） ----
--- local function EnsureTableNetvarsAndVisuals(inst, data)
---     -- call this in AddTable's fn after inst.entity:SetPristine() OR register globally with AddPrefabPostInit for tables
---     if not inst.has_table_food then
---         inst.has_table_food = net_bool(inst.GUID, "decortable.has_table_food")
---         inst.table_food_hunger = net_float(inst.GUID, "decortable.table_food_hunger")
---     end
-
---     local function UpdateVisual()
---         if not inst.AnimState then return end
---         if pref and pref ~= "" then
---             inst.AnimState:OverrideSymbol("swap_object", "cook_pot_food", pref)
---         else
---             -- attempt to clear override by restoring table's own symbol (best-effort)
---             inst.AnimState:ClearOverrideSymbol("swap_object")
---         end
---     end
-
---     inst:DoPeriodicTask(0.5, UpdateVisual) -- periodic refresh to keep client visuals in sync
---     inst:DoTaskInTime(0, UpdateVisual)
--- end
-
--- -- Optionally: call EnsureTableNetvarsAndVisuals for all table prefabs on prefab init:
--- AddPrefabPostInit("wood_table_round", function(inst) EnsureTableNetvarsAndVisuals(inst) end)
--- AddPrefabPostInit("wood_table_square", function(inst) EnsureTableNetvarsAndVisuals(inst) end)
--- AddPrefabPostInit("stone_table_round", function(inst) EnsureTableNetvarsAndVisuals(inst) end)
--- AddPrefabPostInit("stone_table_square", function(inst) EnsureTableNetvarsAndVisuals(inst) end)
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.PLACE_FOOD_ON_TABLE, "give"))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.PLACE_FOOD_ON_TABLE, "give"))

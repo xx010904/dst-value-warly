@@ -1,47 +1,285 @@
-local assets =
-{
-    Asset("ANIM", "anim/decor_lamp.zip"),
-}
--- local LAMP_LIGHT_COLOUR = Vector3(180 / 255, 195 / 255, 150 / 255)
+local function CloneDecorFoodAppearance(src)
+    if not (src and src.mimic_food) then
+        print("[DecorFoodClone] 没有 mimic_food，复制失败")
+        src.mimic_food = "meatballs"
+    end
 
--- local function lamp_turnoff(inst)
---     if inst.Light then
---         inst.Light:Enable(false)
---     end
---     inst.components.fueled:StopConsuming()
---     inst.components.machine.ison = false
---     -- inst.AnimState:PlayAnimation("off")
---     inst.AnimState:PushAnimation("idle")
---     inst.AnimState:OverrideSymbol("swap_food", "cook_pot_food", "frogfishbowl")
--- end
+    local restore_skill = src.restore_skill
+    local foodname = src.mimic_food
+    local food_symbol_build = src.food_symbol_build or "cook_pot_food"
+    local food_basename = src.food_basename or foodname
+    local spicename = src.spicename
 
--- local function lamp_fuelupdate(inst)
---     local fuelpercent = inst.components.fueled:GetPercent()
---     if inst.Light then
---         inst.Light:SetIntensity(Lerp(0.4, 0.6, fuelpercent))
---         inst.Light:SetRadius(Lerp(2, 4, fuelpercent))
---     end
--- end
+    -- print("[DecorFoodClone] 拷贝外观:", foodname, food_symbol_build, food_basename, "spice:", spicename)
 
--- local function lamp_turnon(inst)
---     local fueled = inst.components.fueled
---     if fueled:IsEmpty() or inst.components.inventoryitem:IsHeld() then return end
+    -- 生成一个新的 decor_food
+    local decor = SpawnPrefab("decor_food")
+    if not decor then
+        print("[DecorFoodClone] SpawnPrefab 失败")
+        return nil
+    end
 
---     fueled:StartConsuming()
---     if inst.Light then
---         inst.Light:Enable(true)
---     end
---     inst.components.machine.ison = true
---     -- inst.AnimState:PlayAnimation("on")
---     inst.AnimState:PushAnimation("idle")
---     inst.AnimState:OverrideSymbol("swap_food", "cook_pot_food", "meatballs")
--- end
+    -- 复制 build/bank/调料
+    if spicename ~= nil then
+        decor.AnimState:SetBuild("plate_food")
+        decor.AnimState:SetBank("plate_food")
+        decor.AnimState:OverrideSymbol("swap_garnish", "spices", spicename)
+        decor:AddTag("spicedfood")
+    else
+        decor.AnimState:SetBuild(food_symbol_build or "cook_pot_food")
+        decor.AnimState:SetBank("cook_pot_food")
+    end
 
--- local function lamp_ondropped(inst)
---     -- Works because of the IsEmpty check in turnon
---     -- lamp_turnoff(inst)
---     -- lamp_turnon(inst)
--- end
+    -- 复制食物符号
+    decor.AnimState:OverrideSymbol("swap_food", food_symbol_build or "cook_pot_food", food_basename or foodname)
+
+    -- 保留 mimic 信息（方便下次克隆或下线还原）
+    decor.restore_skill = restore_skill
+    decor.mimic_food = foodname
+    decor.food_symbol_build = food_symbol_build
+    decor.food_basename = food_basename
+    decor.spicename = spicename
+
+    -- 拷贝颜色、缩放（如果原 decor 有这些属性）
+    -- if src.AnimState then
+    --     local r, g, b, a = src.AnimState:GetMultColour()
+    --     decor.AnimState:SetMultColour(r, g, b, a)
+    --     decor.Transform:SetScale(src.Transform:GetScale())
+    -- end
+
+    return decor
+end
+
+local function TryFindNearbyTable(inst, doer)
+    local x, y, z = inst.Transform:GetWorldPosition()
+    local tables = TheSim:FindEntities(x, y, z, 2, { "decortable", "structure" }, { "hasfurnituredecoritem" })
+    -- print("找到空桌子", #tables)
+    for _, table in ipairs(tables) do
+        if table and table.components.furnituredecortaker then
+            local newDecor = CloneDecorFoodAppearance(inst)
+            if newDecor then
+                table.components.furnituredecortaker:AcceptDecor(newDecor, doer)
+                if newDecor.Follower then newDecor.Follower:FollowSymbol(table.GUID, "swap_object") end
+                -- print("接受回decor食物", newDecor.prefab, doer.prefab)
+                return true
+            end
+        end
+    end
+    return false
+end
+
+local function ApplyFoodDirectly(owner, food)
+    if not (owner and food and food.components and food.components.edible) then
+        return
+    end
+
+    local edible = food.components.edible
+
+    -- 饥饿
+    local hunger = edible.hungervalue or 0
+    if owner.components.hunger then
+        owner.components.hunger:DoDelta(hunger, true) -- true = ignore modifiers
+    end
+
+    -- 生命
+    local health = edible.healthvalue or 0
+    if owner.components.health then
+        owner.components.health:DoDelta(health)
+    end
+
+    -- 理智
+    local sanity = edible.sanityvalue or 0
+    if owner.components.sanity then
+        owner.components.sanity:DoDelta(sanity)
+    end
+end
+
+local function EatMimicFood(inst, owner)
+    if not (owner and owner.components and owner.components.eater) then
+        return
+    end
+
+    local foodname = inst.mimic_food or "meatballs"
+    local food = SpawnPrefab(foodname)
+    if not food then
+        -- 如果没有对应prefab，生成一个空壳dummy防报错
+        food = SpawnPrefab("meatballs")
+    end
+
+    if not food.components.edible then
+        return
+    end
+
+    local veryStarve = false
+    if owner and owner.components.hunger then
+        local hunger_percent = owner.components.hunger:GetPercent()
+        local threshold = 0.33 -- 饿到说话
+        -- 技能树控制，沃利随时享受这个持续buff，但是只点1级，他放的食物没有buff
+        if owner:HasTag("warly_true_delicious_desk") then
+            threshold = 1.1
+        end
+        if hunger_percent < threshold then
+            -- print(string.format("饥饿触发：%s 当前%.2f%% < %.0f%%阈值", owner.prefab, hunger_percent * 100, threshold * 100))
+            veryStarve = true
+            if food and food.components.edible then
+                food.components.edible.foodtype = FOODTYPE.GOODIES
+            end
+        end
+    end
+
+    -- 防止被吃完前触发掉落
+    food.persists = false
+
+    local success = owner.components.eater:PrefersToEat(food)
+    if success then
+        -- 直接加属性，而不是吃，解决一切挑食问题
+        ApplyFoodDirectly(owner, food)
+        food.components.edible.healthvalue = 0
+        food.components.edible.hungervalue = 0
+        food.components.edible.sanityvalue = 0
+        -- 吃一个为了触发buff
+        owner.components.eater:Eat(food)
+        -- print("餐桌模拟食物使用成功", owner.prefab, food.prefab)
+        -- 太饿的时候吃会有额外动作和台词
+        SpawnPrefab("winters_feast_depletefood").Transform:SetPosition(owner.Transform:GetWorldPosition())
+        if veryStarve then
+            owner:DoTaskInTime(0, function()
+                if owner.components.talker then
+                    owner.components.talker:Say(GetString(owner, "ANNOUNCE_TRUE_DELICIOUS"))
+                end
+                owner.sg:GoToState("emote", { anim = "emoteXL_happycheer", mounted = true, mountsound = "yell" })
+            end)
+        else
+            owner.AnimState:PlayAnimation("feast_eat_pre_pre")
+            owner.AnimState:PushAnimation("feast_eat_pre", false)
+            owner.AnimState:PushAnimation("feast_eat_loop", false)
+            owner.AnimState:PushAnimation("feast_eat_loop", false)
+            owner.AnimState:PushAnimation("feast_eat_pst", false)
+        end
+        -- 技能树控制食物是否有持续buff
+        if inst.restore_skill then
+            owner:AddDebuff("warly_truedelicious_buff", "warly_truedelicious_buff")
+            local truedelicious_buff = owner:GetDebuff("warly_truedelicious_buff")
+            truedelicious_buff.foodPrefab = inst.food_basename or inst.mimic_food
+            SpawnPrefab("werebeaver_shock_fx").Transform:SetPosition(owner.Transform:GetWorldPosition())
+        end
+    else
+        -- print("餐桌模拟食物使用失败", owner.prefab, food.prefab)
+        if owner.components.talker then
+            owner.components.talker:Say(GetString(owner, "ANNOUNCE_FALSE_DELICIOUS"))
+        end
+        owner.sg:GoToState("refuseeat")
+
+        -- 尝试放回桌子
+        local isback = TryFindNearbyTable(inst, owner)
+        if not isback then
+            local newDecor = CloneDecorFoodAppearance(inst)
+            if newDecor then
+                -- print("没找到桌子，重新生成一个丢地上", newDecor.mimic_food)
+                newDecor.Transform:SetPosition(owner.Transform:GetWorldPosition())
+                Launch(newDecor, owner)
+            end
+        end
+    end
+    if food then
+        food:Remove()
+    end
+    inst:Remove()
+end
+
+local function OnPutInInventory(inst, owner)
+    if inst._already_consumed then
+        return
+    end
+    inst._already_consumed = true
+    inst:DoTaskInTime(0, function()
+        EatMimicFood(inst, owner)
+    end)
+end
+
+local function OnDropped(inst)
+    inst._already_consumed = false
+    inst:DoTaskInTime(0, function()
+        if inst:IsValid() then
+            inst:Remove()
+        end
+    end)
+end
+
+local function OnSave(inst, data)
+    data.restore_skill = inst.restore_skill
+    data.mimic_food = inst.mimic_food
+    data.food_symbol_build = inst.food_symbol_build
+    data.spicename = inst.spicename
+    data.food_basename = inst.food_basename
+end
+
+local function OnLoad(inst, data)
+    if data then
+        inst.restore_skill = data.restore_skill
+        inst.mimic_food = data.mimic_food
+        inst.food_symbol_build = data.food_symbol_build
+        inst.spicename = data.spicename
+        inst.food_basename = data.food_basename
+    end
+end
+
+local function SetName(inst)
+    local realName = STRINGS.NAMES.DECOR_FOOD or "Food Decoration"
+
+    if inst.mimic_food then
+        if inst.spicename then
+            local spice_key = string.upper(inst.spicename .. "_FOOD")
+            local food_key = string.upper(inst.food_basename or inst.mimic_food)
+
+            local spice_str = STRINGS.NAMES[spice_key]
+            local food_str = STRINGS.NAMES[food_key]
+
+            -- 防止 nil
+            if not spice_str then
+                -- print("[SetName] 警告: 找不到调料字符串", spice_key)
+                spice_str = spice_key
+            end
+            if not food_str then
+                -- print("[SetName] 警告: 找不到食物字符串", food_key)
+                food_str = food_key
+            end
+
+            realName = subfmt(spice_str, { food = food_str })
+            -- print("[SetName] 设置自定义名字（有调料）", realName)
+
+            ---- 同时设置外观
+            inst.AnimState:SetBuild("plate_food")
+            inst.AnimState:SetBank("plate_food")
+            inst.AnimState:OverrideSymbol("swap_garnish", "spices", inst.spicename)
+            inst:AddTag("spicedfood")
+        else
+            local food_key = string.upper(inst.mimic_food)
+            local food_str = STRINGS.NAMES[food_key] or inst.mimic_food
+            realName = food_str
+            -- print("[SetName] 设置自定义名字（无调料）", realName)
+
+            ---- 同时设置外观
+            inst.AnimState:SetBuild(inst.food_symbol_build or "cook_pot_food")
+            inst.AnimState:SetBank("cook_pot_food")
+        end
+    else
+        print("[SetName] mimic_food 为 nil，使用默认名字", realName)
+    end
+
+    if inst.components.named then
+        inst.components.named:SetName(realName)
+    end
+
+    ---- 同时设置外观
+    inst.AnimState:OverrideSymbol("swap_food", inst.food_symbol_build or "cook_pot_food",
+        inst.food_basename or inst.mimic_food)
+    if inst.restore_skill then
+        SpawnPrefab("carnival_sparkle_fx").Transform:SetPosition(inst.Transform:GetWorldPosition())
+    end
+    SpawnPrefab("winters_feast_depletefood").Transform:SetPosition(inst.Transform:GetWorldPosition())
+end
+
 
 local function fn()
     local inst = CreateEntity()
@@ -49,7 +287,6 @@ local function fn()
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
     inst.entity:AddFollower()
-    -- inst.entity:AddLight()
     inst.entity:AddNetwork()
 
     MakeInventoryPhysics(inst)
@@ -59,46 +296,46 @@ local function fn()
     inst.AnimState:PlayAnimation("idle")
     inst.AnimState:OverrideSymbol("swap_food", "cook_pot_food", "meatballs")
 
-    inst:AddTag("furnituredecor") -- From "furnituredecor", for optimization
-    inst:AddTag("NOCLICK")
-
-    -- inst.Light:SetIntensity(0.4)
-    -- inst.Light:SetColour(LAMP_LIGHT_COLOUR.x, LAMP_LIGHT_COLOUR.y, LAMP_LIGHT_COLOUR.z)
-    -- inst.Light:SetFalloff(0.8)
-    -- inst.Light:SetRadius(2)
-    -- inst.Light:Enable(false)
-
-    -- MakeInventoryFloatable(inst, "small", 0.065, 0.85)
+    inst:AddTag("furnituredecor")
+    inst:AddTag("_named")
 
     inst.entity:SetPristine()
+
     if not TheWorld.ismastersim then
         return inst
     end
 
-    --
-    -- local fueled = inst:AddComponent("fueled")
-    -- fueled.fueltype = FUELTYPE.CAVE
-    -- fueled:InitializeFuelLevel(TUNING.LANTERN_LIGHTTIME)
-    -- fueled:SetDepletedFn(lamp_turnoff)
-    -- fueled:SetUpdateFn(lamp_fuelupdate)
-    -- fueled:SetTakeFuelFn(lamp_turnon)
-    -- fueled:SetFirstPeriod(TUNING.TURNON_FUELED_CONSUMPTION, TUNING.TURNON_FULL_FUELED_CONSUMPTION)
-    -- fueled.accepting = true
+    inst:RemoveTag("_named")
+    inst:AddComponent("named")
 
-    --
-    local furnituredecor = inst:AddComponent("furnituredecor")
-    -- furnituredecor.onputonfurniture = lamp_ondropped
+    inst:AddComponent("furnituredecor")
 
-    --
+    inst.restore_skill = false
+    inst.mimic_food = "meatballs"
+    inst.food_symbol_build = ""
+    inst.food_basename = ""
+    inst.spicename = ""
+
     inst:AddComponent("inspectable")
 
-    --
     local inventoryitem = inst:AddComponent("inventoryitem")
-    inst.components.inventoryitem.imagename = "meatballs"
-    inst.components.inventoryitem.atlasname = "images/inventoryimages2.xml"
+    -- inst.components.inventoryitem.imagename = "meatballs"
+    -- inst.components.inventoryitem.atlasname = "images/inventoryimages2.xml"
 
+    -- 监听进入物品栏事件
+    inst:ListenForEvent("onputininventory", function(inst, owner)
+        OnPutInInventory(inst, owner)
+    end)
+
+    -- 掉落时重置状态
+    inst:ListenForEvent("ondropped", OnDropped)
+
+    inst:DoTaskInTime(0, SetName)
+
+    inst.OnSave = OnSave
+    inst.OnLoad = OnLoad
 
     return inst
 end
 
-return Prefab("decor_food", fn, assets)
+return Prefab("decor_food", fn)
