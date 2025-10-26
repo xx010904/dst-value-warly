@@ -34,6 +34,8 @@ local function OnTick(inst, target)
         inst.components.debuff:Stop()
         return
     end
+    local fx = SpawnPrefab("abigail_rising_twinkles_fx")
+    target:AddChild(fx)
 
     if target.components.health then
         target.components.health:DoDelta(1, nil, "warly_truedelicious_buff")

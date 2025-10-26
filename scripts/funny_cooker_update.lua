@@ -22,8 +22,8 @@
 -- 4 现烤大饼变成附近玩家（寄居蟹）最喜欢的食物，或者飞饼
 
 -- Section 3：真香警告
--- 1 可以把食物放在桌上，永鲜，其他角色在饿的时候可以去吃，忽略食物的倍率
--- 2 可以额外持续恢复
+-- 1 可以把食物放在桌上，永鲜，其他角色在饿的时候可以去吃，忽略食物的倍率，有概率多重
+-- 2 吃桌上的料理获得额外恢复，是持续给的
 -- 3 沃利可以持续消除记忆
 
 
@@ -103,8 +103,8 @@ AddPlayerPostInit(function(inst)
         return
     end
 
-    inst.warly_throw_pot_accum_chance = inst.warly_throw_pot_accum_chance or 0
-    inst.warly_skypie_accum_chance = inst.warly_skypie_accum_chance or 0
+    inst.warly_throw_pot_accum_chance = inst.warly_throw_pot_accum_chance or math.random(0, 0.5)
+    inst.warly_skypie_accum_chance = inst.warly_skypie_accum_chance or math.random(0, 0.5)
 
     local _OldOnSave_throw = inst.OnSave
     inst.OnSave = function(inst, data)
@@ -251,7 +251,7 @@ local function doFunnyCook(inst, idiot, food_name, op)
             if inst and inst:IsValid() then
                 SpawnCookPotFX(inst, idiot)
                 -- puff 特效
-                local puff = SpawnPrefab("firesplash_fx")
+                local puff = SpawnPrefab("abigail_shadow_buff_fx")
                 if puff then
                     puff.entity:SetParent(inst.entity)
                     puff.Transform:SetPosition(0, 1, 0)
@@ -277,7 +277,7 @@ AddComponentPostInit("stewer", function(stewer)
         local result = old_Harvest and old_Harvest(self, harvester)
         if product and FOOD_RECOVERY_TABLE.harvest_pot[product] then
             for _, player in ipairs(AllPlayers) do
-                if player.prefab == "warly" and player.components.health and not player.components.health:IsDead() then
+                if player.prefab == "warly" and not player:HasTag("playerghost") then
                     if harvester and player:IsNear(harvester, 12) then
                         local hasSkill = player.components.skilltreeupdater and
                             player.components.skilltreeupdater:IsActivated("warly_funny_cook_base")
@@ -303,7 +303,7 @@ AddComponentPostInit("cookable", function(cookable)
         local product = old_Cook and old_Cook(self, cooker, chef)
         if food_name and FOOD_RECOVERY_TABLE.cook_fire[food_name] then
             for _, player in ipairs(AllPlayers) do
-                if player.prefab == "warly" and player.components.health and not player.components.health:IsDead() then
+                if player.prefab == "warly" and not player:HasTag("playerghost") then
                     if chef and player:IsNear(chef, 12) then
                         local hasSkill = player.components.skilltreeupdater and
                             player.components.skilltreeupdater:IsActivated("warly_funny_cook_base")
@@ -330,7 +330,7 @@ AddComponentPostInit("edible", function(edible)
             local food_name = self.inst.prefab
             food_name = GetBaseFood(food_name)
             for _, player in ipairs(AllPlayers) do
-                if player.prefab == "warly" and player.components.health and not player.components.health:IsDead() then
+                if player.prefab == "warly" and not player:HasTag("playerghost") then
                     if eater and player:IsNear(eater, 12) then
                         local hasSkill = player.components.skilltreeupdater and
                             player.components.skilltreeupdater:IsActivated("warly_funny_cook_base")
@@ -368,8 +368,10 @@ AddPlayerPostInit(function(dead)
     dead:ListenForEvent("death", function(inst, data)
         -- 遍历所有玩家，找附近的沃利
         for _, player in ipairs(AllPlayers) do
-            if player.prefab == "warly" and player.components.health and not player.components.health:IsDead()
-                and dead and player:IsNear(dead, 12)
+            if player.prefab == "warly"
+                and (dead == player or not player:HasTag("playerghost"))
+                and dead
+                and player:IsNear(dead, 12)
             then
                 -- 技能树控制
                 local hasSkill = player.components.skilltreeupdater and
@@ -840,8 +842,8 @@ end)
 
 -- =========================================================
 -- SECTION3 真香
--- 1 可以把食物放在桌上，永鲜，其他角色在饿的时候可以去吃，忽略食物的倍率
--- 2 可以额外持续恢复
+-- 1 可以把食物放在桌上，永鲜，其他角色在饿的时候可以去吃，忽略食物的倍率，有概率多重
+-- 2 吃桌上的料理获得额外恢复，是持续给的
 -- 3 沃利可以持续消除记忆
 -- =========================================================
 local ACTION_PLACE_FOOD_ON_TABLE = AddAction("PLACE_FOOD_ON_TABLE", STRINGS.ACTIONS.PLACE_FOOD_ON_TABLE, -- perform fn:
@@ -898,7 +900,7 @@ local ACTION_PLACE_FOOD_ON_TABLE = AddAction("PLACE_FOOD_ON_TABLE", STRINGS.ACTI
         if decor.Physics then decor.Physics:SetActive(false) end
         if decor.Follower then decor.Follower:FollowSymbol(target.GUID, "swap_object") end
 
-        print("[DecorFood] Finished applying symbols.")
+        -- print("[DecorFood] Finished applying symbols.")
 
         -- 用装饰take的逻辑
         target.components.furnituredecortaker:AcceptDecor(decor, doer)
@@ -913,17 +915,38 @@ local ACTION_PLACE_FOOD_ON_TABLE = AddAction("PLACE_FOOD_ON_TABLE", STRINGS.ACTI
             invobject:Remove()
         end
 
+        -- 做一个提示
+        decor:DoTaskInTime(10*FRAMES, function(_decor)
+            local uses = _decor.uses_left
+            if uses > 1 and doer and doer.components.talker then
+                if uses > 2 then
+                    SpawnPrefab("carnival_streamer_fx").Transform:SetPosition(_decor.Transform:GetWorldPosition())
+                    if uses > 3 then
+                        SpawnPrefab("rabbit_confetti_fx").Transform:SetPosition(_decor.Transform:GetWorldPosition())
+                    end
+                end
+                local str = subfmt(GetString(doer, "ANNOUNCE_MULTIPLATE"), { uses = uses })
+                doer.components.talker:Say(str)
+            end
+        end)
+
         return true
     end
 )
 ACTION_PLACE_FOOD_ON_TABLE.distance = 1.5
 
--- Make the action appear when using a preparedfood from inventory onto a table
+-- 只能把东西放到目前现有的4个桌子上
 AddComponentAction("USEITEM", "inventoryitem", function(inst, doer, target, actions, right)
     if not target or not doer or not inst then return end
-    if doer:HasTag("warly_true_delicious_desk") then
-        if not target:HasTag("hasfurnituredecoritem") and target:HasTag("decortable") and target:HasTag("structure") and inst:HasTag("preparedfood") and doer.prefab == "warly" then
-            table.insert(actions, ACTIONS.PLACE_FOOD_ON_TABLE)
+    if doer.prefab == "warly" and doer:HasTag("warly_true_delicious_desk") then
+        local isTable = target.prefab == "wood_table_round"
+                    or target.prefab == "wood_table_square"
+                    or target.prefab == "stone_table_round"
+                    or target.prefab == "stone_table_square"
+        if not target:HasTag("hasfurnituredecoritem") and isTable then
+            if inst:HasTag("preparedfood") and inst.prefab ~= "warly_sky_pie_baked" then
+                table.insert(actions, ACTIONS.PLACE_FOOD_ON_TABLE)
+            end
         end
     end
 end)
@@ -931,3 +954,72 @@ end)
 -- Add a stategraph action handler so the player plays the short action animation
 AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.PLACE_FOOD_ON_TABLE, "give"))
 AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.PLACE_FOOD_ON_TABLE, "give"))
+
+-- 兼容排队论
+local actionqueuer_status = pcall(require, "components/actionqueuer")
+if actionqueuer_status then
+    if AddActionQueuerAction then
+        AddActionQueuerAction("leftclick", ACTION_PLACE_FOOD_ON_TABLE.id, true)
+    end
+end
+
+-- 修改拾取装饰食物的动作名字和动作距离
+local old_pickup_strfn = ACTIONS.PICKUP.strfn
+ACTIONS.PICKUP.strfn = function(act)
+    if act.target and act.target.prefab == "decor_food" then
+        return "DECOR_FOOD"
+    end
+    if old_pickup_strfn then
+        return old_pickup_strfn(act)
+    end
+    return nil
+end
+local old_pickup_extra_arrive_dist = ACTIONS.PICKUP.extra_arrive_dist
+ACTIONS.PICKUP.extra_arrive_dist = function(doer, dest)
+    local target = dest and dest.inst or nil
+    if target and target.prefab == "decor_food" then
+        return 1
+    end
+    if old_pickup_extra_arrive_dist then
+        return old_pickup_extra_arrive_dist(doer, dest)
+    end
+    return 0
+end
+
+-- 被锤击时删除桌子的装饰食物
+local function RemoveDecorIfFood(inst, worker, workleft, numworks) --(self.inst, worker, self.workleft, numworks)
+    if inst.components and inst.components.furnituredecortaker then
+        local decor = inst.components.furnituredecortaker.decor_item
+        if decor and decor:IsValid() and decor.prefab == "decor_food" then
+            inst.components.workable.workleft = workleft + numworks -- 补回次数
+            decor:Remove()
+        end
+    end
+end
+
+local function HookTable(prefabname)
+    AddPrefabPostInit(prefabname, function(inst)
+        if not TheWorld.ismastersim then
+            return
+        end
+
+        if inst.components.workable then
+            local old_work_decor = inst.components.workable.onwork
+            inst.components.workable:SetOnWorkCallback(function(inst, worker, workleft, numworks)
+                -- 先执行原始逻辑
+                if old_work_decor then
+                    old_work_decor(inst, worker, workleft, numworks)
+                end
+
+                -- 执行删除食物 decor
+                RemoveDecorIfFood(inst, worker, workleft, numworks)
+            end)
+        end
+    end)
+end
+
+-- Hook 所有桌子
+HookTable("wood_table_round")
+HookTable("wood_table_square")
+HookTable("stone_table_round")
+HookTable("stone_table_square")

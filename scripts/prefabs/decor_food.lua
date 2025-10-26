@@ -9,6 +9,7 @@ local function CloneDecorFoodAppearance(src)
     local food_symbol_build = src.food_symbol_build or "cook_pot_food"
     local food_basename = src.food_basename or foodname
     local spicename = src.spicename
+    local uses_left = src.uses_left
 
     -- print("[DecorFoodClone] 拷贝外观:", foodname, food_symbol_build, food_basename, "spice:", spicename)
 
@@ -39,6 +40,7 @@ local function CloneDecorFoodAppearance(src)
     decor.food_symbol_build = food_symbol_build
     decor.food_basename = food_basename
     decor.spicename = spicename
+    decor.uses_left = uses_left
 
     -- 拷贝颜色、缩放（如果原 decor 有这些属性）
     -- if src.AnimState then
@@ -51,18 +53,26 @@ local function CloneDecorFoodAppearance(src)
 end
 
 local function TryFindNearbyTable(inst, doer)
-    local x, y, z = inst.Transform:GetWorldPosition()
-    local tables = TheSim:FindEntities(x, y, z, 2, { "decortable", "structure" }, { "hasfurnituredecoritem" })
-    -- print("找到空桌子", #tables)
-    for _, table in ipairs(tables) do
-        if table and table.components.furnituredecortaker then
-            local newDecor = CloneDecorFoodAppearance(inst)
-            if newDecor then
-                table.components.furnituredecortaker:AcceptDecor(newDecor, doer)
-                if newDecor.Follower then newDecor.Follower:FollowSymbol(table.GUID, "swap_object") end
-                -- print("接受回decor食物", newDecor.prefab, doer.prefab)
-                return true
+    local link_table = inst.link_table
+    -- print("有绑定的桌子，放回去")
+    if link_table == nil then
+        local x, y, z = inst.Transform:GetWorldPosition()
+        local tables = TheSim:FindEntities(x, y, z, 3.5, { "decortable", "structure" }, { "hasfurnituredecoritem" })
+        -- print("找到空桌子", #tables)
+        for _, table in ipairs(tables) do
+            if table and table.components.furnituredecortaker then
+                link_table = table
             end
+        end
+    end
+    -- 补充逻辑：有桌子在附近
+    if link_table then
+        local newDecor = CloneDecorFoodAppearance(inst)
+        if newDecor then
+            link_table.components.furnituredecortaker:AcceptDecor(newDecor, doer)
+            if newDecor.Follower then newDecor.Follower:FollowSymbol(link_table.GUID, "swap_object") end
+            -- print("接受回decor食物", newDecor.prefab, doer.prefab)
+            return true
         end
     end
     return false
@@ -160,26 +170,30 @@ local function EatMimicFood(inst, owner)
         if inst.restore_skill then
             owner:AddDebuff("warly_truedelicious_buff", "warly_truedelicious_buff")
             local truedelicious_buff = owner:GetDebuff("warly_truedelicious_buff")
-            truedelicious_buff.foodPrefab = inst.food_basename or inst.mimic_food
-            SpawnPrefab("werebeaver_shock_fx").Transform:SetPosition(owner.Transform:GetWorldPosition())
+            if truedelicious_buff then
+                truedelicious_buff.foodPrefab = inst.food_basename or inst.mimic_food
+            end
+            SpawnPrefab("mossling_spin_fx").entity:SetParent(owner.entity)
         end
+        inst.uses_left = inst.uses_left - 1
     else
         -- print("餐桌模拟食物使用失败", owner.prefab, food.prefab)
         if owner.components.talker then
             owner.components.talker:Say(GetString(owner, "ANNOUNCE_FALSE_DELICIOUS"))
         end
         owner.sg:GoToState("refuseeat")
-
-        -- 尝试放回桌子
+    end
+    -- 尝试放回桌子
+    if inst.uses_left <= 0 then
         local isback = TryFindNearbyTable(inst, owner)
-        if not isback then
-            local newDecor = CloneDecorFoodAppearance(inst)
-            if newDecor then
-                -- print("没找到桌子，重新生成一个丢地上", newDecor.mimic_food)
-                newDecor.Transform:SetPosition(owner.Transform:GetWorldPosition())
-                Launch(newDecor, owner)
-            end
-        end
+        -- if not isback then
+        --     local newDecor = CloneDecorFoodAppearance(inst)
+        --     if newDecor then
+        --         -- print("没找到桌子，重新生成一个丢地上", newDecor.mimic_food)
+        --         newDecor.Transform:SetPosition(owner.Transform:GetWorldPosition())
+        --         Launch(newDecor, owner)
+        --     end
+        -- end
     end
     if food then
         food:Remove()
@@ -212,6 +226,9 @@ local function OnSave(inst, data)
     data.food_symbol_build = inst.food_symbol_build
     data.spicename = inst.spicename
     data.food_basename = inst.food_basename
+    if inst.uses_left then
+        data.uses_left = inst.uses_left
+    end
 end
 
 local function OnLoad(inst, data)
@@ -221,10 +238,40 @@ local function OnLoad(inst, data)
         inst.food_symbol_build = data.food_symbol_build
         inst.spicename = data.spicename
         inst.food_basename = data.food_basename
+        inst.uses_left = data.uses_left or 1
     end
 end
 
-local function SetName(inst)
+local function Initial(inst)
+    -- ✅初始化绑定的桌子
+    local x, y, z = inst.Transform:GetWorldPosition()
+    local tables = TheSim:FindEntities(x, y, z, 2, { "decortable", "structure" })
+
+    if #tables > 0 then
+        local found = false
+        for _, tbl in ipairs(tables) do
+            if tbl.components.furnituredecortaker and tbl.components.furnituredecortaker.decor_item then
+                if tbl.components.furnituredecortaker.decor_item == inst then
+                    inst.link_table = tbl
+                    found = true
+                    -- print(string.format("[DecorLink] 成功绑定到桌子: %s, 位置(%.2f, %.2f, %.2f)", tostring(tbl.prefab), tbl.Transform:GetWorldPosition()))
+                    break
+                end
+            end
+        end
+        if not found then
+            -- print("[DecorLink] 找到桌子但没有匹配的 decor_item，准备删除")
+            inst:Remove()
+            return
+        end
+    else
+        -- print("[DecorLink] 附近没有桌子，删除 decor_food")
+        inst:Remove()
+        return
+    end
+
+
+    -- ✅初始化名字
     local realName = STRINGS.NAMES.DECOR_FOOD or "Food Decoration"
 
     if inst.mimic_food then
@@ -263,6 +310,10 @@ local function SetName(inst)
             inst.AnimState:SetBuild(inst.food_symbol_build or "cook_pot_food")
             inst.AnimState:SetBank("cook_pot_food")
         end
+        -- 补上次数
+        if inst.uses_left and inst.uses_left > 1 then
+            realName = realName .. "(" .. inst.uses_left .. ")"
+        end
     else
         print("[SetName] mimic_food 为 nil，使用默认名字", realName)
     end
@@ -271,7 +322,7 @@ local function SetName(inst)
         inst.components.named:SetName(realName)
     end
 
-    ---- 同时设置外观
+    -- ✅同时设置外观
     inst.AnimState:OverrideSymbol("swap_food", inst.food_symbol_build or "cook_pot_food",
         inst.food_basename or inst.mimic_food)
     if inst.restore_skill then
@@ -316,6 +367,21 @@ local function fn()
     inst.food_basename = ""
     inst.spicename = ""
 
+    local function GetUsesLeft()
+        local uses = 1  -- 保底 1
+        if math.random() < 0.5 then        -- 50%概率触发 2
+            uses = 2
+            if math.random() < 0.5 then    -- 25% 概率触发 3 （0.5*0.5）
+                uses = 3
+                if math.random() < 0.5 then -- 12.5% 概率触发 4 （0.5*0.5*0.5）
+                    uses = 4
+                end
+            end
+        end
+        return uses
+    end
+    inst.uses_left = GetUsesLeft()
+
     inst:AddComponent("inspectable")
 
     local inventoryitem = inst:AddComponent("inventoryitem")
@@ -330,7 +396,7 @@ local function fn()
     -- 掉落时重置状态
     inst:ListenForEvent("ondropped", OnDropped)
 
-    inst:DoTaskInTime(0, SetName)
+    inst:DoTaskInTime(0, Initial)
 
     inst.OnSave = OnSave
     inst.OnLoad = OnLoad

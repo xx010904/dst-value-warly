@@ -30,10 +30,10 @@ STRINGS.SKILLTREE.WARLY.WARLY_GOURMET_1_LOCK_DESC = "Learn 2 Gourmet skills to u
 
 -- Meal-worthy Play
 STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_BASE_TITLE = "Meal-worthy Play"
-STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_BASE_DESC = "When Warly sees a friend's Meal-worthy Play (noob move), he can't help but immediately cook a dish to go with it."
+STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_BASE_DESC = "When Warly sees a Meal-worthy Play (noob move), he can't help but immediately cook a dish to go with it."
 
 STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_FEAST_TITLE = "The Feast"
-STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_FEAST_DESC = "When a friend dies, Warly will immediately start the meal, cooking four dishes and a soup."
+STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_FEAST_DESC = "When a friend — or Warly himself — dies, Warly will immediately start the feast, cooking four dishes and a soup."
 
 STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_SPICE_TITLE = "Extra Flavor"
 STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_SPICE_DESC = "Warly may improvise by adding a seasoning to the dishes cooked for Meal-worthy Play."
@@ -90,10 +90,10 @@ STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_COZY_DESC = "The more seasoned dishes pl
 -- Allegiance
 STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LOCK_1_DESC = "Unlocks after learning 12 skills."
 
-STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_SHADOW_TITLE = "Bloody Butcher"
+STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_SHADOW_TITLE = "The Ripper Butcher"
 STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_SHADOW_DESC = "The Queen will reward your loyalty by unlocking power from wielding a Shadow Maul. Warly can wield the Shadow Maul to unleash a bloodied long hook and drag targets, and he can also craft the Half-Baked Shadow Maul."
 
-STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LUNAR_TITLE = "Midnight Butcher"
+STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LUNAR_TITLE = "The Midnight Butcher"
 STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LUNAR_DESC = "The Cryptic Founder will reward your curiosity by showing you the power of slaughter. On a full moon night, or after being slain by Warly's Brightshade weapons, pigmen can be revived by Warly to join the fight."
 
 
@@ -240,6 +240,7 @@ STRINGS.CHARACTERS.GENERIC.ANNOUNCE_FORGET_FOOD =
     "I want {food} again.",
     "What does {food} taste like again?",
 }
+STRINGS.CHARACTERS.GENERIC.ANNOUNCE_MULTIPLATE = "{uses} times the joy!"
 STRINGS.CHARACTERS.WARLY.ANNOUNCE_SPICEPACK_UPGRADE = "Ah, my magic spice pack!"
 STRINGS.CHARACTERS.WARLY.ACTIONFAIL.BUILD.NO_COOKPOT_NEARBY = "Actually I need 6 Portable Crock Pot!"
 
@@ -248,3 +249,4 @@ STRINGS.ACTIONS.GIVEFOODTOBATTLEAXE = "Breed"
 STRINGS.ACTIONS.ACTIVATE_POT_PIE = "Inspire Pie"
 STRINGS.ACTIONS.PLACE_FOOD_ON_TABLE = "Plate"
 STRINGS.ACTIONS.SPICEPACK_UPGRADE = "Spice"
+STRINGS.ACTIONS.PICKUP.DECOR_FOOD = "Savor"

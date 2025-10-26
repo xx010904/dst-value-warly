@@ -51,6 +51,9 @@ local function OnHit(inst, attacker, target)
 					-- 线性衰减
 					damage = math.max(min_damage, max_damage * (1 - dist / explosive_range))
 				end
+				if etarget:HasTag("scapegoat") then
+					damage = damage * 0.25
+				end
 				etarget.components.combat:GetAttacked(attacker, damage)
 			end
 		end

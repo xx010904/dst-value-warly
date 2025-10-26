@@ -25,7 +25,8 @@ local function SpawnScapegoat(owner, attacker)
         goat:RemoveTag("herdmember")
         -- 添加替罪羊标签
         goat:AddTag("scapegoat")
-        goat.Transform:SetPosition(goatpos.x, goatpos.y, goatpos.z)
+        owner.Transform:SetPosition(goatpos.x, goatpos.y, goatpos.z)
+        goat.Transform:SetPosition(x, y, z)
 
         if attacker then
             goat.components.combat:SuggestTarget(attacker)
@@ -434,6 +435,8 @@ local function fn()
     inst.components.equippable.equipslot = EQUIPSLOTS.BODY
     inst.components.equippable:SetOnEquip(onequip)
     inst.components.equippable:SetOnUnequip(onunequip)
+
+    inst.components.equippable.insulated = true -- 绝缘
 
     -- 🔹 加载时轮询检查技能树
     inst.check_task = nil

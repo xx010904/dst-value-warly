@@ -134,34 +134,38 @@ local function MakeSpicedFood(inst, cooker, chef)
             -- 累积触发
             if chef.warly_skypie_accum_chance >= 1 then
                 chef.warly_skypie_accum_chance = chef.warly_skypie_accum_chance - 1
+
+                -- ✅ 直接给沃利本人生成飞饼
+                local chefMark = SpawnPrefab("improv_question_mark_fx")
+                chefMark.entity:SetParent(chef.entity)
+                chefMark.Transform:SetPosition(0, 3, 0)
+                prefab_to_spawn = "warly_sky_pie_boomerang"
+
+                -- ✅ 给附近随机幸运儿生成最爱的食物
                 local x, y, z = inst.Transform:GetWorldPosition()
-
                 local targets = {}  -- 最终参与随机的对象列表
-                local nearby = TheSim:FindEntities(x, y, z, 12)  -- 找附近12格的所有实体
-
+                local nearby = TheSim:FindEntities(x, y, z, 12, {"character"})
                 for _, ent in ipairs(nearby) do
-                    if ent:HasTag("player") and not ent:HasTag("playerghost") then
-                        table.insert(targets, ent)
-                    elseif ent.prefab == "hermitcrab" then
-                        table.insert(targets, ent)
+                    if ent ~= chef then -- ❌ 不要把沃利本人算进去
+                        if ent:HasTag("player") and not ent:HasTag("playerghost") then
+                            table.insert(targets, ent)
+                        elseif ent.prefab == "hermitcrab" then
+                            table.insert(targets, ent)
+                        end
                     end
                 end
 
                 if #targets > 0 then
                     local target = targets[math.random(#targets)]
+                    local spiced_best_food = "warly_sky_pie_baked"
 
                     -- ping个问号❓
-                    local chefMark = SpawnPrefab("improv_question_mark_fx")
-                    chefMark.entity:SetParent(chef.entity)
-                    chefMark.Transform:SetPosition(0, 3, 0)
                     local idiotMark = SpawnPrefab("improv_question_mark_fx")
                     idiotMark.entity:SetParent(target.entity)
                     idiotMark.Transform:SetPosition(0, 3, 0)
 
-                    if target == chef then -- 技能树控制（沃利是飞饼）
-                        prefab_to_spawn = "warly_sky_pie_boomerang"
-                    elseif target.prefab == "hermitcrab" then -- 寄居蟹
-                        prefab_to_spawn = "flowersalad"
+                    if target.prefab == "hermitcrab" then
+                        spiced_best_food = GetRandomSpicedFoodFromAll("flowersalad")
                     else
                         local affinity = target.components.foodaffinity
                         if affinity ~= nil and affinity.prefab_affinities ~= nil then
@@ -178,9 +182,15 @@ local function MakeSpicedFood(inst, cooker, chef)
 
                             -- 如果有最喜欢的食物 → 生成那道菜
                             if best_food ~= nil then
-                                prefab_to_spawn = GetRandomSpicedFoodFromAll(best_food)
+                                spiced_best_food = GetRandomSpicedFoodFromAll(best_food)
                             end
                         end
+                    end
+                    -- 生成最爱的食物
+                    local item = SpawnPrefab(spiced_best_food)
+                    if item then
+                        item.Transform:SetPosition(chef.Transform:GetWorldPosition())
+                        LaunchAt(item, chef, target, 1)
                     end
                 end
             end
@@ -221,8 +231,6 @@ local function fn()
     inst:AddComponent("inventoryitem")
     inst.components.inventoryitem.imagename = "warly_sky_pie"
     inst.components.inventoryitem.atlasname = "images/inventoryimages/warly_sky_pie.xml"
-
-    local furnituredecor = inst:AddComponent("furnituredecor")
 
     inst:AddComponent("edible")
     inst.components.edible.foodtype = FOODTYPE.GOODIES

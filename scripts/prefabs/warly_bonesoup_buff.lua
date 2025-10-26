@@ -40,9 +40,9 @@ local function OnAttached(inst, target)
                 end
 
                 -- 提示
-                if inst.components.talker then
-                    inst.components.talker:Say("I dodged it!")
-                end
+                -- if inst.components.talker then
+                --     inst.components.talker:Say("I dodged it!")
+                -- end
 
                 return true  -- 返回 true 表示本次攻击被闪避，不受伤
             end
