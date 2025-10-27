@@ -1,6 +1,6 @@
 -- 炊具改装 (解决回血困难)
 -- Section 1：背锅侠 Crockpot Carrier
--- 1 制作黑锅：100%承受伤害，666耐久，额外受到10%精神损失10%饥饿损失，
+-- 1 制作黑锅：100%承受伤害，666耐久，额外受到10%精神损失10%饥饿损失，分锅摆6个锅
 -- 2 100%附近队友伤害转移
 -- 3.1 概率产生替罪羊 3.2 解羊：屠杀额外掉落
 -- 4.1 6个方向甩锅 4.2 二段跳炸锅（摔坏了就没有二段炸了啊）
@@ -48,6 +48,30 @@ AddRecipe2("armor_crockpot",
                         count = pot.components.stackable:StackSize()
                     end
                     table.insert(candidates, { pot = pot, count = count, dist = dist })
+                end
+            end
+
+            -- 2. 不够就收几个摆好的锅
+            if #candidates < 6 then
+                local missing = 6 - #candidates
+                local recovered = 0
+
+                local placed_pots = TheSim:FindEntities(x, y, z, 4, nil, nil, nil)
+
+                for _, pot in ipairs(placed_pots) do
+                    if pot.prefab == "portablecookpot"
+                        and pot.components
+                        and pot.components.stewer
+                        and not pot.components.stewer:IsCooking()
+                        and pot.components.portablestructure then
+
+                        pot.components.portablestructure:Dismantle(builder)
+                        recovered = recovered + 1
+
+                        if recovered >= missing then
+                            break
+                        end
+                    end
                 end
             end
 
@@ -103,6 +127,9 @@ AddPrefabPostInit("lightninggoat", function(goat)
             end
             goat:RemoveTag("herdmember")
 
+            goat:AddComponent("named")
+            goat.components.named:SetName(STRINGS.NAMES.SCAPEGOAT)
+
             -- 玩家攻击加倍伤害 + 死亡额外掉落羊角
             goat:ListenForEvent("attacked", function(goat, data)
                 if data and data.attacker and data.attacker:HasTag("player") then
@@ -120,7 +147,7 @@ AddPrefabPostInit("lightninggoat", function(goat)
                 end
                 -- 查找附近玩家
                 local x, y, z = goat.Transform:GetWorldPosition()
-                local players = TheSim:FindEntities(x, y, z, 10, { "player" })
+                local players = TheSim:FindEntities(x, y, z, 16, { "player" })
                 for _, player in ipairs(players) do
                     -- 检查是否为沃利并且有技能树
                     local hasSkill = player.components.skilltreeupdater and
@@ -137,7 +164,7 @@ AddPrefabPostInit("lightninggoat", function(goat)
             end)
 
             -- 替罪羊每秒掉血
-            goat.components.health:StartRegen(-3, 1)
+            goat.components.health:StartRegen(-6, 1)
         end
     end)
 
@@ -163,6 +190,93 @@ AddPrefabPostInit("lightninggoat", function(goat)
         end
     end
 end)
+
+--========================================================
+-- 分锅技能
+--========================================================
+local CHARCOAL_MAX = 20
+local SPAWN_RADIUS = 2
+local NUM_COOKPOTS = 6
+
+local function PassCookpots(inst, doer)
+    if not (inst and doer and doer:HasTag("player") and doer.prefab == "warly") then
+        return false
+    end
+
+    -- 技能树控制分锅
+    local hasSkill = doer.components.skilltreeupdater and
+                    doer.components.skilltreeupdater:IsActivated("warly_crockpot_make")
+    if not hasSkill then
+        return false, "NO_SKILL"
+    end
+
+    -- 计算可返还木炭数量（向下取整）
+    local durability_percent = inst.components.armor and inst.components.armor:GetPercent() or 0
+    local num_charcoal = math.floor(durability_percent * CHARCOAL_MAX)
+    -- print(string.format("[ArmorCrockpot] 耐久度 %.2f -> 木炭返还 %d", durability_percent, num_charcoal))
+
+    local x, y, z = inst.Transform:GetWorldPosition()
+    local theta_step = 2 * PI / NUM_COOKPOTS
+
+    for i = 1, NUM_COOKPOTS do
+        local angle = i * theta_step
+        local offset = Vector3(math.cos(angle) * SPAWN_RADIUS, 0, math.sin(angle) * SPAWN_RADIUS)
+        local pos = Vector3(x + offset.x, 0, z + offset.z)
+
+        -- local can_deploy = TheWorld.Map and TheWorld.Map:IsPassableAtPoint(pos:Get()) and TheWorld.Map:IsDeployPointClear2(pos, nil, 2) and not TheWorld.Map:IsOceanAtPoint(pos.x, 0, pos.z)
+        -- local prefab = can_deploy and "portablecookpot" or "portablecookpot_item"
+        local prefab = "portablecookpot"
+
+        local pot = SpawnPrefab(prefab)
+        if pot then
+            pot.AnimState:PlayAnimation("place")
+            pot.SoundEmitter:PlaySound("dontstarve/common/together/portable/cookpot/place")
+            pot.Transform:SetPosition(pos:Get())
+            -- print(string.format("[ArmorCrockpot] 生成 %s 于 (%.2f, %.2f, %.2f)", prefab, pos.x, pos.y, pos.z))
+        end
+    end
+
+    -- 返还木炭
+    if num_charcoal > 0 and doer and doer.components and doer.components.inventory then
+        local charcoal = SpawnPrefab("charcoal")
+        if charcoal ~= nil then
+            charcoal.components.stackable:SetStackSize(math.floor(num_charcoal)) -- 向下取整确保安全
+            doer.components.inventory:GiveItem(charcoal)
+            -- print(string.format("[分锅] 给 %s %d 个木炭", doer:GetDisplayName(), num_charcoal))
+        end
+    else
+        -- print("[分锅] 没有需要返还的木炭或动作人无效")
+    end
+
+    -- 使用完后移除装备
+    inst:Remove()
+
+    return true
+end
+
+-- 自定义动作
+local PassCookpotsAction = Action({ priority = 10 })
+PassCookpotsAction.id = "PASS_THE_POT"
+PassCookpotsAction.str = STRINGS.ACTIONS.PASS_THE_POT
+PassCookpotsAction.fn = function(act)
+    local inst = act.target or act.invobject
+    local doer = act.doer
+    if inst and doer then
+        return PassCookpots(inst, doer)
+    end
+end
+
+AddAction(PassCookpotsAction)
+
+-- 绑定右键动作
+AddComponentAction("SCENE", "passpottool", function(inst, doer, actions, right)
+    if right and inst.prefab == "armor_crockpot" and doer.prefab == "warly" then
+        table.insert(actions, ACTIONS.PASS_THE_POT)
+    end
+end)
+
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.PASS_THE_POT, "dolongaction"))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.PASS_THE_POT, "dolongaction"))
 
 
 --========================================================

@@ -134,6 +134,27 @@ local function HireNearbyPigmen(inst, giver, item)
                     end
                 end
 
+                -- ======= 变成疯猪逻辑 =======
+                if pig.AnimState ~= nil then
+                    pig.AnimState:SetBuild("werepig_build")
+                end
+                if pig.components.combat ~= nil then
+                    pig.components.combat:SetDefaultDamage(TUNING.WEREPIG_DAMAGE)
+                    pig.components.combat:SetAttackPeriod(TUNING.WEREPIG_ATTACK_PERIOD)
+                end
+                if pig.components.locomotor ~= nil then
+                    pig.components.locomotor.runspeed = TUNING.WEREPIG_RUN_SPEED
+                    pig.components.locomotor.walkspeed = TUNING.WEREPIG_WALK_SPEED
+                end
+                if pig.components.lootdropper ~= nil then
+                    pig.components.lootdropper:SetLoot({ "meat", "meat", "pigskin" })
+                    pig.components.lootdropper.numrandomloot = 0
+                end
+                if pig.components.health ~= nil then
+                    pig.components.health:SetMaxHealth(TUNING.WEREPIG_HEALTH)
+                    pig.components.health:Heal(TUNING.WEREPIG_HEALTH) -- 可选，确保血量满
+                end
+                -- ==========================
                 count = count + 1
                 if count >= 5 then
                     break
@@ -218,13 +239,12 @@ local function ShareFoodEffects(eater, food)
         end
     end
 
-    -- 分享给沃利的猪人随从（所有的）
+    -- 分享给沃利的随从（所有的）
     if eater.components.leader ~= nil then
         -- 获取所有跟随者
         for follower, _ in pairs(eater.components.leader.followers) do
             if follower ~= nil
                 and follower:IsValid()
-                and follower:HasTag("pig")
                 and follower.components.health ~= nil
                 and not follower.components.health:IsDead()
             then

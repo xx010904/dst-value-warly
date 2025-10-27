@@ -1,7 +1,7 @@
 local SCAN_RADIUS = 10
 local SANITY_RATIO = 0.1
 local HUNGER_RATIO = 0.1
-local GOAT_CHANCE = 0.01
+local ARMOR_DURABILITY = 666
 
 local function OnBlocked(owner)
     owner.SoundEmitter:PlaySound("dontstarve/wilson/hit_metal")
@@ -58,11 +58,18 @@ local function OnTakeDamage(inst, damage_amount)
 
     -- 自身受伤低概率触发替罪羊，技能树控制
     local hasSkill = owner and owner.components.skilltreeupdater and owner.components.skilltreeupdater:IsActivated("warly_crockpot_scapegoat")
-    if hasSkill and (math.random() < (GOAT_CHANCE + (damage_amount or 0) / 1500)) then
-        local goat = SpawnScapegoat(owner)
-        if goat and goat.components.health then
-            goat.components.health:DoDelta(-damage_amount)
-            return
+    if hasSkill then
+        local base_fraction = (damage_amount or 0) / ARMOR_DURABILITY
+        local random_fraction = base_fraction * 1.0
+        -- print("自己承伤，累计概率", inst.accumulating_goat_chance,"加上", random_fraction)
+        inst.accumulating_goat_chance = inst.accumulating_goat_chance + random_fraction
+        if inst.accumulating_goat_chance > 1 then
+            inst.accumulating_goat_chance = inst.accumulating_goat_chance - 1
+            local goat = SpawnScapegoat(owner)
+            if goat and goat.components.health then
+                goat.components.health:DoDelta(-damage_amount)
+                return
+            end
         end
     end
 
@@ -122,10 +129,17 @@ local function ApplyDamageRedirect(inst, teammate)
 
             -- 技能树控制
             local hasSkill = owner and owner.components.skilltreeupdater and owner.components.skilltreeupdater:IsActivated("warly_crockpot_scapegoat")
-            if hasSkill and (math.random() < (GOAT_CHANCE + (damage or 0) / 750)) then
-                local goat = SpawnScapegoat(owner, attacker)
-                if goat then
-                    return goat
+            if hasSkill then
+                local base_fraction = (damage or 0) / ARMOR_DURABILITY -- 每次累计本次收到的伤害占护甲的总比例
+                local random_fraction = base_fraction * 0.5   -- 替队友可以得0.5的额外累计
+                -- print("替队友承伤，累计概率", inst.accumulating_goat_chance,"加上", random_fraction)
+                inst.accumulating_goat_chance = inst.accumulating_goat_chance + random_fraction
+                if inst.accumulating_goat_chance > 1 then
+                    inst.accumulating_goat_chance = inst.accumulating_goat_chance - 1
+                    local goat = SpawnScapegoat(owner, attacker)
+                    if goat then
+                        return goat
+                    end
                 end
             end
             return owner
@@ -402,6 +416,16 @@ local function Initial(inst)
     end)
 end
 
+local function OnSave(inst, data)
+    data.accumulating_goat_chance = inst.accumulating_goat_chance or 0
+end
+
+local function OnLoad(inst, data)
+    if data and data.accumulating_goat_chance then
+        inst.accumulating_goat_chance = data.accumulating_goat_chance
+    end
+end
+
 
 local function fn()
     local inst = CreateEntity()
@@ -425,11 +449,13 @@ local function fn()
     inst.components.inventoryitem.atlasname = "images/inventoryimages/armor_crockpot.xml"
 
     inst:AddComponent("armor")
-    inst.components.armor:InitCondition(666, 0.99999)
+    inst.components.armor:InitCondition(ARMOR_DURABILITY, 0.99999)
     inst.components.armor.ontakedamage = OnTakeDamage
 
     inst:AddComponent("planardefense")
-	inst.components.planardefense:SetBaseDefense(666)
+	inst.components.planardefense:SetBaseDefense(ARMOR_DURABILITY)
+
+    inst:AddComponent("passpottool")
 
     inst:AddComponent("equippable")
     inst.components.equippable.equipslot = EQUIPSLOTS.BODY
@@ -441,6 +467,11 @@ local function fn()
     -- 🔹 加载时轮询检查技能树
     inst.check_task = nil
     inst:DoTaskInTime(0, Initial)
+
+    inst.accumulating_goat_chance = math.random()
+
+    inst.OnSave = OnSave
+    inst.OnLoad = OnLoad
 
     MakeHauntableLaunch(inst)
 

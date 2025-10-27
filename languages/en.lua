@@ -43,27 +43,27 @@ STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_DESK_TITLE = "True Delicious Warnin
 STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_DESK_DESC = "Warly can place his dishes on the table for permanent preservation, and his true delicious dishes cure all starving picky eaters."
 
 STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_RESTORE_TITLE = "Lingering Taste"
-STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_RESTORE_DESC = "Eaters who try the true delicious dishes on the table will receive continuous healing effects."
+STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_RESTORE_DESC = "Eating the true delicious dish on the table grants a long-lasting effect that restores sanity, hunger, and health."
 
 STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_MEMORY_TITLE = "Relaxing Memories"
-STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_MEMORY_DESC = "The true delicious dishes makes Warly forget his picky-eating past, continuously erases memories of food."
+STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_MEMORY_DESC = "The true delicious dishes makes Warly forget his picky-eating past, continuously erases memories of this food."
 
 -- Pie In The Sky
 STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_POT_TITLE = "Pie In The Sky"
 STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_POT_DESC = "Warly only needs to shake his portable pot near friends to temporarily satisfy all their needs, but this false energy will gradually fade."
 
 STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_MAKE_TITLE = "Handmade Pie"
-STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_MAKE_DESC = "Warly can spend sanity to make pies, which, when eaten, will also make friends completely satisfied."
+STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_MAKE_DESC = "Warly can cost sanity to make pies, which, when eaten, will also make friends completely satisfied."
 
 STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_BAKED_TITLE = "Dense Baked Pie"
 STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_BAKED_DESC = "Warly can put the pie on the fire to bake it, resulting in a Dense Baked Pie that can truly fill the stomach."
 
 STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_FAVORITE_TITLE = "Dream Dish"
-STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_FAVORITE_DESC = "Warly's magical cooking can turn the pie into the favorite food of his friends(or Crabby Hermit), or his own beloved Void Sky Pie."
+STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_FAVORITE_DESC = "Warly's magical cooking can turn the pie into the favorite food of his friends(or Crabby Hermit), and his own beloved Void Sky Pie."
 
 -- Burdened Pot
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_MAKE_TITLE = "Stacked Armor Pot"
-STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_MAKE_DESC = "Warly can stack pots as armor on his back to block all attacks, but it consumes sanity and hunger."
+STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_MAKE_DESC = "Warly can stack pots as armor on his back to block all attacks, but it consumes sanity and hunger. He can also unstack the pots again"
 
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_TRANSFER_TITLE = "Take the Blame"
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_TRANSFER_DESC = "When Warly carries a pot, nearby friends' damage is transferred to him."
@@ -101,6 +101,7 @@ STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LUNAR_DESC = "The Cryptic Founder will 
 -- Item desc
 -- =============================================================================
 STRINGS.NAMES.ARMOR_CROCKPOT = "Burdened Pot"
+STRINGS.NAMES.SCAPEGOAT = "Scapegoat"
 STRINGS.NAMES.SHADOW_BATTLEAXE_YOUNG = "Half-Baked Shadow Maul"
 STRINGS.NAMES.WARLY_SKY_PIE = "Pie In The Sky"
 STRINGS.NAMES.WARLY_SKY_PIE_BAKED = "Dense Baked Pie"
@@ -243,6 +244,8 @@ STRINGS.CHARACTERS.GENERIC.ANNOUNCE_FORGET_FOOD =
 STRINGS.CHARACTERS.GENERIC.ANNOUNCE_MULTIPLATE = "{uses} times the joy!"
 STRINGS.CHARACTERS.WARLY.ANNOUNCE_SPICEPACK_UPGRADE = "Ah, my magic spice pack!"
 STRINGS.CHARACTERS.WARLY.ACTIONFAIL.BUILD.NO_COOKPOT_NEARBY = "Actually I need 6 Portable Crock Pot!"
+STRINGS.CHARACTERS.WARLY.ACTIONFAIL.PASS_THE_POT = {}
+STRINGS.CHARACTERS.WARLY.ACTIONFAIL.PASS_THE_POT.NO_SKILL = "I haven't learned how to pass the pot yet."
 
 STRINGS.ACTIONS.USESHADOWHOOK = "Shadow Hook"
 STRINGS.ACTIONS.GIVEFOODTOBATTLEAXE = "Breed"
@@ -250,3 +253,4 @@ STRINGS.ACTIONS.ACTIVATE_POT_PIE = "Inspire Pie"
 STRINGS.ACTIONS.PLACE_FOOD_ON_TABLE = "Plate"
 STRINGS.ACTIONS.SPICEPACK_UPGRADE = "Spice"
 STRINGS.ACTIONS.PICKUP.DECOR_FOOD = "Savor"
+STRINGS.ACTIONS.PASS_THE_POT = "Pass the Pot"

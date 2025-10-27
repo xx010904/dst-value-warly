@@ -32,7 +32,7 @@ local function OnHit(inst, attacker, target)
 
 	-- ✅ 延迟爆炸：等待动画播放到一半时爆炸
 	local EXPLODETARGET_MUST_TAGS = { "_health", "_combat" }
-	local EXPLODETARGET_CANT_TAGS = { "INLIMBO", "notarget", "noattack", "flight", "invisible", "wall", "player", "companion" }
+	local EXPLODETARGET_CANT_TAGS = { "INLIMBO", "notarget", "noattack", "flight", "invisible", "wall", "player", "companion", "structure" }
 	attacker:DoTaskInTime(anim_length / 7, function()
 		if not inst:IsValid() then return end
 
