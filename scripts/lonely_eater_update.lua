@@ -1,12 +1,12 @@
 -- 美食鉴赏 (解决做菜下线，解决联机料理太少)
 -- 沃利是一个高端寂寞的美食家，只有他可以尝出来某些料理中的深层底蕴；沃利对每道菜都有自己独到的深层次的见解，也能将感受分享给伙伴
--- Section 1：吃独食 Eat Alone 
+-- Section 1：吃独食 Eat Alone
 -- 1 骨头汤：获得5分钟概率骨甲效果
 -- 2 鲜果可丽饼：获得5分钟锁定85%san
 -- 3 海鲜杂烩：获得5分钟敌人越多移速越快
 -- 4 蓬松土豆蛋奶酥：获得5分钟攻击力加成（200以上两倍，50-200线性变化，50以下1倍）
 
--- Section 2：分享食物 Share Food 
+-- Section 2：分享食物 Share Food
 -- 5.1 怪物鞑靼：额外的，同时雇佣5个猪人，满时间2.5天，也能吃到怪物鞑靼的调味料
 -- 5.2 沃利吃东西时，分享料理和调味料的buff给所有雇佣的猪人，以及附近的玩家
 
@@ -61,9 +61,10 @@ AddPlayerPostInit(function(inst)
         end
 
         local required_skill = buffdata.required_skill
-        local hasSkill = required_skill and inst.components.skilltreeupdater and inst.components.skilltreeupdater:IsActivated(required_skill)
+        local hasSkill = required_skill and inst.components.skilltreeupdater and
+            inst.components.skilltreeupdater:IsActivated(required_skill)
         if not hasSkill then --技能树控制
-        -- if not true then
+            -- if not true then
             -- print("[Warly Buff] Missing skill:", required_skill, "- Buff not applied.")
             return
         end
@@ -85,10 +86,85 @@ end)
 --========================================================
 -- 怪物鞑靼：额外同时雇佣5个猪人，满时间2.5天
 --========================================================
+-- 给🐷哥会挖矿
+AddStategraphState("pig",
+    State {
+        name = "mine",
+        tags = { "mining" },
+
+        onenter = function(inst)
+            inst.Physics:Stop()
+            inst.AnimState:PlayAnimation("atk")
+        end,
+
+        timeline =
+        {
+            TimeEvent(13 * FRAMES, function(inst)
+                if inst.bufferedaction ~= nil then
+                    PlayMiningFX(inst, inst.bufferedaction.target)
+                end
+                inst:PerformBufferedAction()
+            end),
+        },
+
+        events =
+        {
+            EventHandler("animover", function(inst)
+                inst.sg:GoToState("idle")
+            end),
+        },
+    })
+AddStategraphActionHandler("pig", ActionHandler(ACTIONS.MINE, "mine"))
+
+local warlypigbrain = require "brains/warlypigbrain"
+
+local function changeWere(pig)
+    pig:AddTag("werepig_warly")
+
+    if pig.components.trader then
+        pig.components.trader:Disable()
+    end
+    if pig.components.sleeper then
+        pig.components.sleeper:SetResistance(30)
+    end
+    if pig.AnimState ~= nil then
+        pig.AnimState:SetBuild("werepig_build")
+        pig.AnimState:OverrideSymbol("pig_belt", "pig_token", "pig_belt")
+    end
+    if pig.components.combat ~= nil then
+        pig.components.combat:SetDefaultDamage(TUNING.WEREPIG_DAMAGE)
+        pig.components.combat:SetAttackPeriod(TUNING.WEREPIG_ATTACK_PERIOD)
+    end
+    if pig.components.locomotor ~= nil then
+        pig.components.locomotor.runspeed = TUNING.WEREPIG_RUN_SPEED
+        pig.components.locomotor.walkspeed = TUNING.WEREPIG_WALK_SPEED
+    end
+    if pig.components.lootdropper ~= nil then
+        pig.components.lootdropper:SetLoot({ "meat", "meat", "pigskin" })
+        pig.components.lootdropper.numrandomloot = 0
+    end
+    if pig.components.health ~= nil then
+        pig.components.health:SetMaxHealth(TUNING.WEREPIG_HEALTH)
+        pig.components.health:StartRegen(-1, 2)
+        -- pig.components.health:SetAbsorptionAmount(0.8)
+    end
+    if pig.components.werebeast then
+        pig.components.werebeast:SetOnWereFn(nil)
+        pig.components.werebeast:SetOnNormalFn(nil)
+        pig.components.werebeast.SetNormal = function () end
+        -- pig.components.werebeast:WatchWorldState("isfullmoon", function(self, isfullmoon)
+        --     if not isfullmoon then
+        --         self.inst.components.health:Kill()
+        --     end
+        -- end)
+    end
+    pig:SetBrain(warlypigbrain)
+end
+
 local function HireNearbyPigmen(inst, giver, item)
     local x, y, z = inst.Transform:GetWorldPosition()
     -- 搜索25格范围内的猪人（排除守卫和疯猪）
-    local ents = TheSim:FindEntities(x, y, z, 25, { "pig" }, { "guard", "werepig" })
+    local ents = TheSim:FindEntities(x, y, z, 25, { "pig" }, { "guard", "werepig", "werepig_warly" })
 
     -- 先排序：按忠诚度从低到高排列（没有follower组件的排在最前）
     table.sort(ents, function(a, b)
@@ -135,25 +211,10 @@ local function HireNearbyPigmen(inst, giver, item)
                 end
 
                 -- ======= 变成疯猪逻辑 =======
-                if pig.AnimState ~= nil then
-                    pig.AnimState:SetBuild("werepig_build")
-                end
-                if pig.components.combat ~= nil then
-                    pig.components.combat:SetDefaultDamage(TUNING.WEREPIG_DAMAGE)
-                    pig.components.combat:SetAttackPeriod(TUNING.WEREPIG_ATTACK_PERIOD)
-                end
-                if pig.components.locomotor ~= nil then
-                    pig.components.locomotor.runspeed = TUNING.WEREPIG_RUN_SPEED
-                    pig.components.locomotor.walkspeed = TUNING.WEREPIG_WALK_SPEED
-                end
-                if pig.components.lootdropper ~= nil then
-                    pig.components.lootdropper:SetLoot({ "meat", "meat", "pigskin" })
-                    pig.components.lootdropper.numrandomloot = 0
-                end
                 if pig.components.health ~= nil then
-                    pig.components.health:SetMaxHealth(TUNING.WEREPIG_HEALTH)
-                    pig.components.health:Heal(TUNING.WEREPIG_HEALTH) -- 可选，确保血量满
+                    pig.components.health:SetPercent(1)
                 end
+                changeWere(pig)
                 -- ==========================
                 count = count + 1
                 if count >= 5 then
@@ -167,6 +228,10 @@ local function HireNearbyPigmen(inst, giver, item)
     inst.SoundEmitter:PlaySound("dontstarve/common/fireAddFuel")
     if inst.sg ~= nil and inst.sg:HasState("funnyidle") then
         inst.sg:GoToState("funnyidle")
+    end
+
+    if item then
+        item:Remove()
     end
 end
 
@@ -185,13 +250,56 @@ AddPrefabPostInit("pigman", function(inst)
         end
 
         -- 触发怪物鞑靼效果，技能树控制
-        local hasSkill = giver and giver.components.skilltreeupdater and giver.components.skilltreeupdater:IsActivated("warly_monstertartare_buff")
+        local hasSkill = giver and giver.components.skilltreeupdater and
+            giver.components.skilltreeupdater:IsActivated("warly_monstertartare_buff")
         if hasSkill and item and string.find(item.prefab, "monstertartare") then
             HireNearbyPigmen(inst, giver, item)
+            if inst.components.health ~= nil then
+                inst.components.health:SetPercent(1)
+            end
+            changeWere(inst)
+            if item then
+                item:Remove()
+            end
         end
     end
 
     inst.components.trader.onaccept = NewOnGetItemFromPlayer
+
+    -- 禁止回血
+    inst:ListenForEvent("healthdelta", function(inst, data)
+        -- 如果新血量比旧血量高，说明是回血事件
+        if data.newpercent > data.oldpercent then
+            -- 设置健康值回到原来的状态
+            inst.components.health:SetPercent(data.oldpercent)
+        end
+    end)
+
+    -- 保存与加载
+    local old_OnSave = inst.OnSave
+    inst.OnSave = function(inst, data)
+        if old_OnSave then
+            old_OnSave(inst, data)
+        end
+        if inst:HasTag("werepig_warly") then
+            data.werepig_warly = true
+            data.current_health = inst.components.health and inst.components.health.currenthealth or nil
+        end
+    end
+    local old_OnLoad = inst.OnLoad
+    inst.OnLoad = function(inst, data)
+        if old_OnLoad then
+            old_OnLoad(inst, data)
+        end
+        if data.werepig_warly then
+            inst:DoTaskInTime(0, function()
+                changeWere(inst)
+                if data.current_health and inst.components.health then
+                    inst.components.health.currenthealth = data.current_health
+                end
+            end)
+        end
+    end
 end)
 
 
@@ -261,7 +369,8 @@ local function ShareFoodEffects(eater, food)
                     if follower.components.eater ~= nil then
                         local success = follower.components.eater:Eat(dummy)
                         if success then
-                            SpawnPrefab("winters_feast_depletefood").Transform:SetPosition(follower.Transform:GetWorldPosition())
+                            SpawnPrefab("winters_feast_depletefood").Transform:SetPosition(follower.Transform
+                                :GetWorldPosition())
                         else
                             dummy:Remove()
                             print("[Warly Buff] Failed to share food effect to follower", follower.prefab)
@@ -283,7 +392,8 @@ AddPlayerPostInit(function(inst)
     -- 只针对沃利，技能树控制
     if inst.prefab == "warly" then
         inst:ListenForEvent("oneat", function(inst, data)
-            local hasSkill = inst and inst.components.skilltreeupdater and inst.components.skilltreeupdater:IsActivated("warly_share_buff")
+            local hasSkill = inst and inst.components.skilltreeupdater and
+                inst.components.skilltreeupdater:IsActivated("warly_share_buff")
             if data and data.food ~= nil and hasSkill then
                 local food = data.food
                 -- local feeder = data.feeder
