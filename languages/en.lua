@@ -81,10 +81,10 @@ STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_LOOTER_TITLE = "Dismember"
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_LOOTER_DESC = "Warly the butcher is skilled at handling scapegoats, gaining more loot upon their defeat."
 
 -- Chef Pouch
-STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_UPGRADE_TITLE = "Spice Pack"
+STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_UPGRADE_TITLE = "Spice Pack I"
 STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_UPGRADE_DESC = "Warly can use spices to add flavor to his Chef Pouch, granting it various practical functions."
 
-STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_COZY_TITLE = "Cozy Chef Pouch"
+STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_COZY_TITLE = "Spice Pack II"
 STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_COZY_DESC = "The more seasoned dishes placed in the Chef Pouch, the more comfortable and mentally refreshed Warly feels."
 
 -- Allegiance

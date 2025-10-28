@@ -168,10 +168,12 @@ local function EatMimicFood(inst, owner)
         end
         -- 技能树控制食物是否有持续buff
         if inst.restore_skill then
-            owner:AddDebuff("warly_truedelicious_buff", "warly_truedelicious_buff")
-            local truedelicious_buff = owner:GetDebuff("warly_truedelicious_buff")
+            local buff_food = inst.food_basename or inst.mimic_food
+            local buff_name = buff_food .. "warly_truedelicious_buff"
+            owner:AddDebuff(buff_name, "warly_truedelicious_buff")
+            local truedelicious_buff = owner:GetDebuff(buff_name)
             if truedelicious_buff then
-                truedelicious_buff.foodPrefab = inst.food_basename or inst.mimic_food
+                truedelicious_buff.foodPrefab = buff_food
             end
             SpawnPrefab("mossling_spin_fx").entity:SetParent(owner.entity)
         end
@@ -184,7 +186,7 @@ local function EatMimicFood(inst, owner)
         owner.sg:GoToState("refuseeat")
     end
     -- 尝试放回桌子
-    if inst.uses_left <= 0 then
+    if inst.uses_left > 0 then
         local isback = TryFindNearbyTable(inst, owner)
         -- if not isback then
         --     local newDecor = CloneDecorFoodAppearance(inst)

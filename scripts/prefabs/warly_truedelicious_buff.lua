@@ -1,6 +1,7 @@
 local MIN_DURATION = 400
 local MAX_DURATION = 800
 local TICK_RATE = 10 -- 每多少秒 tick 一次
+local TICK_AMOUNT = 0.5 -- 每次 tick 恢复多少
 
 -- 根据当前饥饿度计算buff持续时间
 local function CalcBuffDuration(target)
@@ -20,7 +21,8 @@ local function ClearFoodMemory(target, foodPrefab, firstTime)
             local foods = target.components.foodmemory.foods
             if foods[foodPrefab] then
                 if target.components.talker and not firstTime then
-                    local str = subfmt(GetString(target, "ANNOUNCE_FORGET_FOOD"), { food = STRINGS.NAMES[string.upper(foodPrefab)] })
+                    local str = subfmt(GetString(target, "ANNOUNCE_FORGET_FOOD"),
+                        { food = STRINGS.NAMES[string.upper(foodPrefab)] })
                     target.components.talker:Say(str)
                 end
                 foods[foodPrefab] = nil
@@ -38,13 +40,13 @@ local function OnTick(inst, target)
     target:AddChild(fx)
 
     if target.components.health then
-        target.components.health:DoDelta(1, nil, "warly_truedelicious_buff")
+        target.components.health:DoDelta(TICK_AMOUNT, nil, "warly_truedelicious_buff")
     end
     if target.components.hunger then
-        target.components.hunger:DoDelta(1)
+        target.components.hunger:DoDelta(TICK_AMOUNT)
     end
     if target.components.sanity then
-        target.components.sanity:DoDelta(1)
+        target.components.sanity:DoDelta(TICK_AMOUNT)
     end
 
     ClearFoodMemory(target, inst.foodPrefab, false)
@@ -54,12 +56,17 @@ local function OnAttached(inst, target)
     inst.entity:SetParent(target.entity)
     inst.Transform:SetPosition(0, 0, 0)
 
-    local duration = CalcBuffDuration(target)
-    inst.components.timer:StartTimer("warly_buff_duration", duration)
-    inst.task = inst:DoPeriodicTask(TICK_RATE, OnTick, nil, target)
+    inst:DoTaskInTime(1 * FRAMES, function(inst)
+        if not target then
+            return
+        end
+        local duration = CalcBuffDuration(target)
+        inst.components.timer:StartTimer(inst.foodPrefab .. "warly_buff_duration", duration)
+        inst.task = inst:DoPeriodicTask(TICK_RATE, OnTick, nil, target)
+    end)
 
     -- 清除一次该食物的记忆
-    inst:DoTaskInTime(1, function (inst)
+    inst:DoTaskInTime(1, function(inst)
         ClearFoodMemory(target, inst.foodPrefab, true)
     end)
 
@@ -69,17 +76,24 @@ local function OnAttached(inst, target)
 end
 
 local function OnTimerDone(inst, data)
-    if data.name == "warly_buff_duration" then
+    if data.name == inst.foodPrefab .. "warly_buff_duration" then
         inst.components.debuff:Stop()
     end
 end
 
 local function OnExtended(inst, target)
     if target and target.components.hunger and inst.components.timer then
-        local duration = CalcBuffDuration(target)
-        local left = inst.components.timer:GetTimeLeft("warly_buff_duration") or 0
-        inst.components.timer:SetTimeLeft("warly_buff_duration", left + duration)
-        -- print("续真香buff，目前剩余时间:", inst.components.timer:GetTimeLeft("warly_buff_duration"))
+        inst:DoTaskInTime(1 * FRAMES, function(inst)
+            if not target then
+                return
+            end
+            local duration = CalcBuffDuration(target)
+            local left = inst.components.timer:GetTimeLeft(inst.foodPrefab .. "warly_buff_duration") or 0
+            inst.components.timer:SetTimeLeft(inst.foodPrefab .. "warly_buff_duration", left + duration)
+            print(string.format("续真香buff，目前剩余时间: %.2f, 食物: %s",
+                inst.components.timer:GetTimeLeft(inst.foodPrefab .. "warly_buff_duration") or 0,
+                inst.foodPrefab))
+        end)
     end
 
     if inst.task then
@@ -88,9 +102,21 @@ local function OnExtended(inst, target)
     inst.task = inst:DoPeriodicTask(TICK_RATE, OnTick, nil, target)
 
     -- 清除一次该食物的记忆
-    inst:DoTaskInTime(1, function (inst)
+    inst:DoTaskInTime(1, function(inst)
         ClearFoodMemory(target, inst.foodPrefab, true)
     end)
+end
+
+local function OnSave(inst, data)
+    if inst.foodPrefab then
+        data.foodPrefab = inst.foodPrefab
+    end
+end
+
+local function OnLoad(inst, data)
+    if data and data.foodPrefab then
+        inst.foodPrefab = data.foodPrefab
+    end
 end
 
 local function fn()
@@ -116,6 +142,9 @@ local function fn()
 
     inst:AddComponent("timer")
     inst:ListenForEvent("timerdone", OnTimerDone)
+
+    inst.OnSave = OnSave
+    inst.OnLoad = OnLoad
 
     return inst
 end

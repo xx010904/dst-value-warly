@@ -139,10 +139,10 @@ local function changeWere(pig)
         pig.components.locomotor.runspeed = TUNING.WEREPIG_RUN_SPEED
         pig.components.locomotor.walkspeed = TUNING.WEREPIG_WALK_SPEED
     end
-    if pig.components.lootdropper ~= nil then
-        pig.components.lootdropper:SetLoot({ "meat", "meat", "pigskin" })
-        pig.components.lootdropper.numrandomloot = 0
-    end
+    -- if pig.components.lootdropper ~= nil then
+    --     pig.components.lootdropper:SetLoot({ "meat", "meat", "pigskin" })
+    --     pig.components.lootdropper.numrandomloot = 0
+    -- end
     if pig.components.health ~= nil then
         pig.components.health:SetMaxHealth(TUNING.WEREPIG_HEALTH)
         pig.components.health:StartRegen(-1, 2)
@@ -152,6 +152,7 @@ local function changeWere(pig)
         pig.components.werebeast:SetOnWereFn(nil)
         pig.components.werebeast:SetOnNormalFn(nil)
         pig.components.werebeast.SetNormal = function () end
+        pig.components.werebeast.SetWere = function () end
         -- pig.components.werebeast:WatchWorldState("isfullmoon", function(self, isfullmoon)
         --     if not isfullmoon then
         --         self.inst.components.health:Kill()
@@ -167,11 +168,11 @@ local function HireNearbyPigmen(inst, giver, item)
     local ents = TheSim:FindEntities(x, y, z, 25, { "pig" }, { "guard", "werepig", "werepig_warly" })
 
     -- 先排序：按忠诚度从低到高排列（没有follower组件的排在最前）
-    table.sort(ents, function(a, b)
-        local fa = (a.components.follower and a.components.follower:GetLoyaltyPercent()) or 0
-        local fb = (b.components.follower and b.components.follower:GetLoyaltyPercent()) or 0
-        return fa < fb
-    end)
+    -- table.sort(ents, function(a, b)
+    --     local fa = (a.components.follower and a.components.follower:GetLoyaltyPercent()) or 0
+    --     local fb = (b.components.follower and b.components.follower:GetLoyaltyPercent()) or 0
+    --     return fa < fb
+    -- end)
 
     local count = 0
     for _, pig in ipairs(ents) do
@@ -184,8 +185,8 @@ local function HireNearbyPigmen(inst, giver, item)
                 pig.components.combat:SetTarget(nil)
 
                 -- 拍手欢呼动画
-                if pig.sg ~= nil and pig.sg:HasState("dropitem") then
-                    pig.sg:GoToState("dropitem")
+                if pig.sg ~= nil and pig.sg:HasState("abandon") then
+                    pig.sg:GoToState("abandon")
                 end
 
                 -- 发出猪叫声
@@ -226,8 +227,8 @@ local function HireNearbyPigmen(inst, giver, item)
 
     -- 中心猪人（被喂食者）播放强化特效
     inst.SoundEmitter:PlaySound("dontstarve/common/fireAddFuel")
-    if inst.sg ~= nil and inst.sg:HasState("funnyidle") then
-        inst.sg:GoToState("funnyidle")
+    if inst.sg ~= nil and inst.sg:HasState("abandon") then
+        inst.sg:GoToState("abandon")
     end
 
     if item then
