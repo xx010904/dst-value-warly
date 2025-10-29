@@ -168,14 +168,18 @@ local function EatMimicFood(inst, owner)
         end
         -- 技能树控制食物是否有持续buff
         if inst.restore_skill then
-            local buff_food = inst.food_basename or inst.mimic_food
-            local buff_name = buff_food .. "warly_truedelicious_buff"
-            owner:AddDebuff(buff_name, "warly_truedelicious_buff")
-            local truedelicious_buff = owner:GetDebuff(buff_name)
-            if truedelicious_buff then
-                truedelicious_buff.foodPrefab = buff_food
+            local hasSkill = owner.components.skilltreeupdater and
+                owner.components.skilltreeupdater:IsActivated("warly_true_delicious_restore")
+            if hasSkill then
+                local buff_food = inst.food_basename or inst.mimic_food
+                local buff_name = buff_food .. "warly_truedelicious_buff"
+                owner:AddDebuff(buff_name, "warly_truedelicious_buff")
+                local truedelicious_buff = owner:GetDebuff(buff_name)
+                if truedelicious_buff then
+                    truedelicious_buff.foodPrefab = buff_food
+                end
+                SpawnPrefab("mossling_spin_fx").entity:SetParent(owner.entity)
             end
-            SpawnPrefab("mossling_spin_fx").entity:SetParent(owner.entity)
         end
         inst.uses_left = inst.uses_left - 1
     else
@@ -370,10 +374,10 @@ local function fn()
     inst.spicename = ""
 
     local function GetUsesLeft()
-        local uses = 1  -- 保底 1
-        if math.random() < 0.5 then        -- 50%概率触发 2
+        local uses = 1                      -- 保底 1
+        if math.random() < 0.5 then         -- 50%概率触发 2
             uses = 2
-            if math.random() < 0.5 then    -- 25% 概率触发 3 （0.5*0.5）
+            if math.random() < 0.5 then     -- 25% 概率触发 3 （0.5*0.5）
                 uses = 3
                 if math.random() < 0.5 then -- 12.5% 概率触发 4 （0.5*0.5*0.5）
                     uses = 4

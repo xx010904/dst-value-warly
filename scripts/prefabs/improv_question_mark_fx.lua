@@ -11,7 +11,6 @@ local function shadow_fn()
 	inst:AddTag("FX")
 	inst:AddTag("NOCLICK")
 
-	inst.entity:AddTransform()
 	inst.entity:AddAnimState()
 	inst.AnimState:SetBank("warly_question_mark")
 	inst.AnimState:SetBuild("warly_question_mark")

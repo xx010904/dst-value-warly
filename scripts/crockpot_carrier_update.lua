@@ -623,3 +623,122 @@ AddPrefabPostInit("spice_salt", function(inst)
     end
     inst:AddComponent("spicesacktool")
 end)
+
+
+
+--========================================================
+-- SECTION3: 改造便携研磨器
+--========================================================
+--------------------------------------------------------------------------
+-- 冷却时间
+--------------------------------------------------------------------------
+local FLAVOR_COOLDOWN = 10 -- 1天冷却
+
+-- 启动冷却
+local function StartFlavorCooldown(player)
+    if not player then return end
+
+    -- 添加标记
+    player:AddTag("portableblender_cd")
+
+    -- 记录结束时间戳
+    player._next_flavor_time = GetTime() + FLAVOR_COOLDOWN
+
+    -- 每秒检查是否结束
+    if player._flavor_cd_task then
+        player._flavor_cd_task:Cancel()
+        player._flavor_cd_task = nil
+    end
+    player._flavor_cd_task = player:DoPeriodicTask(1, function(inst)
+        if inst._next_flavor_time and GetTime() >= inst._next_flavor_time then
+            inst:RemoveTag("portableblender_cd")
+            if inst.components.talker then
+                inst.components.talker:Say("我闻到了香料！")
+            end
+            inst._next_flavor_time = nil
+            if inst._flavor_cd_task then
+                inst._flavor_cd_task:Cancel()
+                inst._flavor_cd_task = nil
+            end
+        end
+    end)
+end
+
+--------------------------------------------------------------------------
+-- 动作定义
+--------------------------------------------------------------------------
+local SACRIFICE_FLAVOR = AddAction("SACRIFICE_FLAVOR", "探味", function(act)
+    local inst = act.invobject
+    local doer = act.doer
+    if not (inst and doer) then
+        return false
+    end
+
+    if doer:HasTag("portableblender_cd") then
+        if doer.components.talker then
+            doer.components.talker:Say("有虫子！")
+        end
+        return true
+    end
+
+    StartFlavorCooldown(doer)
+
+    local x, y, z = doer.Transform:GetWorldPosition()
+
+    -- 移除物品
+    inst:Remove()
+
+    -- 生成动画FX
+    local fx = SpawnPrefab("portableblender_sacrifice_fx")
+    fx.Transform:SetPosition(x, y, z)
+
+    return true
+end)
+SACRIFICE_FLAVOR.priority = 10
+
+--------------------------------------------------------------------------
+-- 注册动作入口
+--------------------------------------------------------------------------
+AddComponentAction("INVENTORY", "inventoryitem", function(inst, doer, actions)
+    if inst.prefab == "portableblender_item" and doer:HasTag("masterchef") and not doer:HasTag("portableblender_cd") then
+        table.insert(actions, ACTIONS.SACRIFICE_FLAVOR)
+    end
+end)
+
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.SACRIFICE_FLAVOR, "dolongaction"))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.SACRIFICE_FLAVOR, "dolongaction"))
+
+--------------------------------------------------------------------------
+-- prefab 扩展
+--------------------------------------------------------------------------
+AddPrefabPostInit("portableblender_item", function(inst)
+    if not TheWorld.ismastersim then
+        return
+    end
+    inst._cooling = false
+end)
+
+-- 保存 / 读取
+AddPrefabPostInit("warly", function(inst)
+    if not TheWorld.ismastersim then return end
+
+    local oldsave = inst.OnSave
+    inst.OnSave = function(inst, data)
+        if oldsave then oldsave(inst, data) end
+        if inst._next_flavor_time then
+            local remaining = math.max(0, inst._next_flavor_time - GetTime())
+            if remaining > 0 then
+                data.next_flavor_cd = remaining
+            end
+        end
+    end
+
+    local oldload = inst.OnLoad
+    inst.OnLoad = function(inst, data)
+        if oldload then oldload(inst, data) end
+        if data and data.next_flavor_cd then
+            StartFlavorCooldown(inst) -- 会自动设置 tag 并启动倒计时
+            inst._next_flavor_time = GetTime() + data.next_flavor_cd
+        end
+    end
+end)

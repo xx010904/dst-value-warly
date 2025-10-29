@@ -992,6 +992,7 @@ local function RemoveDecorIfFood(inst, worker, workleft, numworks) --(self.inst,
         local decor = inst.components.furnituredecortaker.decor_item
         if decor and decor:IsValid() and decor.prefab == "decor_food" then
             inst.components.workable.workleft = workleft + numworks -- 补回次数
+            SpawnPrefab("small_puff").Transform:SetPosition(decor.Transform:GetWorldPosition())
             decor:Remove()
         end
     end
