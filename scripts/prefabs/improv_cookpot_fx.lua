@@ -3,18 +3,6 @@ require "prefabutil"
 local cooking = require("cooking")
 local spicedfoods = require("spicedfoods")
 
-local foods = {}
-for cooker, recipes in pairs(cooking.recipes) do
-    for product, _ in pairs(recipes) do
-        foods[product] = true
-    end
-end
-
-local food_list = {}
-for k in pairs(foods) do
-    table.insert(food_list, k)
-end
-
 -- 获取基础食物名（去掉调味前缀/后缀），更稳健地处理 spicedfoods[prefab] 存在但 .basename 为空的情况
 local function GetBaseFood(prefab)
     if not prefab then return prefab end
@@ -36,24 +24,9 @@ local function GetBaseFood(prefab)
     return prefab
 end
 
--- 🥔 获取所有食谱产物（包含MOD食谱）
-local function GetAllCookableFoods()
-    local allCookableFoods = {}
-    for cooker, recipes in pairs(cooking.recipes) do
-        if type(recipes) == "table" then
-            for product, _ in pairs(recipes) do
-                if product ~= nil and product ~= "" then
-                    allCookableFoods[product] = true
-                end
-            end
-        end
-    end
-    return allCookableFoods
-end
-
 -- 🍲 根据厨师记忆筛选未吃过的食物（无doer则随机全食谱）
 local function GetUnmemorizedFoods(doer)
-    local allfoods = GetAllCookableFoods()
+    local allfoods = _G.ALL_COOKALBE_FOODS
     local valid = {}
 
     if doer and doer.components.foodmemory then

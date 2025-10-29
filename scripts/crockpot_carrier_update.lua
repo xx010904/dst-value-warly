@@ -653,7 +653,7 @@ local function StartFlavorCooldown(player)
         if inst._next_flavor_time and GetTime() >= inst._next_flavor_time then
             inst:RemoveTag("portableblender_cd")
             if inst.components.talker then
-                inst.components.talker:Say("我闻到了香料！")
+                inst.components.talker:Say(GetString(inst, "ANNOUNCE_SEARCH_FLAVOR_READY"))
             end
             inst._next_flavor_time = nil
             if inst._flavor_cd_task then
@@ -667,12 +667,14 @@ end
 --------------------------------------------------------------------------
 -- 动作定义
 --------------------------------------------------------------------------
-local SACRIFICE_FLAVOR = AddAction("SACRIFICE_FLAVOR", "探味", function(act)
+local SEARCH_FLAVOR = AddAction("SEARCH_FLAVOR", STRINGS.ACTIONS.SEARCH_FLAVOR, function(act)
     local inst = act.invobject
     local doer = act.doer
     if not (inst and doer) then
         return false
     end
+
+    local x, y, z = doer.Transform:GetWorldPosition()
 
     if doer:HasTag("portableblender_cd") then
         if doer.components.talker then
@@ -683,8 +685,6 @@ local SACRIFICE_FLAVOR = AddAction("SACRIFICE_FLAVOR", "探味", function(act)
 
     StartFlavorCooldown(doer)
 
-    local x, y, z = doer.Transform:GetWorldPosition()
-
     -- 移除物品
     inst:Remove()
 
@@ -694,19 +694,19 @@ local SACRIFICE_FLAVOR = AddAction("SACRIFICE_FLAVOR", "探味", function(act)
 
     return true
 end)
-SACRIFICE_FLAVOR.priority = 10
+SEARCH_FLAVOR.priority = 10
 
 --------------------------------------------------------------------------
 -- 注册动作入口
 --------------------------------------------------------------------------
 AddComponentAction("INVENTORY", "inventoryitem", function(inst, doer, actions)
     if inst.prefab == "portableblender_item" and doer:HasTag("masterchef") and not doer:HasTag("portableblender_cd") then
-        table.insert(actions, ACTIONS.SACRIFICE_FLAVOR)
+        table.insert(actions, ACTIONS.SEARCH_FLAVOR)
     end
 end)
 
-AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.SACRIFICE_FLAVOR, "dolongaction"))
-AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.SACRIFICE_FLAVOR, "dolongaction"))
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.SEARCH_FLAVOR, "dolongaction"))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.SEARCH_FLAVOR, "dolongaction"))
 
 --------------------------------------------------------------------------
 -- prefab 扩展

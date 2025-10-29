@@ -1,30 +1,42 @@
 ---------------------------------------------------------
 -- 随机调味逻辑
 ---------------------------------------------------------
-local function GetRandomFlavor()
-    local spicepool = {
-        { prefab = "spice_salt",  weight = 30 },
-        { prefab = "spice_sugar", weight = 25 },
-        { prefab = "spice_chili", weight = 20 },
-        { prefab = "spice_garlic",  weight = 15 },
-        { prefab = "ash",         weight = 10 },
-    }
+local function GetRandomSpice()
+    -- 1.从官方调料中选择
+    if math.random() < 0.5 then
+        local spicepool = {
+            { prefab = "spice_salt",   weight = 30 },
+            { prefab = "spice_sugar",  weight = 35 },
+            { prefab = "spice_chili",  weight = 35 },
+            { prefab = "spice_garlic", weight = 35 },
+            { prefab = "ash",          weight = 15 },
+            { prefab = "mutatedhound", weight = 15 },
+        }
 
-    local total = 0
-    for _, v in ipairs(spicepool) do total = total + v.weight end
-    local roll = math.random() * total
-    for _, v in ipairs(spicepool) do
-        roll = roll - v.weight
-        if roll <= 0 then
-            return v.prefab
+        local total = 0
+        for _, v in ipairs(spicepool) do total = total + v.weight end
+        local roll = math.random() * total
+        for _, v in ipairs(spicepool) do
+            roll = roll - v.weight
+            if roll <= 0 then
+                return v.prefab
+            end
         end
+    else
+        -- 2.否则从全局调料表中选择
+        local spicepool = _G.ALL_SPICES
+        local valid = {}
+        for spice, _ in pairs(spicepool) do
+            table.insert(valid, spice)
+        end
+        return valid[math.random(1, #valid)]
     end
 end
 
 ---------------------------------------------------------
 -- 动画逻辑
 ---------------------------------------------------------
-local HIT_DURATION = 3  -- hit 动画持续时间
+local HIT_DURATION = 3 -- hit 动画持续时间
 
 -- 生成随机位置的 FX
 local function SpawnNearbyFXLoop(x, y, z, remainingTime)
@@ -33,8 +45,8 @@ local function SpawnNearbyFXLoop(x, y, z, remainingTime)
     end
     SpawnPrefab("groundpound_fx").Transform:SetPosition(x, y, z)
 
-    -- 随机生成 1~3 个 FX
-    local count = math.random(1, 3)
+    -- 随机生成 1~2 个 FX
+    local count = math.random(1, 2)
     for i = 1, count do
         local fx = SpawnPrefab("portableblender_soil_fx")
         if fx then
@@ -59,41 +71,54 @@ local function PlaySequence(inst)
         return
     end
 
-    inst.AnimState:PlayAnimation("hit", true)
-    inst.SoundEmitter:PlaySound("grotto/common/turf_crafting_station/prox_LP", "loop_sound")
-
     local x, y, z = inst.Transform:GetWorldPosition()
 
-    -- 在 hit 播放期间随机生成 FX
-    SpawnNearbyFXLoop(x, y, z, HIT_DURATION + math.random()) -- 每次生成 1~3 个
+    -- 播放 place 动画和声音
+    inst.AnimState:PlayAnimation("place")
+    inst.SoundEmitter:PlaySound("dontstarve/common/together/portable/blender/place")
 
-    -- 3 秒后播放 collapse
-    inst:DoTaskInTime(HIT_DURATION, function()
-        if inst:IsValid() then
-            inst.AnimState:PlayAnimation("collapse")
-        end
-    end)
+    -- 等 place 动画播放完后再播放 hit 动画和 loop 声音
+    inst:DoTaskInTime(inst.AnimState:GetCurrentAnimationLength(), function()
+        if inst and inst:IsValid() then
+            -- 播放 hit 动画和循环声音
+            inst.AnimState:PlayAnimation("hit", true)
+            inst.SoundEmitter:PlaySound("grotto/common/turf_crafting_station/prox_LP", "loop_sound")
 
-    inst:ListenForEvent("animover", function(inst2)
-        if inst2.AnimState:IsCurrentAnimation("collapse") then
-            inst2.SoundEmitter:KillSound("loop_sound")
-            -- 掉落调味料
-            local spice = GetRandomFlavor()
-            if spice then
-                local item = SpawnPrefab(spice)
-                if item then
-                    item.Transform:SetPosition(x + math.random() * 0.3, y, z + math.random() * 0.3)
-                    Launch2(item, inst2, 1.5, 1.25, 0.3, 0, 2)
+            -- 在 hit 播放期间随机生成 FX
+            SpawnNearbyFXLoop(x, y, z, HIT_DURATION)
+
+            -- 3 秒后播放 collapse
+            inst:DoTaskInTime(HIT_DURATION, function()
+                if inst:IsValid() then
+                    inst.AnimState:PlayAnimation("collapse")
                 end
-            end
+            end)
 
-            -- 重生研磨器
-            local newblender = SpawnPrefab("portableblender_item")
-            if newblender then
-                newblender.Transform:SetPosition(x, y, z)
-            end
+            inst:ListenForEvent("animover", function(inst2)
+                if inst2.AnimState:IsCurrentAnimation("collapse") then
+                    inst2.SoundEmitter:KillSound("loop_sound")
 
-            inst2:Remove()
+                    -- 掉落调味料
+                    local spice = GetRandomSpice()
+                    if spice then
+                        local item = SpawnPrefab(spice)
+                        if item then
+                            item.Transform:SetPosition(x + math.random() * 0.3, y, z + math.random() * 0.3)
+                            Launch2(item, inst2, 1.5, 1.25, 0.3, 0, 2)
+                            SpawnPrefab("sand_puff_large_front").Transform:SetPosition(item.Transform:GetWorldPosition())
+                        end
+                    end
+
+                    -- 重生研磨器
+                    local newblender = SpawnPrefab("portableblender_item")
+                    if newblender then
+                        newblender.Transform:SetPosition(x, y, z)
+                        newblender.SoundEmitter:PlaySound("dontstarve/common/together/portable/blender/collapse")
+                    end
+
+                    inst2:Remove()
+                end
+            end)
         end
     end)
 end
@@ -109,10 +134,12 @@ local function fn()
     inst.entity:AddSoundEmitter()
     inst.entity:AddNetwork()
 
+    inst:SetPhysicsRadiusOverride(.5)
+    MakeObstaclePhysics(inst, inst.physicsradiusoverride)
+
     inst.AnimState:SetBank("portable_blender")
     inst.AnimState:SetBuild("portable_blender")
     inst.AnimState:PlayAnimation("hit", true)
-    inst.AnimState:SetSortOrder(2)
 
     inst:AddTag("FX")
     inst:AddTag("NOCLICK")

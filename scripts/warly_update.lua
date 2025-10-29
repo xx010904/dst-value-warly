@@ -20,3 +20,45 @@
 -- 生活质量：摆盘持续恢复消除记忆 厨师袋保暖移速保鲜防雨回san 画大饼 san转饥饿
 -- 保鲜：摆盘 厨师袋
 -- 雇佣：刷食材 新战斗
+
+-- 定义全局表来存储所有调料
+local cooking = require("cooking")
+_G.ALL_SPICES = {}
+_G.ALL_COOKALBE_FOODS = {}
+
+-- 获取所有可烹饪食物和调味料
+local function GetAllCookableFoodsAndSpices()
+    -- 遍历所有烹饪食谱
+    for cooker, recipes in pairs(cooking.recipes) do
+        if type(recipes) == "table" then
+            for product, _ in pairs(recipes) do
+                if product ~= nil and product ~= "" then
+                    -- 记录食物
+                    ALL_COOKALBE_FOODS[product] = true
+
+                    -- 检查是否为调味料
+                    if string.match(product, "_spice_") then
+                        -- 截取调味料的名字，保留"spice_"后面的部分
+                        local spiceName = string.match(product, "spice_.*")  -- 匹配"spice_"及其后面的内容
+                        -- 去重并记录调味料
+                        ALL_SPICES[spiceName] = true
+                    end
+                end
+            end
+        end
+    end
+    -- print("All Cookable Foods:")
+    -- for food, _ in pairs(_G.ALL_COOKALBE_FOODS) do
+    --     print(food)
+    -- end
+
+    -- print("All Spices:")
+    -- for spice, _ in pairs(_G.ALL_SPICES) do
+    --     print(spice)
+    -- end
+end
+
+-- 监听游戏中的初始化，确保游戏进入模拟状态后执行
+AddSimPostInit(function()
+    GetAllCookableFoodsAndSpices()
+end)

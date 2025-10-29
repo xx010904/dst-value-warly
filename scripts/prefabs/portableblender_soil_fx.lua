@@ -10,7 +10,6 @@ local function fn()
     inst.AnimState:PlayAnimation("till_rise")
     local scale = math.random() * 0.2 + 1.1
     inst.AnimState:SetScale(scale, scale, scale)
-    inst.AnimState:SetSortOrder(3)
 
     inst:AddTag("FX")
     inst.persists = false

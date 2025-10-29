@@ -93,3 +93,4 @@ import_if_enabled("shadow_switch",           "scripts/shadow_update.lua")
 
 -- 技能树
 modimport("scripts/skilltree_update.lua")
+modimport("scripts/warly_update.lua")
