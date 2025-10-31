@@ -125,9 +125,9 @@ local function EatMimicFood(inst, owner)
         local hunger_percent = owner.components.hunger:GetPercent()
         local threshold = 0.33 -- 饿到说话
         -- 技能树控制，沃利随时享受这个持续buff，但是只点1级，他放的食物没有buff
-        if owner:HasTag("warly_true_delicious_desk") then
-            threshold = 1.1
-        end
+        -- if owner:HasTag("warly_true_delicious_desk") then
+        --     threshold = 1.1
+        -- end
         if hunger_percent < threshold then
             -- print(string.format("饥饿触发：%s 当前%.2f%% < %.0f%%阈值", owner.prefab, hunger_percent * 100, threshold * 100))
             veryStarve = true
@@ -157,14 +157,15 @@ local function EatMimicFood(inst, owner)
                 if owner.components.talker then
                     owner.components.talker:Say(GetString(owner, "ANNOUNCE_TRUE_DELICIOUS"))
                 end
-                owner.sg:GoToState("emote", { anim = "emoteXL_happycheer", mounted = true, mountsound = "yell" })
+                owner.AnimState:PlayAnimation("feast_eat_pre_pre")
+                owner.AnimState:PushAnimation("feast_eat_pre", false)
+                owner.AnimState:PushAnimation("feast_eat_loop", false)
+                owner.AnimState:PushAnimation("feast_eat_loop", false)
+                owner.AnimState:PushAnimation("feast_eat_pst", false)
             end)
         else
-            owner.AnimState:PlayAnimation("feast_eat_pre_pre")
-            owner.AnimState:PushAnimation("feast_eat_pre", false)
-            owner.AnimState:PushAnimation("feast_eat_loop", false)
-            owner.AnimState:PushAnimation("feast_eat_loop", false)
-            owner.AnimState:PushAnimation("feast_eat_pst", false)
+            owner.AnimState:PlayAnimation("eat_pre")
+            owner.AnimState:PushAnimation("eat", false)
         end
         -- 技能树控制食物是否有持续buff
         if inst.restore_skill then
@@ -178,7 +179,7 @@ local function EatMimicFood(inst, owner)
                 if truedelicious_buff then
                     truedelicious_buff.foodPrefab = buff_food
                 end
-                SpawnPrefab("mossling_spin_fx").entity:SetParent(owner.entity)
+                SpawnPrefab("spider_heal_target_fx").entity:SetParent(owner.entity)
             end
         end
         inst.uses_left = inst.uses_left - 1

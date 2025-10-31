@@ -9,6 +9,8 @@
 -- 1 料理升级厨师袋，咸加保鲜度，甜加移速，辣加保暖，蒜香加防水防沙
 -- 2 舒适的厨师袋，料理越多越多回san
 
+-- SECTION3: 改造便携研磨器
+
 
 --========================================================
 -- Section 1：背锅锅制作配方
@@ -140,25 +142,20 @@ AddPrefabPostInit("lightninggoat", function(goat)
                 end
             end)
 
+            local x, y, z = goat.Transform:GetWorldPosition()
             -- 替罪羊被击杀后可能掉落羊角
             goat:ListenForEvent("death", function(goat, data)
-                if math.random() > 0.25 then
-                    return
-                end
-                -- 查找附近玩家
-                local x, y, z = goat.Transform:GetWorldPosition()
-                local players = TheSim:FindEntities(x, y, z, 16, { "player" })
-                for _, player in ipairs(players) do
-                    -- 检查是否为沃利并且有技能树
-                    local hasSkill = player.components.skilltreeupdater and
-                        player.components.skilltreeupdater:IsActivated("warly_crockpot_scapegoat")
-                    if hasSkill then
-                        -- 掉落一个羊角
-                        local horn = SpawnPrefab("lightninggoathorn")
-                        if horn then
-                            horn.Transform:SetPosition(x, y, z)
-                        end
-                        break
+                if math.random() < 0.25 then
+                    -- 掉落一个羊角
+                    local horn = SpawnPrefab("lightninggoathorn")
+                    if horn then
+                        horn.Transform:SetPosition(x, y, z)
+                    end
+                else
+                    -- 掉落一个电子元件
+                    local transistor = SpawnPrefab("transistor")
+                    if transistor then
+                        transistor.Transform:SetPosition(x, y, z)
                     end
                 end
             end)
@@ -700,7 +697,8 @@ SEARCH_FLAVOR.priority = 10
 -- 注册动作入口
 --------------------------------------------------------------------------
 AddComponentAction("INVENTORY", "inventoryitem", function(inst, doer, actions)
-    if inst.prefab == "portableblender_item" and doer:HasTag("masterchef") and not doer:HasTag("portableblender_cd") then
+    -- 技能树控制是否能挖
+    if inst.prefab == "portableblender_item" and doer:HasTag("masterchef") and not doer:HasTag("portableblender_cd") and doer:HasTag("warly_blender_dig") then
         table.insert(actions, ACTIONS.SEARCH_FLAVOR)
     end
 end)

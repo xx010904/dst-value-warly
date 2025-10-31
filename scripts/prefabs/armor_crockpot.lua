@@ -215,8 +215,8 @@ local function OnArmorBroke(owner, data)
     end
 
     -- 是否整组触发二段甩（可由技能树控制）
-    local will_second = owner and owner.components.skilltreeupdater and owner.components.skilltreeupdater:IsActivated("warly_crockpot_jump")
-    -- local will_second = true -- 改成 false 就只炸一段
+    -- local will_second = owner and owner.components.skilltreeupdater and owner.components.skilltreeupdater:IsActivated("warly_crockpot_jump")
+    local will_second = true -- 改成 false 就只炸一段
 
     -- 🔹 函数：生成锅实体并有概率敲坏掉落材料
     local function TrySpawnPotWithSmash(bomb, bx, by, bz, owner)

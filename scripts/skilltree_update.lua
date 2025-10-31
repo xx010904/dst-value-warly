@@ -58,10 +58,12 @@ table.insert(Assets, Asset("ATLAS", "images/skilltree/warly_crockpot_transfer.xm
 RegisterSkilltreeIconsAtlas("images/skilltree/warly_crockpot_transfer.xml", "warly_crockpot_transfer.tex")
 table.insert(Assets, Asset("ATLAS", "images/skilltree/warly_crockpot_flung.xml"))
 RegisterSkilltreeIconsAtlas("images/skilltree/warly_crockpot_flung.xml", "warly_crockpot_flung.tex")
-table.insert(Assets, Asset("ATLAS", "images/skilltree/warly_crockpot_jump.xml"))
-RegisterSkilltreeIconsAtlas("images/skilltree/warly_crockpot_jump.xml", "warly_crockpot_jump.tex")
 table.insert(Assets, Asset("ATLAS", "images/skilltree/warly_crockpot_scapegoat.xml"))
 RegisterSkilltreeIconsAtlas("images/skilltree/warly_crockpot_scapegoat.xml", "warly_crockpot_scapegoat.tex")
+
+-- 研磨器
+table.insert(Assets, Asset("ATLAS", "images/skilltree/warly_crockpot_jump.xml"))
+RegisterSkilltreeIconsAtlas("images/skilltree/warly_crockpot_jump.xml", "warly_crockpot_jump.tex")
 table.insert(Assets, Asset("ATLAS", "images/skilltree/warly_crockpot_looter.xml"))
 RegisterSkilltreeIconsAtlas("images/skilltree/warly_crockpot_looter.xml", "warly_crockpot_looter.tex")
 

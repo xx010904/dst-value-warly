@@ -250,35 +250,45 @@ local function BuildSkillsData(SkillTreeFns)
             group = "multicooker",
             tags = { "multicooker", "multicooker1" },
             connects = {
-                "warly_crockpot_jump",
+                "warly_crockpot_scapegoat",
             },
-        },
-        warly_crockpot_jump = {
-            title = STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_JUMP_TITLE,
-            desc = STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_JUMP_DESC,
-            icon = "warly_crockpot_jump",
-            pos = { 60, 176 - 138 - 16 },
-            group = "multicooker",
-            tags = { "multicooker", "multicooker1" },
         },
         warly_crockpot_scapegoat = {
             title = STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_SCAPEGOAT_TITLE,
             desc = STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_SCAPEGOAT_DESC,
             icon = "warly_crockpot_scapegoat",
+            pos = { 60, 176 - 138 - 16 },
+            group = "multicooker",
+            tags = { "multicooker", "multicooker1" },
+        },
+        -- =============================================================================
+        -- 研磨器
+        -- =============================================================================
+        warly_blender_dig = {
+            title = STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG_TITLE,
+            desc = STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG_DESC,
+            icon = "warly_blender_dig",
             pos = { 60 + 48, 176 - 92 - 16 },
             group = "multicooker",
-            tags = { "multicooker", "multicooker1" },
+            tags = { "multicooker", "multicooker3" },
+            root = true,
             connects = {
-                "warly_crockpot_looter",
+                "warly_blender_dig2",
             },
+            onactivate = function(inst, fromload)
+                inst:AddTag("warly_blender_dig")
+            end,
+            ondeactivate = function(inst)
+                inst:RemoveTag("warly_blender_dig")
+            end,
         },
-        warly_crockpot_looter = {
-            title = STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_LOOTER_TITLE,
-            desc = STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_LOOTER_DESC,
-            icon = "warly_crockpot_looter",
+        warly_blender_dig2 = {
+            title = STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG2_TITLE,
+            desc = STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG2_DESC,
+            icon = "warly_blender_dig2",
             pos = { 60 + 48, 176 - 138 - 16 },
             group = "multicooker",
-            tags = { "multicooker", "multicooker1" },
+            tags = { "multicooker", "multicooker3" },
         },
         -- =============================================================================
         -- 改造厨师袋

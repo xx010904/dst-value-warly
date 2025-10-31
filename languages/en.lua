@@ -43,7 +43,7 @@ STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_DESK_TITLE = "True Delicious Warnin
 STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_DESK_DESC = "Warly can place his dishes on the table for permanent preservation, and his true delicious dishes cure all starving picky eaters."
 
 STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_RESTORE_TITLE = "Lingering Taste"
-STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_RESTORE_DESC = "Eating the true delicious dish on the table grants a long-lasting effect that restores sanity, hunger, and health."
+STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_RESTORE_DESC = "When Warly eats the true delicious dishes on the table, he gains a lasting effect that gradually restores sanity, hunger, and health."
 
 STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_MEMORY_TITLE = "Relaxing Memories"
 STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_MEMORY_DESC = "The true delicious dishes makes Warly forget his picky-eating past, continuously erases memories of this food."
@@ -71,14 +71,15 @@ STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_TRANSFER_DESC = "When Warly carries a pot
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_FLUNG_TITLE = "Flung Pot"
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_FLUNG_DESC = "When the pot reaches its limit, Warly flings it in all directions."
 
-STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_JUMP_TITLE = "Exploding Pot"
-STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_JUMP_DESC = "Warly angrily flings the pot, causing it to perform a double jump."
-
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_SCAPEGOAT_TITLE = "Scapegoat"
-STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_SCAPEGOAT_DESC = "While carrying stacked pots, Warly has a chance to summon a scapegoat to take damage when attacked."
+STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_SCAPEGOAT_DESC = "While carrying stacked pots, Warly has a chance to summon a scapegoat to take damage when attacked, and gaining more loot upon their defeat."
 
-STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_LOOTER_TITLE = "Dismember"
-STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_LOOTER_DESC = "Warly the butcher is skilled at handling scapegoats, gaining more loot upon their defeat."
+-- Blander
+STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG_TITLE = "Reliable Blender"
+STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG_DESC = "Warly's Portable Grinding Mill can grind the ground to obtain spices."
+
+STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG2_TITLE = "Little Ground Mover"
+STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG2_DESC = "Warly can use his Portable Grinding Mill to dig up more ground, increasing the chance of obtaining rare spices."
 
 -- Chef Pouch
 STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_UPGRADE_TITLE = "Spice Pack I"
