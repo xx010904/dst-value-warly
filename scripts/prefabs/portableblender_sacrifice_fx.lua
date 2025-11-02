@@ -10,7 +10,7 @@ local function GetRandomSpice()
             { prefab = "spice_chili",  weight = 35 },
             { prefab = "spice_garlic", weight = 35 },
             { prefab = "ash",          weight = 15 },
-            { prefab = "mutatedhound", weight = 15 },
+            { prefab = "hound",        weight = 15 },
         }
 
         local total = 0
@@ -99,10 +99,20 @@ local function PlaySequence(inst)
                     inst2.SoundEmitter:KillSound("loop_sound")
 
                     -- 掉落调味料
-                    local spice = GetRandomSpice()
-                    if spice then
-                        local item = SpawnPrefab(spice)
-                        if item then
+                    local spicePrefab = GetRandomSpice()
+                    if spicePrefab then
+                        if spicePrefab == "hound" then
+                            if TheWorld.ismastersim then
+                                local hound = SpawnPrefab("hound")
+                                hound.Transform:SetPosition(x + math.random() * 0.3, y, z + math.random() * 0.3)
+                                hound.sg:GoToState("mutated_spawn")
+                            else
+                                local worm = SpawnPrefab("worm")
+                                worm.Transform:SetPosition(x + math.random() * 0.3, y, z + math.random() * 0.3)
+                                worm.sg:GoToState("lure_enter")
+                            end
+                        else
+                            local item = SpawnPrefab(spicePrefab)
                             item.Transform:SetPosition(x + math.random() * 0.3, y, z + math.random() * 0.3)
                             Launch2(item, inst2, 1.5, 1.25, 0.3, 0, 2)
                             SpawnPrefab("sand_puff_large_front").Transform:SetPosition(item.Transform:GetWorldPosition())
@@ -110,7 +120,7 @@ local function PlaySequence(inst)
                     end
 
                     -- 重生研磨器
-                    local newblender = SpawnPrefab("portableblender_item")
+                    local newblender = SpawnPrefab("portableblender_item", inst.linked_skinname, inst.skin_id)
                     if newblender then
                         newblender.Transform:SetPosition(x, y, z)
                         newblender.SoundEmitter:PlaySound("dontstarve/common/together/portable/blender/collapse")
@@ -139,7 +149,7 @@ local function fn()
 
     inst.AnimState:SetBank("portable_blender")
     inst.AnimState:SetBuild("portable_blender")
-    inst.AnimState:PlayAnimation("hit", true)
+    inst.AnimState:PlayAnimation("idle_ground")
 
     inst:AddTag("FX")
     inst:AddTag("NOCLICK")

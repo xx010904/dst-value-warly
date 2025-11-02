@@ -227,18 +227,6 @@ local function BuildSkillsData(SkillTreeFns)
             tags = { "multicooker", "multicooker1" },
             root = true,
             connects = {
-                "warly_crockpot_transfer",
-            },
-        },
-        warly_crockpot_transfer = {
-            title = STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_TRANSFER_TITLE,
-            desc = STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_TRANSFER_DESC,
-            icon = "warly_crockpot_transfer",
-            pos = { 60, 176 - 48 },
-            group = "multicooker",
-            tags = { "multicooker", "multicooker1" },
-            connects = {
-                "warly_crockpot_scapegoat",
                 "warly_crockpot_flung",
             },
         },
@@ -246,7 +234,7 @@ local function BuildSkillsData(SkillTreeFns)
             title = STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_FLUNG_TITLE,
             desc = STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_FLUNG_DESC,
             icon = "warly_crockpot_flung",
-            pos = { 60, 176 - 92 - 16 },
+            pos = { 60, 176 - 48 },
             group = "multicooker",
             tags = { "multicooker", "multicooker1" },
             connects = {
@@ -257,38 +245,9 @@ local function BuildSkillsData(SkillTreeFns)
             title = STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_SCAPEGOAT_TITLE,
             desc = STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_SCAPEGOAT_DESC,
             icon = "warly_crockpot_scapegoat",
-            pos = { 60, 176 - 138 - 16 },
+            pos = { 60, 176 - 96 },
             group = "multicooker",
             tags = { "multicooker", "multicooker1" },
-        },
-        -- =============================================================================
-        -- 研磨器
-        -- =============================================================================
-        warly_blender_dig = {
-            title = STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG_TITLE,
-            desc = STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG_DESC,
-            icon = "warly_blender_dig",
-            pos = { 60 + 48, 176 - 92 - 16 },
-            group = "multicooker",
-            tags = { "multicooker", "multicooker3" },
-            root = true,
-            connects = {
-                "warly_blender_dig2",
-            },
-            onactivate = function(inst, fromload)
-                inst:AddTag("warly_blender_dig")
-            end,
-            ondeactivate = function(inst)
-                inst:RemoveTag("warly_blender_dig")
-            end,
-        },
-        warly_blender_dig2 = {
-            title = STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG2_TITLE,
-            desc = STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG2_DESC,
-            icon = "warly_blender_dig2",
-            pos = { 60 + 48, 176 - 138 - 16 },
-            group = "multicooker",
-            tags = { "multicooker", "multicooker3" },
         },
         -- =============================================================================
         -- 改造厨师袋
@@ -301,9 +260,6 @@ local function BuildSkillsData(SkillTreeFns)
             group = "multicooker",
             tags = { "multicooker", "multicooker2" },
             root = true,
-            connects = {
-                "warly_spickpack_cozy",
-            },
             onactivate = function(inst, fromload)
                 inst:AddTag("warly_spickpack_upgrade")
             end,
@@ -311,15 +267,60 @@ local function BuildSkillsData(SkillTreeFns)
                 inst:RemoveTag("warly_spickpack_upgrade")
             end,
         },
+        -- =============================================================================
+        -- todo 调味站
+        -- =============================================================================
         warly_spickpack_cozy = {
             title = STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_COZY_TITLE,
             desc = STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_COZY_DESC,
             icon = "warly_spickpack_cozy",
             pos = { 60 + 48, 176 - 48 },
             group = "multicooker",
+            root = true,
             tags = { "multicooker", "multicooker2" },
         },
-
+        -- =============================================================================
+        -- 研磨器
+        -- =============================================================================
+        warly_blender_dig = {
+            title = STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG_TITLE,
+            desc = STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG_DESC,
+            icon = "warly_blender_dig",
+            pos = { 60 + 48, 176 - 96 },
+            group = "multicooker",
+            tags = { "multicooker", "multicooker2" },
+            root = true,
+            onactivate = function(inst, fromload)
+                inst:AddTag("warly_blender_dig")
+            end,
+            ondeactivate = function(inst)
+                inst:RemoveTag("warly_blender_dig")
+            end,
+        },
+        -- =============================================================================
+        -- 快餐手
+        -- =============================================================================
+        warly_cooker_faster_lock_1 = {
+            desc = STRINGS.SKILLTREE.WARLY.WARLY_COOKER_FASTER_1_LOCK_DESC,
+            pos = { 60, 176 - 144 - 8 },
+            group = "gourmet",
+            tags = { "gourmet", "lock" },
+            root = true,
+            lock_open = function(prefabname, activatedskills, readonly)
+                return SkillTreeFns.CountTags(prefabname, "multicooker", activatedskills) >= 3
+            end,
+            connects = {
+                "warly_cooker_faster",
+            },
+        },
+        warly_cooker_faster = {
+            title = STRINGS.SKILLTREE.WARLY.WARLY_COOKER_FASTER_TITLE,
+            desc = STRINGS.SKILLTREE.WARLY.WARLY_COOKER_FASTER_DESC,
+            icon = "warly_cooker_faster",
+            pos = { 60 + 48, 176 - 144 - 8 },
+            group = "multicooker",
+            tags = { "multicooker", "multicooker3" },
+        },
         -- =============================================================================
         -- 亲和
         -- =============================================================================

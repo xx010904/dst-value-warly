@@ -44,7 +44,7 @@ AddRecipe2("armor_crockpot",
             for _, pot in ipairs(ground_pots) do
                 if pot.prefab == "portablecookpot_item" then
                     local px, py, pz = pot.Transform:GetWorldPosition()
-                    local dist = math.sqrt((px - x)^2 + (py - y)^2 + (pz - z)^2)
+                    local dist = math.sqrt((px - x) ^ 2 + (py - y) ^ 2 + (pz - z) ^ 2)
                     local count = 1
                     if pot.components.stackable then
                         count = pot.components.stackable:StackSize()
@@ -66,7 +66,6 @@ AddRecipe2("armor_crockpot",
                         and pot.components.stewer
                         and not pot.components.stewer:IsCooking()
                         and pot.components.portablestructure then
-
                         pot.components.portablestructure:Dismantle(builder)
                         recovered = recovered + 1
 
@@ -202,7 +201,7 @@ local function PassCookpots(inst, doer)
 
     -- 技能树控制分锅
     local hasSkill = doer.components.skilltreeupdater and
-                    doer.components.skilltreeupdater:IsActivated("warly_crockpot_make")
+        doer.components.skilltreeupdater:IsActivated("warly_crockpot_make")
     if not hasSkill then
         return false, "NO_SKILL"
     end
@@ -272,8 +271,18 @@ AddComponentAction("SCENE", "passpottool", function(inst, doer, actions, right)
     end
 end)
 
-AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.PASS_THE_POT, "dolongaction"))
-AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.PASS_THE_POT, "dolongaction"))
+local function passPotSg(inst, action)
+    local hasSkill = inst.components.skilltreeupdater and
+        inst.components.skilltreeupdater:IsActivated("warly_cooker_faster")
+    if hasSkill then
+        return "doshortaction"
+    else
+        return "dolongaction"
+    end
+end
+
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.PASS_THE_POT, passPotSg))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.PASS_THE_POT, passPotSg))
 
 
 --========================================================
@@ -319,21 +328,21 @@ local function OnLoad(inst, data)
             inst.components.insulator:SetWinter()
             inst.components.insulator:SetInsulation(data.insulation or TUNING.INSULATION_LARGE)
 
-        -- 恢复蒜粉防水防沙
+            -- 恢复蒜粉防水防沙
         elseif inst._spice_upgrade == "spice_garlic" then
             inst:AddTag("goggles")
             if data.has_waterproofer and inst.components.waterproofer == nil then
                 inst:AddComponent("waterproofer")
             end
 
-        -- 恢复盐保鲜倍率
+            -- 恢复盐保鲜倍率
         elseif inst._spice_upgrade == "spice_salt" then
             if inst.components.preserver == nil then
                 inst:AddComponent("preserver")
             end
             inst.components.preserver:SetPerishRateMultiplier(data.preserver_mult or TUNING.PERISH_SALTBOX_MULT)
 
-        -- 恢复甜加移速
+            -- 恢复甜加移速
         elseif inst._spice_upgrade == "spice_sugar" then
             if inst.components.equippable == nil then
                 inst:AddComponent("equippable")
@@ -381,7 +390,7 @@ AddPrefabPostInit("spicepack", function(inst)
         end
 
         local hasSkill = owner.components.skilltreeupdater and
-                         owner.components.skilltreeupdater:IsActivated("warly_spickpack_cozy")
+            owner.components.skilltreeupdater:IsActivated("warly_spickpack_cozy")
 
         if not hasSkill then
             equippable.dapperness = 0
@@ -591,9 +600,18 @@ AddComponentAction("USEITEM", "spicesacktool", function(inst, doer, target, acti
     end
 end)
 
--- 动作动画（修理动作）
-AddStategraphActionHandler("wilson", ActionHandler(SPICEPACK_UPGRADE, "dolongaction"))
-AddStategraphActionHandler("wilson_client", ActionHandler(SPICEPACK_UPGRADE, "dolongaction"))
+local function spicePackSg(inst, action)
+    local hasSkill = inst.components.skilltreeupdater and
+        inst.components.skilltreeupdater:IsActivated("warly_cooker_faster")
+    if hasSkill then
+        return "doshortaction"
+    else
+        return "dolongaction"
+    end
+end
+-- 动作动画
+AddStategraphActionHandler("wilson", ActionHandler(SPICEPACK_UPGRADE, spicePackSg))
+AddStategraphActionHandler("wilson_client", ActionHandler(SPICEPACK_UPGRADE, spicePackSg))
 
 -- 添加组件
 AddPrefabPostInit("spice_chili", function(inst)
@@ -686,7 +704,7 @@ local SEARCH_FLAVOR = AddAction("SEARCH_FLAVOR", STRINGS.ACTIONS.SEARCH_FLAVOR, 
     inst:Remove()
 
     -- 生成动画FX
-    local fx = SpawnPrefab("portableblender_sacrifice_fx")
+    local fx = SpawnPrefab("portableblender_sacrifice_fx", inst.linked_skinname, inst.skin_id)
     fx.Transform:SetPosition(x, y, z)
 
     return true
@@ -703,8 +721,18 @@ AddComponentAction("INVENTORY", "inventoryitem", function(inst, doer, actions)
     end
 end)
 
-AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.SEARCH_FLAVOR, "dolongaction"))
-AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.SEARCH_FLAVOR, "dolongaction"))
+local function searchSg(inst, action)
+    local hasSkill = inst.components.skilltreeupdater and
+        inst.components.skilltreeupdater:IsActivated("warly_cooker_faster")
+    if hasSkill then
+        return "doshortaction"
+    else
+        return "dolongaction"
+    end
+end
+
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.SEARCH_FLAVOR, searchSg))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.SEARCH_FLAVOR, searchSg))
 
 --------------------------------------------------------------------------
 -- prefab 扩展
@@ -737,6 +765,76 @@ AddPrefabPostInit("warly", function(inst)
         if data and data.next_flavor_cd then
             StartFlavorCooldown(inst) -- 会自动设置 tag 并启动倒计时
             inst._next_flavor_time = GetTime() + data.next_flavor_cd
+        end
+    end
+end)
+
+
+
+
+--========================================================
+-- SECTION4: 快速动作
+--========================================================
+-- 快速拆便携厨具
+AddStategraphPostInit("wilson", function(sg)
+    local dismantle = sg.actionhandlers[ACTIONS.DISMANTLE]
+    if dismantle then
+        local old_deststate_pot = dismantle.deststate
+        dismantle.deststate = function(inst, action, ...)
+            -- 技能树控制快速动作
+            local hasSkill = inst.components.skilltreeupdater and
+                inst.components.skilltreeupdater:IsActivated("warly_cooker_faster")
+            if hasSkill then
+                return "doshortaction"
+            else
+                return old_deststate_pot(inst, action, ...)
+            end
+        end
+    end
+end)
+
+-- 快速煮饭和调味
+AddComponentPostInit("stewer", function(self)
+    -- 保存原始的 StartCooking 方法
+    local originalStartCooking = self.StartCooking
+
+    -- 修改 StartCooking 方法
+    self.StartCooking = function(self, doer)
+        -- 记录原本的倍率
+        local original_cooktimemult = self.cooktimemult
+
+        -- 如果 doer 是沃利，修改 self.cooktimemult
+        if doer and doer.prefab == "warly" then
+            self.cooktimemult = self.cooktimemult * 0.6  -- 设置沃利的烹饪时间倍数为 0.6 
+        end
+
+        -- 调用原始的 StartCooking 方法
+        if originalStartCooking then
+            originalStartCooking(self, doer)
+        end
+
+        -- 一帧后恢复原本的倍率
+        self.inst:DoTaskInTime(0, function()
+            self.cooktimemult = original_cooktimemult  -- 恢复原本的倍率
+        end)
+    end
+end)
+
+
+-- 快速收菜和调味好的菜
+AddStategraphPostInit("wilson", function(sg)
+    local harvest = sg.actionhandlers[ACTIONS.HARVEST]
+    if harvest then
+        local old_deststate_harvest = harvest.deststate
+        harvest.deststate = function(inst, action, ...)
+            -- 技能树控制快速动作
+            local hasSkill = inst.components.skilltreeupdater and
+                inst.components.skilltreeupdater:IsActivated("warly_cooker_faster")
+            if hasSkill and action.target.components.stewer then
+                return "doshortaction"
+            else
+                return old_deststate_harvest(inst, action, ...)
+            end
         end
     end
 end)

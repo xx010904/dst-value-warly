@@ -282,7 +282,7 @@ AddPrefabPostInit("pigman", function(inst)
         if old_OnSave then
             old_OnSave(inst, data)
         end
-        if inst:HasTag("werepig_warly") then
+        if inst and inst:HasTag("werepig_warly") then
             data.werepig_warly = true
             data.current_health = inst.components.health and inst.components.health.currenthealth or nil
         end
@@ -292,7 +292,7 @@ AddPrefabPostInit("pigman", function(inst)
         if old_OnLoad then
             old_OnLoad(inst, data)
         end
-        if data.werepig_warly then
+        if data and data.werepig_warly then
             inst:DoTaskInTime(0, function()
                 changeWere(inst)
                 if data.current_health and inst.components.health then

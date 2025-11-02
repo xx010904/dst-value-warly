@@ -352,11 +352,7 @@ local function onequip(inst, owner)
     end
 
     -- 定期扫描队友
-    local hasTransferSkill = owner and owner.components.skilltreeupdater and owner.components.skilltreeupdater:IsActivated("warly_crockpot_transfer")
-    -- print("背黑锅技能树：", hasFlungSkill)
-    if hasTransferSkill then -- 技能树控制是否开启
-        inst._scantask = inst:DoPeriodicTask(1, ScanNearbyPlayers)
-    end
+    inst._scantask = inst:DoPeriodicTask(1, ScanNearbyPlayers)
 end
 
 -- 卸下

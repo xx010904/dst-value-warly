@@ -62,17 +62,21 @@ STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_FAVORITE_TITLE = "Dream Dish"
 STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_FAVORITE_DESC = "Warly's magical cooking can turn the pie into the favorite food of his friends(or Crabby Hermit), and his own beloved Void Sky Pie."
 
 -- Burdened Pot
-STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_MAKE_TITLE = "Stacked Armor Pot"
-STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_MAKE_DESC = "Warly can stack pots as armor on his back to block all attacks, but it consumes sanity and hunger. He can also unstack the pots again"
-
-STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_TRANSFER_TITLE = "Take the Blame"
-STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_TRANSFER_DESC = "When Warly carries a pot, nearby friends' damage is transferred to him."
+STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_MAKE_TITLE = "Burdened Pot"
+STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_MAKE_DESC = "Warly can stack pots on his back to shield friends from all attacks, but it consumes sanity and hunger. He can also redistribute the stacked pots."
 
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_FLUNG_TITLE = "Flung Pot"
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_FLUNG_DESC = "When the pot reaches its limit, Warly flings it in all directions."
 
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_SCAPEGOAT_TITLE = "Scapegoat"
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_SCAPEGOAT_DESC = "While carrying stacked pots, Warly has a chance to summon a scapegoat to take damage when attacked, and gaining more loot upon their defeat."
+
+-- Chef Pouch
+STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_UPGRADE_TITLE = "Spice Pack I"
+STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_UPGRADE_DESC = "Warly can use spices to add flavor to his Chef Pouch, granting it various practical functions."
+
+STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_COZY_TITLE = "Spice Pack II"
+STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_COZY_DESC = "The more seasoned dishes placed in the Chef Pouch, the more comfortable and mentally refreshed Warly feels."
 
 -- Blander
 STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG_TITLE = "Reliable Blender"
@@ -81,12 +85,11 @@ STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG_DESC = "Warly's Portable Grinding Mill
 STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG2_TITLE = "Little Ground Mover"
 STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG2_DESC = "Warly can use his Portable Grinding Mill to dig up more ground, increasing the chance of obtaining rare spices."
 
--- Chef Pouch
-STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_UPGRADE_TITLE = "Spice Pack I"
-STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_UPGRADE_DESC = "Warly can use spices to add flavor to his Chef Pouch, granting it various practical functions."
+-- Fast Foodie
+STRINGS.SKILLTREE.WARLY.WARLY_COOKER_FASTER_1_LOCK_DESC = "Learn 3 Multicooker skills to unlock."
 
-STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_COZY_TITLE = "Spice Pack II"
-STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_COZY_DESC = "The more seasoned dishes placed in the Chef Pouch, the more comfortable and mentally refreshed Warly feels."
+STRINGS.SKILLTREE.WARLY.WARLY_COOKER_FASTER_TITLE = "Fast Foodie"
+STRINGS.SKILLTREE.WARLY.WARLY_COOKER_FASTER_DESC = "Warly can quickly use portable cooking tools and can also serve dishes faster."
 
 -- Allegiance
 STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LOCK_1_DESC = "Unlocks after learning 12 skills."
