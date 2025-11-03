@@ -102,6 +102,12 @@ local function BuildSkillsData(SkillTreeFns)
             connects = {
                 "warly_funny_cook_feast"
             },
+            onactivate = function(inst, fromload)
+                inst:AddTag("warly_funny_cook_base")
+            end,
+            ondeactivate = function(inst)
+                inst:RemoveTag("warly_funny_cook_base")
+            end,
         },
         warly_funny_cook_feast = {
             title = STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_FEAST_TITLE,
@@ -114,7 +120,6 @@ local function BuildSkillsData(SkillTreeFns)
                 "warly_funny_cook_spice",
             },
         },
-
         warly_funny_cook_spice = {
             title = STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_SPICE_TITLE,
             desc = STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_SPICE_DESC,

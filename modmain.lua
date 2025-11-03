@@ -7,6 +7,7 @@ Assets = {
     Asset("ANIM", "anim/warly_sky_pie_inspire_buff.zip"),
     Asset("ANIM", "anim/warly_sky_pie_baked.zip"),
     Asset("ANIM", "anim/warly_sky_pie_boomerang.zip"),
+    Asset("ANIM", "anim/improv_cooking_power.zip"),
 	-- Asset("ANIM", "anim/ui_beard_3x1.zip"),
     Asset("IMAGE", "images/inventoryimages/armor_crockpot.tex"),
 	Asset("ATLAS", "images/inventoryimages/armor_crockpot.xml"),
@@ -20,6 +21,10 @@ Assets = {
 	Asset("ATLAS", "images/inventoryimages/warly_sky_pie_boomerang.xml"),
     Asset("IMAGE", "images/inventoryimages/portablecookpot_item_actived.tex"),
 	Asset("ATLAS", "images/inventoryimages/portablecookpot_item_actived.xml"),
+    Asset("IMAGE", "images/inventoryimages/improv_cooking_power.tex"),
+	Asset("ATLAS", "images/inventoryimages/improv_cooking_power.xml"),
+    Asset("IMAGE", "images/inventoryimages/improv_cooking_power_actived.tex"),
+	Asset("ATLAS", "images/inventoryimages/improv_cooking_power_actived.xml"),
 }
 
 PrefabFiles = {
@@ -37,6 +42,7 @@ PrefabFiles = {
 	"improv_cookpot_fx",
 	"improv_cookpot_projectile_fx",
 	"improv_question_mark_fx",
+	"improv_cooking_power",
 	"warly_sky_pie",
 	"warly_sky_pie_baked",
 	"warly_sky_pie_buff",
@@ -54,7 +60,8 @@ RegisterInventoryItemAtlas("images/inventoryimages/armor_crockpot.xml", "armor_c
 RegisterInventoryItemAtlas("images/inventoryimages/shadow_battleaxe_young.xml", "shadow_battleaxe_young.tex")
 RegisterInventoryItemAtlas("images/inventoryimages/warly_sky_pie.xml", "warly_sky_pie.tex")
 RegisterInventoryItemAtlas("images/inventoryimages/portablecookpot_item_actived.xml", "portablecookpot_item_actived.tex")
-
+RegisterInventoryItemAtlas("images/inventoryimages/improv_cooking_power.xml", "improv_cooking_power.tex")
+RegisterInventoryItemAtlas("images/inventoryimages/improv_cooking_power_actived.xml", "improv_cooking_power_actived.tex")
 
 --Make Global
 local require = GLOBAL.require
