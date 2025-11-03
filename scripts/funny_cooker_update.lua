@@ -151,6 +151,26 @@ local function GetBaseFood(prefab)
 end
 
 -- =========================================================
+-- 计算有多少厨力
+-- =========================================================
+local function IsCookingPower(item)
+    return item.prefab == "improv_cooking_power"
+end
+
+local function GetCookingPowerCount(inst)
+    local count = 0
+    if inst.components.inventory then
+        -- print("[GetCookingPowerCount] Scanning inventory for cooking power...")
+        local cookingPower = inst.components.inventory:FindItems(IsCookingPower)
+        -- print(string.format("[GetCookingPowerCount] Found %d cooking power stacks.", #cookingPower))
+        for i, v in ipairs(cookingPower) do
+            count = count + GetStackSize(v)
+        end
+    end
+    return count
+end
+
+-- =========================================================
 -- 抛锅函数
 -- =========================================================
 local function SpawnCookPotFX(chef, idiot, meal)
@@ -168,11 +188,17 @@ local function SpawnCookPotFX(chef, idiot, meal)
     fx.entity:AddFollower()
     fx.Follower:FollowSymbol(chef.GUID, "hair", 0, 0, 0)
 
-    local proj = SpawnPrefab("improv_cookpot_projectile_fx")
-    proj.doer = chef
-    proj.meal = meal
-    proj.Transform:SetPosition(x, y, z)
-    proj.components.complexprojectile:Launch(Vector3(spawn_x, spawn_y, spawn_z), chef)
+    -- 看看是给抛锅，还是给自己加厨力
+    if GetCookingPowerCount(chef) < TUNING.STACK_SIZE_SMALLITEM then
+        local improv_cooking_power = SpawnPrefab("improv_cooking_power")
+        chef.components.inventory:GiveItem(improv_cooking_power)
+    else
+        local proj = SpawnPrefab("improv_cookpot_projectile_fx")
+        proj.doer = chef
+        proj.meal = meal
+        proj.Transform:SetPosition(x, y, z)
+        proj.components.complexprojectile:Launch(Vector3(spawn_x, spawn_y, spawn_z), chef)
+    end
 end
 
 local function ApplyTalking(inst, op)
@@ -406,6 +432,142 @@ AddPlayerPostInit(function(dead)
             end
         end
     end, dead)
+end)
+
+-- =========================================================
+-- cooking power上限溢出处理
+-- =========================================================
+
+local function SortByStackSize(l, r)
+    return GetStackSize(l) < GetStackSize(r)
+end
+
+local function RemoveOverflowItems(inst, items, maxcount)
+    -- items: 要检查的物品列表，比如来自 inst.components.inventory:FindItems(...)
+    -- maxcount: 允许的最大总数（例如 TUNING.STACK_SIZE_SMALLITEM）
+
+    if not items or #items == 0 then
+        -- print("[RemoveOverflowItems] 没有物品需要检查。")
+        return 0
+    end
+
+    local total = 0
+    for _, v in ipairs(items) do
+        total = total + GetStackSize(v)
+    end
+
+    -- print(string.format("[RemoveOverflowItems] 当前物品总数: %d, 最大允许: %d", total, maxcount))
+
+    local overflow = total - maxcount
+    if overflow <= 0 then
+        -- print("[RemoveOverflowItems] 未超过最大堆叠数，无需删除。")
+        return 0
+    end
+
+    table.sort(items, SortByStackSize) -- 优先删除堆小的，保持一致性
+    local removed = 0
+
+    -- print(string.format("[RemoveOverflowItems] 超出数量: %d，开始删除。", overflow))
+
+    for _, v in ipairs(items) do
+        local vcount = GetStackSize(v)
+        local vname = v.prefab or tostring(v)
+        if vcount <= overflow then
+            -- print(string.format("  - 删除整个堆 %s x%d", vname, vcount))
+            removed = removed + vcount
+            overflow = overflow - vcount
+            v:Remove()
+        else
+            local left = vcount - overflow
+            if v.components.stackable ~= nil then
+                if left > 0 then
+                    -- print(string.format("  - 从 %s 中删除部分 (%d/%d)", vname, overflow, vcount))
+                    v.components.stackable:SetStackSize(left)
+                else
+                    -- print(string.format("  - 删除整个堆 %s (剩余0)", vname))
+                    v:Remove()
+                end
+            end
+            removed = removed + overflow
+            overflow = 0
+            break
+        end
+
+        if overflow <= 0 then
+            break
+        end
+    end
+
+    -- print(string.format("[RemoveOverflowItems] 删除完成，总共删除 %d 个。", removed))
+    return removed
+end
+
+
+local function HandleLeftoversShouldDropFn(inst, item)
+    -- print("[HandleLeftovers] Checking cooking power overflow...", inst.prefab, item.prefab)
+    if item and IsCookingPower(item) and inst.GetCookingPowerCount then
+        local count = inst:GetCookingPowerCount() or 0
+        -- print(string.format("[HandleLeftovers] Current cooking power count: %d", count))
+        local maxstack = TUNING.STACK_SIZE_SMALLITEM or 40
+
+        if count >= maxstack then
+            local overflow = count - maxstack
+            -- print(string.format("[HandleLeftovers] overflow detected: %d items will be removed", overflow))
+
+            local items = inst.components.inventory:FindItems(IsCookingPower)
+            table.insert(items, item) -- 包括刚获得的 item
+            local removed = RemoveOverflowItems(inst, items, TUNING.STACK_SIZE_SMALLITEM)
+
+            -- 为每个被移除的单位生成一个 improv_cookpot_fx
+            if removed > 0 then
+                local x, y, z = inst.Transform:GetWorldPosition()
+                for i = 1, removed do
+                    local fx = SpawnPrefab("improv_cookpot_fx")
+                    if fx and fx.Transform then
+                        -- 随机一点位移让效果不重叠
+                        local ox = (math.random() - 0.5) * 0.4
+                        local oz = (math.random() - 0.5) * 0.4
+                        fx.Transform:SetPosition(x + ox, y, z + oz)
+                    end
+                    local transform_fx = SpawnPrefab("lucy_transform_fx")
+                    transform_fx.entity:SetParent(fx.entity)
+                end
+            end
+
+            -- 如果还有剩余 overflow（比如该 item 堆不足以移除所有超额），
+            -- 此处只记录剩余但不再继续删除；如果你需要从容器里继续删除，请告诉我我可以补充。
+            if overflow > removed then
+                -- print(string.format(
+                --     "[HandleLeftovers] overflow=%d but removed=%d from this stack; remaining overflow=%d",
+                --     overflow, removed, overflow - removed))
+            else
+                -- print(string.format("[HandleLeftovers] overflow=%d removed=%d and spawned %d fx",
+                --     overflow, removed, removed))
+            end
+        end
+    end
+    return true
+end
+
+local function gotnewitem_fn(inst, data)
+    local item = data.item
+    if item and IsCookingPower(item) then
+        if inst.components.inventory and inst.components.inventory.HandleLeftoversShouldDropFn then
+            -- print("[gotnewitem_fn] New cooking power acquired, checking overflow...", inst.prefab, item.prefab)
+            inst:HandleLeftoversShouldDropFn(item)
+        end
+    end
+end
+
+AddPrefabPostInit("warly", function(inst)
+    if not TheWorld.ismastersim then
+        return
+    end
+    -- print("[warly] Adding HandleLeftoversShouldDropFn for cooking power overflow...")
+    inst.GetCookingPowerCount = GetCookingPowerCount
+    inst.components.inventory.HandleLeftoversShouldDropFn = HandleLeftoversShouldDropFn
+    inst.HandleLeftoversShouldDropFn = HandleLeftoversShouldDropFn
+    inst:ListenForEvent("gotnewitem", gotnewitem_fn)
 end)
 
 
@@ -916,7 +1078,7 @@ local ACTION_PLACE_FOOD_ON_TABLE = AddAction("PLACE_FOOD_ON_TABLE", STRINGS.ACTI
         end
 
         -- 做一个提示
-        decor:DoTaskInTime(10*FRAMES, function(_decor)
+        decor:DoTaskInTime(10 * FRAMES, function(_decor)
             local uses = _decor.uses_left
             if uses > 1 and doer and doer.components.talker then
                 if uses > 2 then
@@ -940,9 +1102,9 @@ AddComponentAction("USEITEM", "inventoryitem", function(inst, doer, target, acti
     if not target or not doer or not inst then return end
     if doer.prefab == "warly" and doer:HasTag("warly_true_delicious_desk") then
         local isTable = target.prefab == "wood_table_round"
-                    or target.prefab == "wood_table_square"
-                    or target.prefab == "stone_table_round"
-                    or target.prefab == "stone_table_square"
+            or target.prefab == "wood_table_square"
+            or target.prefab == "stone_table_round"
+            or target.prefab == "stone_table_square"
         if not target:HasTag("hasfurnituredecoritem") and isTable then
             if inst:HasTag("preparedfood") and inst.prefab ~= "warly_sky_pie_baked" then
                 table.insert(actions, ACTIONS.PLACE_FOOD_ON_TABLE)

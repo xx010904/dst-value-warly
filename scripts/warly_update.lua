@@ -26,36 +26,97 @@
 local cooking = require("cooking")
 _G.ALL_SPICES = {}
 _G.ALL_COOKALBE_FOODS = {}
+_G.ALL_SPICES = {}
+_G.TOP_HEALTH_FOODS = {}
+_G.TOP_SANITY_FOODS = {}
+_G.TOP_HUNGER_FOODS = {}
 
 -- 获取所有可烹饪食物和调味料
 local function GetAllCookableFoodsAndSpices()
+
+
+    local food_stats = {}
+
     -- 遍历所有烹饪食谱
     for cooker, recipes in pairs(cooking.recipes) do
         if type(recipes) == "table" then
-            for product, _ in pairs(recipes) do
-                if product ~= nil and product ~= "" then
+            for product, recipe in pairs(recipes) do
+                if product ~= nil and product ~= "" and type(recipe) == "table" then
                     -- 记录食物
-                    ALL_COOKALBE_FOODS[product] = true
+                    _G.ALL_COOKALBE_FOODS[product] = true
 
-                    -- 检查是否为调味料
+                    -- 记录调味料
                     if string.match(product, "_spice_") then
-                        -- 截取调味料的名字，保留"spice_"后面的部分
-                        local spiceName = string.match(product, "spice_.*")  -- 匹配"spice_"及其后面的内容
-                        -- 去重并记录调味料
-                        ALL_SPICES[spiceName] = true
+                        local spiceName = string.match(product, "spice_.*")
+                        _G.ALL_SPICES[spiceName] = true
                     end
+
+                    -- 提取血量/饥饿/理智数值（若为空则为0）
+                    local health = recipe.health or 0
+                    local hunger = recipe.hunger or 0
+                    local sanity = recipe.sanity or 0
+
+                    table.insert(food_stats, {
+                        name = product,
+                        health = health,
+                        hunger = hunger,
+                        sanity = sanity,
+                    })
                 end
             end
         end
     end
-    -- print("All Cookable Foods:")
+
+    -- 按血量、理智、饥饿分别排序
+    local function sort_by_key(tbl, key)
+        table.sort(tbl, function(a, b)
+            return (a[key] or 0) > (b[key] or 0)
+        end)
+    end
+
+    sort_by_key(food_stats, "health")
+    local half_index = math.ceil(#food_stats / 2)
+    for i = 1, half_index do
+        local f = food_stats[i]
+        _G.TOP_HEALTH_FOODS[f.name] = f.health
+    end
+
+    sort_by_key(food_stats, "sanity")
+    for i = 1, half_index do
+        local f = food_stats[i]
+        _G.TOP_SANITY_FOODS[f.name] = f.sanity
+    end
+
+    sort_by_key(food_stats, "hunger")
+    for i = 1, half_index do
+        local f = food_stats[i]
+        _G.TOP_HUNGER_FOODS[f.name] = f.hunger
+    end
+
+    -- 输出结果日志
+    -- print("========== All Cookable Foods ==========")
     -- for food, _ in pairs(_G.ALL_COOKALBE_FOODS) do
     --     print(food)
     -- end
 
-    -- print("All Spices:")
+    -- print("========== All Spices ==========")
     -- for spice, _ in pairs(_G.ALL_SPICES) do
     --     print(spice)
+    -- end
+
+    -- print("========== Top 50% Health Foods ==========")
+    -- for k, v in pairs(_G.TOP_HEALTH_FOODS) do
+    --     print(string.format("%s (+%.1f HP)", k, v))
+    -- end
+
+    -- print("========== Top 50% Sanity Foods ==========")
+    -- for k, v in pairs(_G.TOP_SANITY_FOODS) do
+    --     print(string.format("%s (+%.1f Sanity)", k, v))
+    -- end
+
+    -- print("========== Top 50% Hunger Foods ==========")
+    -- for k, v in pairs(_G.TOP_HUNGER_FOODS) do
+    --     print(string.format("%s (+%.1f Hunger)", k, v))
     -- end
 end
 

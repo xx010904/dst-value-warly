@@ -70,7 +70,7 @@ local function DoSpellFn(inst, doer, pos, type)
         Consume(inst, doer, type)
         local proj = SpawnPrefab("improv_cookpot_projectile_fx")
         proj.doer = doer
-        -- proj.meal = meal
+        proj.prefer_type = type
         proj.Transform:SetPosition(doer.Transform:GetWorldPosition())
         proj.components.complexprojectile:Launch(Vector3(pos.x, pos.y, pos.z), doer)
 
@@ -260,8 +260,21 @@ end
 local function toground(inst)
     inst.persists = false
     if inst.AnimState:IsCurrentAnimation("idle") then
-		inst.AnimState:SetFrame(math.random(inst.AnimState:GetCurrentAnimationNumFrames()) - 1)
+        inst.AnimState:SetFrame(math.random(inst.AnimState:GetCurrentAnimationNumFrames()) - 1)
     end
+    inst:ListenForEvent("animover", function()
+        local x, y, z = inst.Transform:GetWorldPosition()
+        local fx = SpawnPrefab("improv_cookpot_fx")
+        if fx and fx.Transform then
+            -- 随机一点位移让效果不重叠
+            local ox = (math.random() - 0.5) * 0.4
+            local oz = (math.random() - 0.5) * 0.4
+            fx.Transform:SetPosition(x + ox, y, z + oz)
+        end
+        local transform_fx = SpawnPrefab("lucy_transform_fx")
+        transform_fx.entity:SetParent(fx.entity)
+        inst:Remove()
+    end)
 end
 
 local COOKING_POWER_TAGS = { "improv_cooking_power" }
@@ -358,29 +371,15 @@ end
 
 if TheSim then -- updateprefabs guard
     SetDesiredMaxTakeCountFunction("improv_cooking_power", function(player, inventory, container_item, container)
-        print("[improv_cooking_power] SetDesiredMaxTakeCountFunction called")
-
         local max_count = 0
 
         if player and player.components.skilltreeupdater then
-            print("[improv_cooking_power] player has skilltreeupdater")
-
             if player.components.skilltreeupdater:IsActivated("warly_funny_cook_base") then
                 max_count = TUNING.STACK_SIZE_SMALLITEM
-                print("[improv_cooking_power] skill 'warly_funny_cook_base' is activated! max_count =", max_count)
-            else
-                print("[improv_cooking_power] skill 'warly_funny_cook_base' NOT activated")
             end
-        else
-            print("[improv_cooking_power] player has NO skilltreeupdater")
         end
-
         local has, count = inventory:Has("improv_cooking_power", 0, false)
-        print(string.format("[improv_cooking_power] inventory check: has=%s, count=%d", tostring(has), count or -1))
-
         local result = math.max(max_count - count, 0)
-        print("[improv_cooking_power] returning", result)
-
         return result
     end)
 end
