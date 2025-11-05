@@ -72,11 +72,12 @@ STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_SCAPEGOAT_TITLE = "Scapegoat"
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_SCAPEGOAT_DESC = "While carrying stacked pots, Warly has a chance to summon a scapegoat to take damage when attacked, and gaining more loot upon their defeat."
 
 -- Chef Pouch
-STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_UPGRADE_TITLE = "Spice Pack I"
-STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_UPGRADE_DESC = "Warly can use spices to add flavor to his Chef Pouch, granting it various practical functions."
+STRINGS.SKILLTREE.WARLY.WARLY_SPICEPACK_UPGRADE_TITLE = "Spice Pack"
+STRINGS.SKILLTREE.WARLY.WARLY_SPICEPACK_UPGRADE_DESC = "Warly can use spices to add flavor to his Chef Pouch, granting it various practical functions. The more seasoned dishes placed in the Chef Pouch, the more comfortable and mentally refreshed Warly feels."
 
-STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_COZY_TITLE = "Spice Pack II"
-STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_COZY_DESC = "The more seasoned dishes placed in the Chef Pouch, the more comfortable and mentally refreshed Warly feels."
+-- Spicer
+STRINGS.SKILLTREE.WARLY.WARLY_SPICKER_DISMANTLE_TITLE = "Spice Dismantler"
+STRINGS.SKILLTREE.WARLY.WARLY_SPICKER_DISMANTLE_DESC = "Warly can use his Portable Spicer to dismantle seasoned food, obtaining the original food and spices."
 
 -- Blander
 STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG_TITLE = "Reliable Blender"
@@ -264,6 +265,7 @@ STRINGS.ACTIONS.SPICEPACK_UPGRADE = "Spice"
 STRINGS.ACTIONS.PICKUP.DECOR_FOOD = "Savor"
 STRINGS.ACTIONS.PASS_THE_POT = "Pass Pot"
 STRINGS.ACTIONS.SEARCH_FLAVOR = "Explore Flavor"
+STRINGS.ACTIONS.USE_SPICE_CONVERT = "Dismantle Flavor"
 STRINGS.IMPROV_COOKING_POWER =
 {
     HUNGER_PREFER = "Prefer Hunger (2 cost)",

@@ -57,15 +57,17 @@ RegisterSkilltreeIconsAtlas("images/skilltree/warly_crockpot_flung.xml", "warly_
 table.insert(Assets, Asset("ATLAS", "images/skilltree/warly_crockpot_scapegoat.xml"))
 RegisterSkilltreeIconsAtlas("images/skilltree/warly_crockpot_scapegoat.xml", "warly_crockpot_scapegoat.tex")
 
+-- 厨师袋
+table.insert(Assets, Asset("ATLAS", "images/skilltree/warly_spicepack_upgrade.xml"))
+RegisterSkilltreeIconsAtlas("images/skilltree/warly_spicepack_upgrade.xml", "warly_spicepack_upgrade.tex")
+
+-- 拆味器
+table.insert(Assets, Asset("ATLAS", "images/skilltree/warly_spicer_dismantle.xml"))
+RegisterSkilltreeIconsAtlas("images/skilltree/warly_spicer_dismantle.xml", "warly_spicer_dismantle.tex")
+
 -- 研磨器
 table.insert(Assets, Asset("ATLAS", "images/skilltree/warly_blender_dig.xml"))
 RegisterSkilltreeIconsAtlas("images/skilltree/warly_blender_dig.xml", "warly_blender_dig.tex")
-
--- 厨师袋
-table.insert(Assets, Asset("ATLAS", "images/skilltree/warly_spickpack_upgrade.xml"))
-RegisterSkilltreeIconsAtlas("images/skilltree/warly_spickpack_upgrade.xml", "warly_spickpack_upgrade.tex")
-table.insert(Assets, Asset("ATLAS", "images/skilltree/warly_spickpack_cozy.xml"))
-RegisterSkilltreeIconsAtlas("images/skilltree/warly_spickpack_cozy.xml", "warly_spickpack_cozy.tex")
 
 -- 快餐手
 table.insert(Assets, Asset("ATLAS", "images/skilltree/warly_cooker_faster.xml"))

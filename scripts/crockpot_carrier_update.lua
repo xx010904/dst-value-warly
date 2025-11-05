@@ -390,7 +390,7 @@ AddPrefabPostInit("spicepack", function(inst)
         end
 
         local hasSkill = owner.components.skilltreeupdater and
-            owner.components.skilltreeupdater:IsActivated("warly_spickpack_cozy")
+            owner.components.skilltreeupdater:IsActivated("warly_spicepack_upgrade")
 
         if not hasSkill then
             equippable.dapperness = 0
@@ -580,7 +580,7 @@ SPICEPACK_UPGRADE.str = STRINGS.ACTIONS.SPICEPACK_UPGRADE
 SPICEPACK_UPGRADE.fn = function(act)
     if act.invobject and act.target and act.doer then
         local doer = act.doer
-        local hasSkill = doer:HasTag("warly_spickpack_upgrade")
+        local hasSkill = doer:HasTag("warly_spicepack_upgrade")
         if hasSkill and act.invobject:HasTag("spice") and string.find(act.invobject.prefab, "spice_") then
             act.invobject.components.stackable:Get():Remove()
             UpgradeSpicePack(act.target, act.doer, act.invobject.prefab)
@@ -593,7 +593,7 @@ AddAction(SPICEPACK_UPGRADE)
 -- 添加使用动作：右键用香料升级 技能树控制
 AddComponentAction("USEITEM", "spicesacktool", function(inst, doer, target, actions, right)
     if right and string.find(inst.prefab, "spice_") and target and target.prefab == "spicepack" and doer.prefab == "warly" then
-        local hasSkill = doer:HasTag("warly_spickpack_upgrade")
+        local hasSkill = doer:HasTag("warly_spicepack_upgrade")
         if hasSkill then
             table.insert(actions, ACTIONS.SPICEPACK_UPGRADE)
         end
@@ -770,6 +770,81 @@ AddPrefabPostInit("warly", function(inst)
 end)
 
 
+--------------------------------------------------------------------------
+-- 拆解调味的食物
+--------------------------------------------------------------------------
+-- 注册新的动作
+local USE_SPICE_CONVERT = AddAction("USE_SPICE_CONVERT", STRINGS.ACTIONS.USE_SPICE_CONVERT, function(act)
+    local doer = act.doer
+    local target = act.target
+    local spicer = act.invobject
+
+    local hasSkill = doer.components.skilltreeupdater and doer.components.skilltreeupdater:IsActivated("warly_spicer_dismantle")
+    if doer.prefab ~= "warly" or not hasSkill then
+        print("奇怪的人使用调味拆解工具", doer.components.skilltreeupdater:IsActivated("warly_spicer_dismantle"))
+        return false
+    end
+
+    if target and target.components.edible and target.components.edible.spice then
+        local base = target.food_basename
+        local spice = target.components.edible.spice
+
+        if base and spice then
+            local new_food = SpawnPrefab(base)
+            if new_food then
+                doer.components.inventory:GiveItem(new_food)
+
+                local new_spice = SpawnPrefab(spice)
+                if new_spice then
+                    doer.components.inventory:GiveItem(new_spice)
+                end
+            end
+
+            -- 移除调味过的食物
+            if target.components.stackable then
+                target.components.stackable:Get():Remove()
+            else
+                target:Remove()
+            end
+
+            spicer.SoundEmitter:PlaySound("dontstarve/common/together/portable/spicer/lid_close")
+
+            return true
+        end
+    end
+
+    return false
+end)
+USE_SPICE_CONVERT.priority = 10
+
+AddComponentAction("USEITEM", "converspicetool", function(inst, doer, target, actions, right)
+    if doer.prefab == "warly" and doer:HasTag("warly_spicer_dismantle") then
+        if right and target and target:HasTag("spicedfood") then
+            table.insert(actions, ACTIONS.USE_SPICE_CONVERT)
+        end
+    end
+end)
+
+local function converSpiceSg(inst, action)
+    local hasSkill = inst.components.skilltreeupdater and
+        inst.components.skilltreeupdater:IsActivated("warly_cooker_faster")
+    if hasSkill then
+        return "doshortaction"
+    else
+        return "dolongaction"
+    end
+end
+
+AddStategraphActionHandler("wilson", ActionHandler(USE_SPICE_CONVERT, converSpiceSg))
+AddStategraphActionHandler("wilson_client", ActionHandler(USE_SPICE_CONVERT, converSpiceSg))
+
+-- 加上操作组件
+AddPrefabPostInit("portablespicer_item", function(inst)
+    if not TheWorld.ismastersim then
+        return
+    end
+    inst:AddComponent("converspicetool")
+end)
 
 
 --========================================================
@@ -805,7 +880,7 @@ AddComponentPostInit("stewer", function(self)
 
         -- 如果 doer 是沃利，修改 self.cooktimemult
         if doer and doer.prefab == "warly" then
-            self.cooktimemult = self.cooktimemult * 0.6  -- 设置沃利的烹饪时间倍数为 0.6 
+            self.cooktimemult = self.cooktimemult * 0.6 -- 设置沃利的烹饪时间倍数为 0.6
         end
 
         -- 调用原始的 StartCooking 方法
@@ -815,7 +890,7 @@ AddComponentPostInit("stewer", function(self)
 
         -- 一帧后恢复原本的倍率
         self.inst:DoTaskInTime(0, function()
-            self.cooktimemult = original_cooktimemult  -- 恢复原本的倍率
+            self.cooktimemult = original_cooktimemult -- 恢复原本的倍率
         end)
     end
 end)

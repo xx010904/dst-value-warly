@@ -257,34 +257,40 @@ local function BuildSkillsData(SkillTreeFns)
         -- =============================================================================
         -- 改造厨师袋 调味站 研磨器
         -- =============================================================================
-        warly_spickpack_upgrade = {
-            title = STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_UPGRADE_TITLE,
-            desc = STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_UPGRADE_DESC,
-            icon = "warly_spickpack_upgrade",
+        warly_spicepack_upgrade = {
+            title = STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACE_UPGRADE_TITLE,
+            desc = STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACE_UPGRADE_DESC,
+            icon = "warly_spicepack_upgrade",
             pos = { 60 + 48, 176 },
             group = "multicooker",
             tags = { "multicooker", "multicooker2" },
             root = true,
             connects = {
-                "warly_spickpack_cozy",
+                "warly_spicer_dismantle",
             },
             onactivate = function(inst, fromload)
-                inst:AddTag("warly_spickpack_upgrade")
+                inst:AddTag("warly_spicepack_upgrade")
             end,
             ondeactivate = function(inst)
-                inst:RemoveTag("warly_spickpack_upgrade")
+                inst:RemoveTag("warly_spicepack_upgrade")
             end,
         },
-        warly_spickpack_cozy = {
-            title = STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_COZY_TITLE,
-            desc = STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACK_COZY_DESC,
-            icon = "warly_spickpack_cozy",
+        warly_spicer_dismantle = {
+            title = STRINGS.SKILLTREE.WARLY.WARLY_SPICKER_DISMANTLE_TITLE,
+            desc = STRINGS.SKILLTREE.WARLY.WARLY_SPICKER_DISMANTLE_DESC,
+            icon = "warly_spicer_dismantle",
             pos = { 60 + 48, 176 - 48 },
             group = "multicooker",
             connects = {
                 "warly_blender_dig",
             },
             tags = { "multicooker", "multicooker2" },
+            onactivate = function(inst, fromload)
+                inst:AddTag("warly_spicer_dismantle")
+            end,
+            ondeactivate = function(inst)
+                inst:RemoveTag("warly_spicer_dismantle")
+            end,
         },
         warly_blender_dig = {
             title = STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG_TITLE,
