@@ -262,7 +262,7 @@ local function toground(inst)
     if inst.AnimState:IsCurrentAnimation("idle") then
         inst.AnimState:SetFrame(math.random(inst.AnimState:GetCurrentAnimationNumFrames()) - 1)
     end
-    inst:ListenForEvent("animover", function()
+    inst:DoTaskInTime(1 + math.random(), function()
         local x, y, z = inst.Transform:GetWorldPosition()
         local fx = SpawnPrefab("improv_cookpot_fx")
         if fx and fx.Transform then
@@ -279,7 +279,7 @@ end
 
 local COOKING_POWER_TAGS = { "improv_cooking_power" }
 local function OnDropped(inst)
-    if inst.components.stackable ~= nil and inst.components.stackable:IsStack() then
+    if inst and inst:IsValid() and inst.components.stackable ~= nil and inst.components.stackable:IsStack() then
         local x, y, z = inst.Transform:GetWorldPosition()
         local num = 10 - #TheSim:FindEntities(x, y, z, 4, COOKING_POWER_TAGS)
         if num > 0 then

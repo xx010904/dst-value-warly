@@ -565,11 +565,28 @@ AddPrefabPostInit("warly", function(inst)
     end
     -- print("[warly] Adding HandleLeftoversShouldDropFn for cooking power overflow...")
     inst.GetCookingPowerCount = GetCookingPowerCount
-    inst.components.inventory.HandleLeftoversShouldDropFn = HandleLeftoversShouldDropFn
+    -- inst.components.inventory.HandleLeftoversShouldDropFn = HandleLeftoversShouldDropFn
     inst.HandleLeftoversShouldDropFn = HandleLeftoversShouldDropFn
     inst:ListenForEvent("gotnewitem", gotnewitem_fn)
 end)
 
+----使用厨力的文案
+local old_USESPELLBOOK_strfn_improv = ACTIONS.USESPELLBOOK.strfn
+ACTIONS.USESPELLBOOK.strfn = function(act)
+    if act.doer:HasTag("warly_funny_cook_base") and act.invobject:HasTag("improv_cooking_power") then
+        return "IMPROV"
+    else
+        return old_USESPELLBOOK_strfn_improv(act)
+    end
+end
+local old_CLOSESPELLBOOK_strfn_improv = ACTIONS.CLOSESPELLBOOK.strfn
+ACTIONS.CLOSESPELLBOOK.strfn = function(act)
+    if act.doer:HasTag("warly_funny_cook_base") and act.invobject:HasTag("improv_cooking_power") then
+        return "IMPROV"
+    else
+        return old_CLOSESPELLBOOK_strfn_improv(act)
+    end
+end
 
 -- =========================================================
 -- SECTION2 可以右键点击动作“画饼”的锅
