@@ -258,8 +258,8 @@ local function BuildSkillsData(SkillTreeFns)
         -- 改造厨师袋 调味站 研磨器
         -- =============================================================================
         warly_spicepack_upgrade = {
-            title = STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACE_UPGRADE_TITLE,
-            desc = STRINGS.SKILLTREE.WARLY.WARLY_SPICKPACE_UPGRADE_DESC,
+            title = STRINGS.SKILLTREE.WARLY.WARLY_SPICEPACK_UPGRADE_TITLE,
+            desc = STRINGS.SKILLTREE.WARLY.WARLY_SPICEPACK_UPGRADE_DESC,
             icon = "warly_spicepack_upgrade",
             pos = { 60 + 48, 176 },
             group = "multicooker",
@@ -276,8 +276,8 @@ local function BuildSkillsData(SkillTreeFns)
             end,
         },
         warly_spicer_dismantle = {
-            title = STRINGS.SKILLTREE.WARLY.WARLY_SPICKER_DISMANTLE_TITLE,
-            desc = STRINGS.SKILLTREE.WARLY.WARLY_SPICKER_DISMANTLE_DESC,
+            title = STRINGS.SKILLTREE.WARLY.WARLY_SPICER_DISMANTLE_TITLE,
+            desc = STRINGS.SKILLTREE.WARLY.WARLY_SPICER_DISMANTLE_DESC,
             icon = "warly_spicer_dismantle",
             pos = { 60 + 48, 176 - 48 },
             group = "multicooker",

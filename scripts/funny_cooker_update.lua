@@ -173,7 +173,7 @@ end
 -- =========================================================
 -- 抛锅函数
 -- =========================================================
-local function SpawnCookPotFX(chef, idiot, meal)
+local function SpawnCookPotFX(chef, idiot, meal, force_throw)
     if not chef then return end
 
     chef:DoTaskInTime(0.1, function()
@@ -189,7 +189,7 @@ local function SpawnCookPotFX(chef, idiot, meal)
     fx.Follower:FollowSymbol(chef.GUID, "hair", 0, 0, 0)
 
     -- 看看是给抛锅，还是给自己加厨力
-    if GetCookingPowerCount(chef) < TUNING.STACK_SIZE_SMALLITEM then
+    if not force_throw and GetCookingPowerCount(chef) < TUNING.STACK_SIZE_SMALLITEM then
         local improv_cooking_power = SpawnPrefab("improv_cooking_power")
         chef.components.inventory:GiveItem(improv_cooking_power)
     else
@@ -424,7 +424,7 @@ AddPlayerPostInit(function(dead)
                     for i, prefab in ipairs(dishes) do
                         player:DoTaskInTime((i - 1) * 0.25, function()
                             if player:IsValid() and dead:IsValid() then
-                                SpawnCookPotFX(player, dead, prefab)
+                                SpawnCookPotFX(player, dead, prefab, true)
                             end
                         end)
                     end

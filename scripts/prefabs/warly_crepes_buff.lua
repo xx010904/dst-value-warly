@@ -2,8 +2,8 @@ local BUFF_DURATION = 300        -- 5分钟
 local TARGET_SAN_PERCENT = 0.9   -- san目标百分比
 
 -- 每分钟恢复量设定
-local SANITY_RECOVER_COMBAT = 15
-local SANITY_RECOVER_IDLE = 150
+local SANITY_RECOVER_COMBAT = 100
+local SANITY_RECOVER_IDLE = 10
 
 -- 每秒更新一次（包括冷却递减与理智恢复）
 local UPDATE_PERIOD = 1
@@ -52,10 +52,13 @@ local function StartSanityControl(inst, target)
     table.insert(inst._crepes_listeners, { event = "onattackother", fn = onattack_fn, source = target })
 
     -- 每秒任务：递减冷却并按状态恢复理智（但不超过目标百分比上限）
+    -- CD期间其实是战斗期间，就给多的恢复和蜂王冠的效果
     inst._crepes_sanity_control_task = target:DoPeriodicTask(UPDATE_PERIOD, function()
         if not (target and target.components.sanity) then
             return
         end
+
+        local absorb = 0
 
         -- 冷却递减（若>0）
         if inst._crepes_combat_cooldown and inst._crepes_combat_cooldown > 0 then
@@ -63,17 +66,23 @@ local function StartSanityControl(inst, target)
             if inst._crepes_combat_cooldown < 0 then
                 inst._crepes_combat_cooldown = 0
             end
+            -- 获得蜂王帽的反转效果
+            absorb = TUNING.ARMOR_HIVEHAT_SANITY_ABSORPTION
         end
 
         local max_san = target.components.sanity.max * TARGET_SAN_PERCENT
         local cur_san = target.components.sanity.current or 0
 
         if cur_san < max_san then
-            -- 冷却期间恢复较慢，非冷却恢复快
+            -- 冷却期间恢复较快，非冷却恢复慢
             local per_min = (inst._crepes_combat_cooldown and inst._crepes_combat_cooldown > 0) and SANITY_RECOVER_COMBAT or SANITY_RECOVER_IDLE
             local rate_per_sec = per_min / 60
             target.components.sanity.current = math.min(cur_san + rate_per_sec * UPDATE_PERIOD, max_san)
+        else
+            absorb = 0
         end
+
+        target.components.sanity.neg_aura_absorb = absorb
     end, UPDATE_PERIOD)
 end
 
@@ -94,6 +103,9 @@ local function StopSanityControl(inst, target)
     end
     inst._crepes_listeners = nil
     inst._crepes_combat_cooldown = nil
+
+    -- 移除蜂王帽的反转效果
+    target.components.sanity.neg_aura_absorb = 0
 end
 
 local function OnAttached(inst, target)

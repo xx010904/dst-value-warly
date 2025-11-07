@@ -3,7 +3,7 @@ local function OnEaten(inst, eater)
         local skilltreeupdater = eater.components.skilltreeupdater
         -- 判断技能是否激活
         local hasSkill = (skilltreeupdater ~= nil and skilltreeupdater:IsActivated("warly_sky_pie_baked"))
-        if hasSkill then
+        if hasSkill and eater.components.hunger then
             eater.components.hunger:DoDelta(10)
         end
         return true
@@ -49,7 +49,7 @@ local function fn()
     inst.components.edible:SetOnEatenFn(OnEaten)
 
     inst:AddComponent("perishable")
-    inst.components.perishable:SetPerishTime(TUNING.PERISH_MED)
+    inst.components.perishable:SetPerishTime(TUNING.PERISH_SUPERSLOW)
     inst.components.perishable:StartPerishing()
     inst.components.perishable.onperishreplacement = "ash"
 

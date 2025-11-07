@@ -253,8 +253,8 @@ AddAction(USESHADOWHOOK)
 
 
 -- 定义动作选择器
-AddComponentAction("EQUIPPED", "shadowhooktool", function(inst, doer, target, actions, right) -- 兼容海上和对物品触发
-    if doer.prefab == "warly" and doer:HasTag("masterchef") and doer:HasTag("warly_allegiance_shadow") then  -- 技能树控制
+AddComponentAction("EQUIPPED", "shadowhooktool", function(inst, doer, target, actions, right)               -- 兼容海上和对物品触发
+    if doer.prefab == "warly" and doer:HasTag("masterchef") and doer:HasTag("warly_allegiance_shadow") then -- 技能树控制
         -- 先检查inst是否有 finiteuses 且耐久 > 0
         local has_uses = true
         if inst and inst.components.finiteuses then
@@ -269,7 +269,7 @@ AddComponentAction("EQUIPPED", "shadowhooktool", function(inst, doer, target, ac
     end
 end)
 AddComponentAction("POINT", "shadowhooktool", function(inst, doer, pos, actions, right, target)
-    if doer.prefab == "warly" and doer:HasTag("masterchef") and doer:HasTag("warly_allegiance_shadow") then  -- 技能树控制
+    if doer.prefab == "warly" and doer:HasTag("masterchef") and doer:HasTag("warly_allegiance_shadow") then -- 技能树控制
         -- 先检查inst是否有 finiteuses 且耐久 > 0
         local has_uses = true
         if inst and inst.components.finiteuses then
@@ -315,48 +315,51 @@ AddAction("GIVEFOODTOBATTLEAXE", STRINGS.ACTIONS.GIVEFOODTOBATTLEAXE, function(a
     end
 
     -- ✅ 限制只能喂怪物肉
-    if item.components.edible.foodtype ~= FOODTYPE.MEAT
-        or item.components.edible.secondaryfoodtype ~= FOODTYPE.MONSTER
-    then
+    -- if item.components.edible.foodtype ~= FOODTYPE.MEAT
+    --     or item.components.edible.secondaryfoodtype ~= FOODTYPE.MONSTER
+    -- then
+    --     return false
+    -- end
+
+    local hunger = target.components.hunger
+    if not hunger then
         return false
     end
 
-    local hunger_component = target.components.hunger
-    if not hunger_component then
+    -- 每次只喂一个食物
+    local hunger_gain = (item.components.edible and item.components.edible:GetHunger() / 4) or 0
+    if hunger_gain <= 0 then
         return false
     end
 
-    local hunger_missing = hunger_component.max - hunger_component.current
+    local prev = hunger.current
+    local used_to_fill = math.max(0, hunger.max - prev)
 
-    if hunger_missing < 12 and target.level > 1 then
-        return false
-    end
-
-    local hunger_per_food = item.components.edible:GetHunger() / 4
-
-    if hunger_per_food <= 0 then
-        return false
-    end
-
-    local stack_size = (item.components.stackable and item.components.stackable:StackSize()) or 1
-
-    -- 计算需要消耗多少个食物来喂满
-    local needed_food_count = math.ceil(hunger_missing / hunger_per_food)
-    local actual_food_count = math.max(1, math.min(needed_food_count, stack_size)) -- 至少1个
-    local total_hunger_delta = actual_food_count * hunger_per_food
-
-    -- 消耗食物
+    -- 移除食物
     if item.components.stackable then
-        item.components.stackable:Get(actual_food_count):Remove()
+        item.components.stackable:Get(1):Remove()
     else
         item:Remove()
     end
 
     -- 增加饥饿值
-    hunger_component:DoDelta(total_hunger_delta)
+    hunger:DoDelta(hunger_gain)
+
+    -- 如果吃饱了，计算溢出饱食度转为耐久
+    if used_to_fill < hunger_gain then
+        local overflow = math.max(0, hunger_gain - used_to_fill)
+
+        if overflow > 0 and target.components.finiteuses then
+            -- 多余饱食度 → 耐久
+            local current = target.components.finiteuses:GetUses()
+            local max_uses = target.components.finiteuses.total
+            target.components.finiteuses:SetUses(math.min(max_uses, current + overflow))
+        end
+    end
+
 
     -- 显示饥饿度
-    local hunger_percent = hunger_component:GetPercent() * 100
+    local hunger_percent = hunger:GetPercent() * 100
 
     if target._classified then
         local list = STRINGS.SHADOW_BATTLEAXE_TALK["feed_up"]

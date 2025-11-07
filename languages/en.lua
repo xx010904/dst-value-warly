@@ -11,7 +11,7 @@ STRINGS.SKILLTREE.WARLY.WARLY_BONESOUP_BUFF_TITLE = "Eat Alone I"
 STRINGS.SKILLTREE.WARLY.WARLY_BONESOUP_BUFF_DESC = "Warly can taste the protection of the bone ancestors from the 「Bone Bouillon」."
 
 STRINGS.SKILLTREE.WARLY.WARLY_CREPES_BUFF_TITLE = "Eat Alone II"
-STRINGS.SKILLTREE.WARLY.WARLY_CREPES_BUFF_DESC = "The sweet and rich flavor of 「Fresh Fruit Crepes」 keeps Warly constantly spirited."
+STRINGS.SKILLTREE.WARLY.WARLY_CREPES_BUFF_DESC = "The super sweetness of 「Fresh Fruit Crepes」 makes Warly extremely excited in battle."
 
 STRINGS.SKILLTREE.WARLY.WARLY_POTATO_BUFF_TITLE = "Eat Alone III"
 STRINGS.SKILLTREE.WARLY.WARLY_POTATO_BUFF_DESC = "Even Warly, after eating 「Puffed Potato Soufflé」, finds his mind taken over by potatoes, attacking instead of thinking."
@@ -50,13 +50,13 @@ STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_MEMORY_DESC = "The true delicious d
 
 -- Pie In The Sky
 STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_POT_TITLE = "Pie In The Sky"
-STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_POT_DESC = "Warly only needs to shake his portable pot near friends to temporarily satisfy all their needs, but this false energy will gradually fade."
+STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_POT_DESC = "Warly only needs to use his Portable Crock Pot to showcase his culinary skills to fully satisfy his friends. However, this false sense of satisfaction will gradually fade away."
 
 STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_MAKE_TITLE = "Handmade Pie"
-STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_MAKE_DESC = "Warly can cost sanity to make pies, which, when eaten, will also make friends completely satisfied."
+STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_MAKE_DESC = "Warly can consume sanity to create a physical pie, and eating the pie can also fully empower him."
 
 STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_BAKED_TITLE = "Dense Baked Pie"
-STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_BAKED_DESC = "Warly can put the pie on the fire to bake it, resulting in a Dense Baked Pie that can truly fill the stomach."
+STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_BAKED_DESC = "Warly can bake pies over fire to make Dense Baked Pies that he himself never gets tired of eating, and are extremely durable for storage."
 
 STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_FAVORITE_TITLE = "Dream Dish"
 STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_FAVORITE_DESC = "Warly's magical cooking can turn the pie into the favorite food of his friends(or Crabby Hermit), and his own beloved Void Sky Pie."
@@ -71,20 +71,15 @@ STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_FLUNG_DESC = "When the pot reaches its li
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_SCAPEGOAT_TITLE = "Scapegoat"
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_SCAPEGOAT_DESC = "While carrying stacked pots, Warly has a chance to summon a scapegoat to take damage when attacked, and gaining more loot upon their defeat."
 
--- Chef Pouch
+-- Spice Handling: Chef Pouch, Portable Seasoning Station, Portable Grinding Mill
 STRINGS.SKILLTREE.WARLY.WARLY_SPICEPACK_UPGRADE_TITLE = "Spice Pack"
-STRINGS.SKILLTREE.WARLY.WARLY_SPICEPACK_UPGRADE_DESC = "Warly can use spices to add flavor to his Chef Pouch, granting it various practical functions. The more seasoned dishes placed in the Chef Pouch, the more comfortable and mentally refreshed Warly feels."
+STRINGS.SKILLTREE.WARLY.WARLY_SPICEPACK_UPGRADE_DESC = "Warly can use spices to add new functions to his Chef Pouch; the more seasoned dishes in the pouch, the more sanity he recovers."
 
--- Spicer
-STRINGS.SKILLTREE.WARLY.WARLY_SPICKER_DISMANTLE_TITLE = "Spice Dismantler"
-STRINGS.SKILLTREE.WARLY.WARLY_SPICKER_DISMANTLE_DESC = "Warly can use his Portable Spicer to dismantle seasoned food, obtaining the original food and spices."
+STRINGS.SKILLTREE.WARLY.WARLY_SPICER_DISMANTLE_TITLE = "Spice Dismantler"
+STRINGS.SKILLTREE.WARLY.WARLY_SPICER_DISMANTLE_DESC = "Warly can use his Portable Seasoning Station to dismantle seasoned food, obtaining the original food and spices."
 
--- Blander
-STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG_TITLE = "Reliable Blender"
-STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG_DESC = "Warly's Portable Grinding Mill can grind the ground to obtain spices."
-
-STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG2_TITLE = "Little Ground Mover"
-STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG2_DESC = "Warly can use his Portable Grinding Mill to dig up more ground, increasing the chance of obtaining rare spices."
+STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG_TITLE = "Spice Digger"
+STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG_DESC = "Warly's trusty Portable Grinding Mill can dig the ground to obtain spices."
 
 -- Fast Foodie
 STRINGS.SKILLTREE.WARLY.WARLY_COOKER_FASTER_1_LOCK_DESC = "Learn 3 Multicooker skills to unlock."

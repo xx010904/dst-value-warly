@@ -191,7 +191,7 @@ local function fn()
     inst.components.inventoryitem.atlasname = "images/inventoryimages/warly_sky_pie_boomerang.xml"
 
     inst:AddComponent("perishable")
-    inst.components.perishable:SetPerishTime(TUNING.PERISH_MED)
+    inst.components.perishable:SetPerishTime(TUNING.PERISH_SUPERSLOW)
     inst.components.perishable:StartPerishing()
     inst.components.perishable.onperishreplacement = "spoiled_food"
 
