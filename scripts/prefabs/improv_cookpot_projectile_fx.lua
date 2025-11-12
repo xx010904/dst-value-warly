@@ -65,6 +65,15 @@ local function GetUnmemorizedFoods(inst)
 end
 
 local function OnThrown(inst)
+    -- 附着锅特效
+    local fx = SpawnPrefab("warly_sky_pie_cook_fx") -- 借用一下
+    fx.AnimState:PlayAnimation("idle_ground")
+    local scale = 0.55
+    fx.Transform:SetScale(scale, scale, scale)
+    fx.AnimState:SetMultColour(1, 1, 1, 0.9)
+    fx.entity:SetParent(inst.entity)
+    fx.AnimState:SetSortOrder(3)
+    -- 开始动画
     inst.AnimState:PlayAnimation("projectile_loop")
     inst.AnimState:PushAnimation("idle_loop", true)
 	inst:DoTaskInTime(1*FRAMES, function()
@@ -145,6 +154,9 @@ local function fn()
     inst.AnimState:SetLightOverride(1)
     local scale = 1.66
     inst.Transform:SetScale(scale, scale, scale)
+
+    inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+    inst.AnimState:SetFinalOffset(3)
 
 	inst:AddTag("projectile")
 	inst:AddTag("complexprojectile")

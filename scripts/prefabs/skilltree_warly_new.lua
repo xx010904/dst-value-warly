@@ -100,7 +100,7 @@ local function BuildSkillsData(SkillTreeFns)
             tags = { "chef", "chef1" },
             root = true,
             connects = {
-                "warly_funny_cook_feast"
+                "warly_funny_cook_spice"
             },
             onactivate = function(inst, fromload)
                 inst:AddTag("warly_funny_cook_base")
@@ -109,24 +109,25 @@ local function BuildSkillsData(SkillTreeFns)
                 inst:RemoveTag("warly_funny_cook_base")
             end,
         },
-        warly_funny_cook_feast = {
-            title = STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_FEAST_TITLE,
-            desc = STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_FEAST_DESC,
-            icon = "warly_funny_cook_feast",
-            pos = { -59 + 42, 176 - 43 },
-            group = "chef",
-            tags = { "chef", "chef1" },
-            connects = {
-                "warly_funny_cook_spice",
-            },
-        },
         warly_funny_cook_spice = {
             title = STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_SPICE_TITLE,
             desc = STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_SPICE_DESC,
             icon = "warly_funny_cook_spice",
+            pos = { -59 + 42, 176 - 43 },
+            group = "chef",
+            tags = { "chef", "chef1" },
+            connects = {
+                "warly_funny_cook_feast",
+            },
+        },
+        warly_funny_cook_feast = {
+            title = STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_FEAST_TITLE,
+            desc = STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_FEAST_DESC,
+            icon = "warly_funny_cook_feast",
             pos = { -59 + 42, 176 - 86 },
             group = "chef",
             tags = { "chef", "chef1" },
+            defaultfocus = true,
         },
         -- =============================================================================
         -- 真香警告

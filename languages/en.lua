@@ -20,10 +20,10 @@ STRINGS.SKILLTREE.WARLY.WARLY_SEAFOOD_BUFF_TITLE = "Eat Alone IV"
 STRINGS.SKILLTREE.WARLY.WARLY_SEAFOOD_BUFF_DESC = "The slippery texture of 「Moqueca」 allows Warly to run faster the more dangerous the situation he encounters."
 
 -- Share Food
-STRINGS.SKILLTREE.WARLY.WARLY_MONSTERTARTARE_BUFF_TITLE = "Share Food I"
+STRINGS.SKILLTREE.WARLY.WARLY_MONSTERTARTARE_BUFF_TITLE = "Not Eat Alone I"
 STRINGS.SKILLTREE.WARLY.WARLY_MONSTERTARTARE_BUFF_DESC = "Warly doesn't always eat alone; he's happy to share his Monster Tartare」 with his Pigman friends."
 
-STRINGS.SKILLTREE.WARLY.WARLY_SHARE_BUFF_TITLE = "Share Food II"
+STRINGS.SKILLTREE.WARLY.WARLY_SHARE_BUFF_TITLE = "Not Eat Alone II"
 STRINGS.SKILLTREE.WARLY.WARLY_SHARE_BUFF_DESC = "The general effects Warly gains from tasting meals can be shared with nearby friends, including Pigman friends."
 
 STRINGS.SKILLTREE.WARLY.WARLY_GOURMET_1_LOCK_DESC = "Learn 2 Gourmet skills to unlock."
@@ -32,11 +32,11 @@ STRINGS.SKILLTREE.WARLY.WARLY_GOURMET_1_LOCK_DESC = "Learn 2 Gourmet skills to u
 STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_BASE_TITLE = "Meal-worthy Play"
 STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_BASE_DESC = "When Warly sees a Meal-worthy Play (noob move), he can't help but immediately cook a dish to go with it."
 
-STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_FEAST_TITLE = "The Feast"
-STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_FEAST_DESC = "When a friend — or Warly himself — dies, Warly will immediately start the feast, cooking four dishes and a soup."
-
-STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_SPICE_TITLE = "Extra Flavor"
+STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_SPICE_TITLE = "Exaggerate"
 STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_SPICE_DESC = "Warly may improvise by adding a seasoning to the dishes cooked for Meal-worthy Play."
+
+STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_FEAST_TITLE = "The Feast"
+STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_FEAST_DESC = "When a survivor nearby dies, Warly will immediately start the feast, cooking four dishes and a soup. Warly can use Cooking Power to revive himself."
 
 -- True Delicious
 STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_DESK_TITLE = "True Delicious Warning"
@@ -105,9 +105,10 @@ STRINGS.NAMES.SCAPEGOAT = "Scapegoat"
 STRINGS.NAMES.SHADOW_BATTLEAXE_YOUNG = "Half-Baked Shadow Maul"
 STRINGS.NAMES.WARLY_SKY_PIE = "Pie In The Sky"
 STRINGS.NAMES.WARLY_SKY_PIE_BAKED = "Dense Baked Pie"
-STRINGS.NAMES.WARLY_SKY_PIE_BOOMERANG = "Void Sky Pie"
+STRINGS.NAMES.WARLY_SKY_PIE_BOOMERANG = "Clean and Hygienic Sky Pie"
 STRINGS.NAMES.DECOR_FOOD = "Mystery Meal"
 STRINGS.NAMES.IMPROV_INSPIRATION = "Cooking Power"
+STRINGS.NAMES.NOOB_CHICKEN = "Noob Chicken"
 
 STRINGS.RECIPE_DESC.ARMOR_CROCKPOT = "Blacken your pot, so you can take the blame."
 STRINGS.RECIPE_DESC.SHADOW_BATTLEAXE_YOUNG = "It will never wake up again."

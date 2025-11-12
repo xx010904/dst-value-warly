@@ -435,6 +435,47 @@ AddPlayerPostInit(function(dead)
 end)
 
 -- =========================================================
+-- 厨力复活
+-- =========================================================
+AddPlayerPostInit(function(dead)
+    if not TheWorld.ismastersim then
+        return
+    end
+
+    -- 监听玩家死亡事件
+    dead:ListenForEvent("death", function(inst, data)
+        -- 技能树控制
+        local hasSkill = dead.components.skilltreeupdater and
+            dead.components.skilltreeupdater:IsActivated("warly_funny_cook_feast")
+        if hasSkill then
+			local cookingPower = inst.components.inventory:FindItem(IsCookingPower)
+            -- print("找到身上有多少厨力")
+			if cookingPower then
+                local stack_size = GetStackSize(cookingPower)
+                -- print("找到身上有多少厨力", stack_size)
+                cookingPower:Remove()
+                dead:DoTaskInTime(2.1, function()
+                    if not dead or not dead:IsValid() or not dead:HasTag("playerghost") then return end
+                    if stack_size <= 0 then return end
+                    if dead.components.inventory == nil then return end
+                    dead:PushEvent("respawnfromghost", { user = cookingPower })
+                    dead:DoTaskInTime(1.3, function()
+                        if dead and dead:IsValid() and not dead:HasTag("playerghost") then
+                            dead:AddDebuff("warly_noob_debuff", "warly_noob_debuff")
+                            local debuff = dead:GetDebuff("warly_noob_debuff")
+                            if debuff and debuff.components.timer then
+                                local left = debuff.components.timer:GetTimeLeft("expire")
+                                debuff.components.timer:SetTimeLeft("expire", left - stack_size)
+                            end
+                        end
+                    end)
+                end)
+			end
+		end
+    end, dead)
+end)
+
+-- =========================================================
 -- cooking power上限溢出处理
 -- =========================================================
 

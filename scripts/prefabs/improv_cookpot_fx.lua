@@ -42,6 +42,9 @@ local function fn()
     inst.AnimState:SetFinalOffset(2)
     inst.AnimState:SetMultColour(1, 1, 1, 0.9)
 
+    inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+    inst.AnimState:SetFinalOffset(3)
+
     MakeCharacterPhysics(inst, 1000, 0.75)
 
     inst:AddTag("improv_cookpot_fx")

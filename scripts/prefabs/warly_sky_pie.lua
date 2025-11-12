@@ -159,8 +159,9 @@ local function MakeSpicedFood(inst, cooker, chef)
                     local target = targets[math.random(#targets)]
                     local spiced_best_food = "warly_sky_pie_baked"
 
-                    -- ping个问号❓
+                    -- ping个感叹号❗
                     local idiotMark = SpawnPrefab("improv_question_mark_fx")
+                    idiotMark.AnimState:PlayAnimation("idle2", true)
                     idiotMark.entity:SetParent(target.entity)
                     idiotMark.Transform:SetPosition(0, 3, 0)
 

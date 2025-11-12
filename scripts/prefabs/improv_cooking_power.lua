@@ -141,13 +141,13 @@ local SKILLTREE_SPELL_DEFS = {
             end
         end,
         execute = StartAOETargeting,
-        bank = "spell_icons_willow",
-        build = "spell_icons_willow",
+        bank = "spell_icons_warly",
+        build = "spell_icons_warly",
         anims =
         {
-            idle = { anim = "fire_burst" },
-            focus = { anim = "fire_burst_focus", loop = true },
-            down = { anim = "fire_burst_pressed" },
+            idle = { anim = "random" },
+            focus = { anim = "random_focus", loop = true },
+            down = { anim = "random_pressed" },
         },
         widget_scale = ICON_SCALE,
     },
@@ -174,13 +174,13 @@ local SKILLTREE_SPELL_DEFS = {
             end
         end,
         execute = StartAOETargeting,
-        bank = "spell_icons_willow",
-        build = "spell_icons_willow",
+        bank = "spell_icons_warly",
+        build = "spell_icons_warly",
         anims =
         {
-            idle = { anim = "fire_burst" },
-            focus = { anim = "fire_burst_focus", loop = true },
-            down = { anim = "fire_burst_pressed" },
+            idle = { anim = "hunger_prefer" },
+            focus = { anim = "hunger_prefer_focus", loop = true },
+            down = { anim = "hunger_prefer_pressed" },
         },
         widget_scale = ICON_SCALE,
     },
@@ -207,13 +207,13 @@ local SKILLTREE_SPELL_DEFS = {
             end
         end,
         execute = StartAOETargeting,
-        bank = "spell_icons_willow",
-        build = "spell_icons_willow",
+        bank = "spell_icons_warly",
+        build = "spell_icons_warly",
         anims =
         {
-            idle = { anim = "fire_burst" },
-            focus = { anim = "fire_burst_focus", loop = true },
-            down = { anim = "fire_burst_pressed" },
+            idle = { anim = "health_prefer" },
+            focus = { anim = "health_prefer_focus", loop = true },
+            down = { anim = "health_prefer_pressed" },
         },
         widget_scale = ICON_SCALE,
     },
@@ -240,13 +240,13 @@ local SKILLTREE_SPELL_DEFS = {
             end
         end,
         execute = StartAOETargeting,
-        bank = "spell_icons_willow",
-        build = "spell_icons_willow",
+        bank = "spell_icons_warly",
+        build = "spell_icons_warly",
         anims =
         {
-            idle = { anim = "fire_burst" },
-            focus = { anim = "fire_burst_focus", loop = true },
-            down = { anim = "fire_burst_pressed" },
+            idle = { anim = "sanity_prefer" },
+            focus = { anim = "sanity_prefer_focus", loop = true },
+            down = { anim = "sanity_prefer_pressed" },
         },
         widget_scale = ICON_SCALE,
     },

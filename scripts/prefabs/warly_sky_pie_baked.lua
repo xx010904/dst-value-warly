@@ -5,6 +5,14 @@ local function OnEaten(inst, eater)
         local hasSkill = (skilltreeupdater ~= nil and skilltreeupdater:IsActivated("warly_sky_pie_baked"))
         if hasSkill and eater.components.hunger then
             eater.components.hunger:DoDelta(10)
+            eater:DoTaskInTime(0, function()
+                if eater and eater.components.foodmemory then
+                    local foods = eater.components.foodmemory.foods
+                    if foods["warly_sky_pie_baked"] then
+                        foods["warly_sky_pie_baked"] = nil
+                    end
+                end
+            end)
         end
         return true
     end
