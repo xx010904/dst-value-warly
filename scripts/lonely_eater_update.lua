@@ -7,7 +7,7 @@
 -- 4 蓬松土豆蛋奶酥：获得5分钟攻击力加成（200以上两倍，50-200线性变化，50以下1倍）
 
 -- Section 2：分享食物 Share Food
--- 5.1 怪物鞑靼：同时雇佣3个猪人，变疯猪属性，会挖矿，不贪吃，不怕黑。也能吃到怪物鞑靼的调味料
+-- 5.1 怪物鞑靼：同时雇佣3个猪人，变疯猪属性，会挖矿，不贪吃，不怕黑，不会恐惧，不怕烧。也能吃到怪物鞑靼的调味料
 -- 5.2 沃利吃东西时，分享料理和调味料的buff给所有雇佣的猪人，以及附近的玩家
 
 --========================================================
@@ -177,49 +177,51 @@ local function HireNearbyPigmen(inst, giver, item)
     local count = 0
     for _, pig in ipairs(ents) do
         if pig ~= inst and pig:IsValid() and pig.components.follower ~= nil and pig.components.combat ~= nil then
-            -- 避免重复雇佣同一个领导者
-            if giver.components.leader ~= nil and pig.components.follower.leader ~= giver then
-                giver:PushEvent("makefriend")
-                giver.components.leader:AddFollower(pig)
-                pig.components.follower:AddLoyaltyTime(TUNING.PIG_LOYALTY_MAXTIME)
-                pig.components.combat:SetTarget(nil)
+            -- 避免重复雇佣其他领导者的猪人
+            if pig.components.follower.leader == nil or pig.components.follower.leader == giver then
+                if giver.components.leader ~= nil then
+                    giver:PushEvent("makefriend")
+                    giver.components.leader:AddFollower(pig)
+                    pig.components.follower:AddLoyaltyTime(TUNING.PIG_LOYALTY_MAXTIME)
+                    pig.components.combat:SetTarget(nil)
 
-                -- 拍手欢呼动画
-                if pig.sg ~= nil and pig.sg:HasState("abandon") then
-                    pig.sg:GoToState("abandon")
-                end
+                    -- 拍手欢呼动画
+                    if pig.sg ~= nil and pig.sg:HasState("cheer") then
+                        pig.sg:GoToState("cheer")
+                    end
 
-                -- 发出猪叫声
-                pig.SoundEmitter:PlaySound("dontstarve/pig/oink")
+                    -- 发出猪叫声
+                    pig.SoundEmitter:PlaySound("dontstarve/pig/oink")
 
-                -- 为了增加怪物鞑靼的调味料buff
-                if pig.components.eater ~= nil then
-                    local dummy = SpawnPrefab(item.prefab)
-                    if dummy then
-                        -- 属性归零，不增加血量/饥饿/精神
-                        if dummy.components.edible ~= nil then
-                            dummy.components.edible.healthvalue = 0
-                            dummy.components.edible.hungervalue = 0
-                            dummy.components.edible.sanityvalue = 0
-                            dummy.components.edible.foodtype = FOODTYPE.GENERIC
-                            dummy:AddTag("dummyfood")
-                            local success = pig.components.eater:Eat(dummy)
-                            if not success then
-                                dummy:Remove()
+                    -- 为了增加怪物鞑靼的调味料buff
+                    if pig.components.eater ~= nil then
+                        local dummy = SpawnPrefab(item.prefab)
+                        if dummy then
+                            -- 属性归零，不增加血量/饥饿/精神
+                            if dummy.components.edible ~= nil then
+                                dummy.components.edible.healthvalue = 0
+                                dummy.components.edible.hungervalue = 0
+                                dummy.components.edible.sanityvalue = 0
+                                dummy.components.edible.foodtype = FOODTYPE.GENERIC
+                                dummy:AddTag("dummyfood")
+                                local success = pig.components.eater:Eat(dummy)
+                                if not success then
+                                    dummy:Remove()
+                                end
                             end
                         end
                     end
-                end
 
-                -- ======= 变成疯猪逻辑 =======
-                if pig.components.health ~= nil then
-                    pig.components.health:SetPercent(1)
-                end
-                changeWere(pig)
-                -- ==========================
-                count = count + 1
-                if count >= 1 then -- 额外雇佣2只
-                    break
+                    -- ======= 变成疯猪逻辑 =======
+                    if pig.components.health ~= nil then
+                        pig.components.health:SetPercent(1)
+                    end
+                    changeWere(pig)
+                    -- ==========================
+                    count = count + 1
+                    if count >= 2 then -- 额外雇佣2只
+                        break
+                    end
                 end
             end
         end
@@ -228,7 +230,7 @@ local function HireNearbyPigmen(inst, giver, item)
     -- 中心猪人（被喂食者）播放强化特效
     inst.SoundEmitter:PlaySound("dontstarve/common/fireAddFuel")
     if inst.sg ~= nil and inst.sg:HasState("abandon") then
-        inst.sg:GoToState("abandon")
+        inst.sg:GoToState("cheer")
     end
 
     if item then

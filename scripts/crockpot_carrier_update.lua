@@ -1,9 +1,8 @@
 -- 炊具改装 (解决回血困难)
 -- Section 1：背锅侠 Crockpot Carrier
--- 1 制作黑锅：100%承受伤害，666耐久，额外受到10%精神损失10%饥饿损失，分锅摆6个锅
--- 2 100%附近队友伤害转移
--- 3.1 概率产生替罪羊 3.2 解羊：屠杀额外掉落
--- 4.1 6个方向甩锅 4.2 二段跳炸锅（摔坏了就没有二段炸了啊）
+-- 1 制作黑锅：100%承受伤害，666耐久，额外受到10%精神损失10%饥饿损失，100%附近队友伤害转移。分锅摆6个锅
+-- 2 甩锅6个方向 二段跳炸锅
+-- 3 概率产生替罪羊 屠杀额外掉落
 
 -- Section 2：改造厨师包 便携研磨器 便携香料站
 -- 1.1 料理升级厨师袋，咸加保鲜度，甜加移速，辣加保暖，蒜香加防水防沙
@@ -330,7 +329,7 @@ local function OnLoad(inst, data)
                 inst:AddComponent("insulator")
             end
             inst.components.insulator:SetWinter()
-            inst.components.insulator:SetInsulation(data.insulation or TUNING.INSULATION_LARGE)
+            inst.components.insulator:SetInsulation(data.insulation or TUNING.INSULATION_LARGE * 2)
 
             -- 恢复蒜粉防水防沙
         elseif inst._spice_upgrade == "spice_garlic" then
@@ -344,14 +343,14 @@ local function OnLoad(inst, data)
             if inst.components.preserver == nil then
                 inst:AddComponent("preserver")
             end
-            inst.components.preserver:SetPerishRateMultiplier(data.preserver_mult or TUNING.PERISH_SALTBOX_MULT)
+            inst.components.preserver:SetPerishRateMultiplier(data.preserver_mult or TUNING.BEARGERFUR_SACK_PRESERVER_RATE)
 
             -- 恢复甜加移速
         elseif inst._spice_upgrade == "spice_sugar" then
             if inst.components.equippable == nil then
                 inst:AddComponent("equippable")
             end
-            inst.components.equippable.walkspeedmult = data.walkspeedmult or 1.2
+            inst.components.equippable.walkspeedmult = data.walkspeedmult or 1.25
         end
 
         -- 恢复 perishable
@@ -551,7 +550,7 @@ local function UpgradeSpicePack(inst, doer, spice_type)
         if inst.components.equippable == nil then
             inst:AddComponent("equippable")
         end
-        inst.components.equippable.walkspeedmult = 1.2
+        inst.components.equippable.walkspeedmult = 1.25
         inst._spice_upgrade = "spice_sugar"
     end
 
@@ -791,10 +790,14 @@ local USE_SPICE_CONVERT = AddAction("USE_SPICE_CONVERT", STRINGS.ACTIONS.USE_SPI
     if target and target.components.edible and target.components.edible.spice then
         local base = target.food_basename
         local spice = target.components.edible.spice
+        local freshness = target.components.perishable and target.components.perishable:GetPercent() or 1
 
         if base and spice then
             local new_food = SpawnPrefab(base)
             if new_food then
+                if new_food.components.perishable then
+                    new_food.components.perishable:SetPercent(freshness)
+                end
                 doer.components.inventory:GiveItem(new_food)
 
                 local new_spice = SpawnPrefab(spice)

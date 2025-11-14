@@ -48,18 +48,18 @@ local function OnAttached(inst, target)
 
     if is_boss then
         -- Boss：轻微减速、轻微削弱
-        slow_mult = 0.55
-        damage_mult = 0.25
+        slow_mult = 0.66
+        damage_mult = 0.75
         duration = 12
     elseif is_animal then
         -- Animal：更强debuff（例如几乎动不了、攻击力更低）
-        slow_mult = 0.15      -- 速度削
-        damage_mult = 0.25    -- 攻击力削
+        slow_mult = 0.22      -- 速度削
+        damage_mult = 0.75    -- 攻击力削
         duration = 36         -- 多持续一点
     else
         -- 其他生物
-        slow_mult = 0.35
-        damage_mult = 0.25
+        slow_mult = 0.44
+        damage_mult = 0.75
         duration = 24
     end
 

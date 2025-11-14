@@ -249,6 +249,49 @@ local function OnLoad(inst, data)
     end
 end
 
+local function InitName(inst)
+    local realName = STRINGS.NAMES.DECOR_FOOD or "Food Decoration"
+
+    if inst.mimic_food then
+        if inst.spicename then
+            local spice_key = string.upper(inst.spicename .. "_FOOD")
+            local food_key = string.upper(inst.food_basename or inst.mimic_food)
+
+            local spice_str = STRINGS.NAMES[spice_key]
+            local food_str = STRINGS.NAMES[food_key]
+
+            -- 防止 nil
+            if not spice_str then
+                -- print("[SetName] 警告: 找不到调料字符串", spice_key)
+                spice_str = spice_key
+            end
+            if not food_str then
+                -- print("[SetName] 警告: 找不到食物字符串", food_key)
+                food_str = food_key
+            end
+
+            realName = subfmt(spice_str, { food = food_str })
+            -- print("[SetName] 设置自定义名字（有调料）", realName)
+
+        else
+            local food_key = string.upper(inst.mimic_food)
+            local food_str = STRINGS.NAMES[food_key] or inst.mimic_food
+            realName = food_str
+            -- print("[SetName] 设置自定义名字（无调料）", realName)
+        end
+        -- 补上次数
+        if inst.uses_left and inst.uses_left > 1 then
+            realName = realName .. "(" .. inst.uses_left .. ")"
+        end
+    else
+        print("[SetName] mimic_food 为 nil，使用默认名字", realName)
+    end
+
+    if inst.components.named then
+        inst.components.named:SetName(realName)
+    end
+end
+
 local function Initial(inst)
     -- ✅初始化绑定的桌子
     local x, y, z = inst.Transform:GetWorldPosition()
@@ -277,61 +320,25 @@ local function Initial(inst)
         return
     end
 
-
     -- ✅初始化名字
-    local realName = STRINGS.NAMES.DECOR_FOOD or "Food Decoration"
+    InitName(inst)
 
+    -- ✅同时设置外观
     if inst.mimic_food then
         if inst.spicename then
-            local spice_key = string.upper(inst.spicename .. "_FOOD")
-            local food_key = string.upper(inst.food_basename or inst.mimic_food)
-
-            local spice_str = STRINGS.NAMES[spice_key]
-            local food_str = STRINGS.NAMES[food_key]
-
-            -- 防止 nil
-            if not spice_str then
-                -- print("[SetName] 警告: 找不到调料字符串", spice_key)
-                spice_str = spice_key
-            end
-            if not food_str then
-                -- print("[SetName] 警告: 找不到食物字符串", food_key)
-                food_str = food_key
-            end
-
-            realName = subfmt(spice_str, { food = food_str })
-            -- print("[SetName] 设置自定义名字（有调料）", realName)
-
-            ---- 同时设置外观
             inst.AnimState:SetBuild("plate_food")
             inst.AnimState:SetBank("plate_food")
             inst.AnimState:OverrideSymbol("swap_garnish", "spices", inst.spicename)
             inst:AddTag("spicedfood")
         else
-            local food_key = string.upper(inst.mimic_food)
-            local food_str = STRINGS.NAMES[food_key] or inst.mimic_food
-            realName = food_str
-            -- print("[SetName] 设置自定义名字（无调料）", realName)
-
-            ---- 同时设置外观
             inst.AnimState:SetBuild(inst.food_symbol_build or "cook_pot_food")
             inst.AnimState:SetBank("cook_pot_food")
         end
-        -- 补上次数
-        if inst.uses_left and inst.uses_left > 1 then
-            realName = realName .. "(" .. inst.uses_left .. ")"
-        end
-    else
-        print("[SetName] mimic_food 为 nil，使用默认名字", realName)
     end
-
-    if inst.components.named then
-        inst.components.named:SetName(realName)
-    end
-
-    -- ✅同时设置外观
     inst.AnimState:OverrideSymbol("swap_food", inst.food_symbol_build or "cook_pot_food",
         inst.food_basename or inst.mimic_food)
+
+    -- 播放特效
     if inst.restore_skill then
         SpawnPrefab("carnival_sparkle_fx").Transform:SetPosition(inst.Transform:GetWorldPosition())
     end
@@ -346,6 +353,7 @@ local function fn()
     inst.entity:AddAnimState()
     inst.entity:AddFollower()
     inst.entity:AddNetwork()
+    inst.entity:AddSoundEmitter()
 
     MakeInventoryPhysics(inst)
 
@@ -404,6 +412,8 @@ local function fn()
     inst:ListenForEvent("ondropped", OnDropped)
 
     inst:DoTaskInTime(0, Initial)
+
+    inst.InitName = InitName
 
     inst.OnSave = OnSave
     inst.OnLoad = OnLoad

@@ -30,7 +30,7 @@ STRINGS.SKILLTREE.WARLY.WARLY_GOURMET_1_LOCK_DESC = "Learn 2 Gourmet skills to u
 
 -- Meal-worthy Play
 STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_BASE_TITLE = "Meal-worthy Play"
-STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_BASE_DESC = "When Warly sees a Meal-worthy Play (noob move), he can't help but immediately cook a dish to go with it."
+STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_BASE_DESC = "When Warly sees a Meal-worthy Play (noob move), he's shocked, anger-satiated, blood pressure spiking—he immediately cook a dish to go with it."
 
 STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_SPICE_TITLE = "Exaggerate"
 STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_SPICE_DESC = "Warly may improvise by adding a seasoning to the dishes cooked for Meal-worthy Play."
@@ -75,14 +75,14 @@ STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_SCAPEGOAT_DESC = "While carrying stacked 
 STRINGS.SKILLTREE.WARLY.WARLY_SPICEPACK_UPGRADE_TITLE = "Spice Pack"
 STRINGS.SKILLTREE.WARLY.WARLY_SPICEPACK_UPGRADE_DESC = "Warly can use spices to add new functions to his Chef Pouch; the more seasoned dishes in the pouch, the more sanity he recovers."
 
-STRINGS.SKILLTREE.WARLY.WARLY_SPICER_DISMANTLE_TITLE = "Spice Dismantler"
+STRINGS.SKILLTREE.WARLY.WARLY_SPICER_DISMANTLE_TITLE = "Spice Extractor"
 STRINGS.SKILLTREE.WARLY.WARLY_SPICER_DISMANTLE_DESC = "Warly can use his Portable Seasoning Station to dismantle seasoned food, obtaining the original food and spices."
 
-STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG_TITLE = "Spice Digger"
+STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG_TITLE = "Spice Detector"
 STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG_DESC = "Warly's trusty Portable Grinding Mill can dig the ground to obtain spices."
 
 -- Fast Foodie
-STRINGS.SKILLTREE.WARLY.WARLY_COOKER_FASTER_1_LOCK_DESC = "Learn 3 Multicooker skills to unlock."
+STRINGS.SKILLTREE.WARLY.WARLY_COOKER_FASTER_1_LOCK_DESC = "Learn 4 Multicooker skills to unlock."
 
 STRINGS.SKILLTREE.WARLY.WARLY_COOKER_FASTER_TITLE = "Fast Foodie"
 STRINGS.SKILLTREE.WARLY.WARLY_COOKER_FASTER_DESC = "Warly can quickly use portable cooking tools and can also serve dishes faster."
@@ -257,6 +257,7 @@ STRINGS.ACTIONS.USESHADOWHOOK = "Shadow Hook"
 STRINGS.ACTIONS.GIVEFOODTOBATTLEAXE = "Breed"
 STRINGS.ACTIONS.ACTIVATE_POT_PIE = "Inspire Pie"
 STRINGS.ACTIONS.PLACE_FOOD_ON_TABLE = "Plate"
+STRINGS.ACTIONS.STACK_DECOR_FOOD = "Stack"
 STRINGS.ACTIONS.SPICEPACK_UPGRADE = "Spice"
 STRINGS.ACTIONS.PICKUP.DECOR_FOOD = "Savor"
 STRINGS.ACTIONS.PASS_THE_POT = "Pass Pot"

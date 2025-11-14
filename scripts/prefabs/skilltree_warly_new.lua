@@ -317,7 +317,7 @@ local function BuildSkillsData(SkillTreeFns)
             tags = { "gourmet", "lock" },
             root = true,
             lock_open = function(prefabname, activatedskills, readonly)
-                return SkillTreeFns.CountTags(prefabname, "multicooker", activatedskills) >= 3
+                return SkillTreeFns.CountTags(prefabname, "multicooker", activatedskills) >= 4
             end,
             connects = {
                 "warly_cooker_faster",

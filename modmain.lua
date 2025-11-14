@@ -55,6 +55,7 @@ PrefabFiles = {
 	"warly_truedelicious_buff",
 	"portableblender_sacrifice_fx",
 	"portableblender_soil_fx",
+	"warly_junk_pile",
     -- 其他 prefab 名称...
 }
 

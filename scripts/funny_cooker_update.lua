@@ -12,18 +12,18 @@
 -- 4 随机下饭菜概率含调味料
 -- 新版
 -- 1 下饭操作（包括记忆偏好和直接恢复）
--- 2 开席
--- 3 更加下饭
+-- 2 添油加醋 增加调料
+-- 3 开席 队友死亡烹饪四菜一汤，有厨力的时候复活自己
 
 -- Section 2：画大饼
 -- 1 沃利仅仅需要介绍一下他的厨艺，便可让大家饱腹。锅检测到附近有三维不满的队友，右键点击锅直接补，然后慢慢消耗
 -- 2 沃利可以手搓大饼。吃了大饼效果同锅补
--- 3 大饼可以烤而不是变成灰烬
+-- 3 大饼可以烤而不是变成灰烬，烤大饼吃不腻
 -- 4 现烤大饼变成附近玩家（寄居蟹）最喜欢的食物，或者飞饼
 
 -- Section 3：真香警告
--- 1 可以把食物放在桌上，永鲜，其他角色在饿的时候可以去吃，忽略食物的倍率，有概率多重
--- 2 吃桌上的料理获得额外恢复，是持续给的
+-- 1 可以把食物放在桌上，永鲜，其他角色在饿的时候可以去吃，忽略食物的倍率，有概率多重，可以堆叠同名食物
+-- 2 沃利吃桌上的料理获得额外恢复，是持续给的
 -- 3 沃利可以持续消除记忆
 
 
@@ -176,7 +176,7 @@ end
 local function SpawnCookPotFX(chef, idiot, meal, force_throw)
     if not chef then return end
 
-    chef:DoTaskInTime(0.1, function()
+    chef:DoTaskInTime(0.05, function()
         chef.AnimState:PlayAnimation("pyrocast")
     end)
 
@@ -197,7 +197,7 @@ local function SpawnCookPotFX(chef, idiot, meal, force_throw)
         proj.doer = chef
         proj.meal = meal
         proj.Transform:SetPosition(x, y, z)
-        proj.components.complexprojectile:Launch(Vector3(spawn_x, spawn_y, spawn_z), chef)
+        proj.components.complexprojectile:Launch(Vector3(spawn_x + math.random(), spawn_y + math.random(), spawn_z + math.random()), chef)
     end
 end
 
@@ -444,13 +444,14 @@ AddPlayerPostInit(function(dead)
 
     -- 监听玩家死亡事件
     dead:ListenForEvent("death", function(inst, data)
+        dead:RemoveTag("groggy")
         -- 技能树控制
         local hasSkill = dead.components.skilltreeupdater and
             dead.components.skilltreeupdater:IsActivated("warly_funny_cook_feast")
         if hasSkill then
-			local cookingPower = inst.components.inventory:FindItem(IsCookingPower)
+            local cookingPower = inst.components.inventory:FindItem(IsCookingPower)
             -- print("找到身上有多少厨力")
-			if cookingPower then
+            if cookingPower then
                 local stack_size = GetStackSize(cookingPower)
                 -- print("找到身上有多少厨力", stack_size)
                 cookingPower:Remove()
@@ -458,20 +459,30 @@ AddPlayerPostInit(function(dead)
                     if not dead or not dead:IsValid() or not dead:HasTag("playerghost") then return end
                     if stack_size <= 0 then return end
                     if dead.components.inventory == nil then return end
-                    dead:PushEvent("respawnfromghost", { user = cookingPower })
+                    dead:PushEvent("respawnfromghost", { user = cookingPower or dead })
                     dead:DoTaskInTime(1.3, function()
                         if dead and dead:IsValid() and not dead:HasTag("playerghost") then
+                            local hasDebuff = dead:HasDebuff("warly_noob_debuff")
+                            if hasDebuff then
+                                dead:GetDebuff("warly_noob_debuff").components.debuff:Stop()
+                            end
                             dead:AddDebuff("warly_noob_debuff", "warly_noob_debuff")
                             local debuff = dead:GetDebuff("warly_noob_debuff")
                             if debuff and debuff.components.timer then
                                 local left = debuff.components.timer:GetTimeLeft("expire")
                                 debuff.components.timer:SetTimeLeft("expire", left - stack_size)
                             end
+                            -- 回复三维
+                            local recover = 2.5 * stack_size
+                            dead.components.health:SetVal(recover + dead.components.health.currenthealth, cookingPower or dead)
+                            dead.components.health:DoDelta(0)
+                            dead.components.hunger:SetCurrent(recover + dead.components.hunger.current)
+                            dead.components.sanity:DoDelta(recover, false)
                         end
                     end)
                 end)
-			end
-		end
+            end
+        end
     end, dead)
 end)
 
@@ -1155,18 +1166,74 @@ local ACTION_PLACE_FOOD_ON_TABLE = AddAction("PLACE_FOOD_ON_TABLE", STRINGS.ACTI
 )
 ACTION_PLACE_FOOD_ON_TABLE.distance = 1.5
 
+
+----------------------------------------
+-- 定义新动作：STACK_DECOR_FOOD
+----------------------------------------
+local ACTION_STACK_DECOR_FOOD = Action({ priority = 10, mount_valid = true })
+ACTION_STACK_DECOR_FOOD.id = "STACK_DECOR_FOOD"
+ACTION_STACK_DECOR_FOOD.str = STRINGS.ACTIONS.STACK_DECOR_FOOD
+ACTION_STACK_DECOR_FOOD.fn = function(act)
+    local target = act.target
+    local item = act.invobject
+    local doer = act.doer
+
+    if target ~= nil and target.prefab == "decor_food" and item ~= nil then
+        if target.mimic_food == item.prefab and target.uses_left and target.uses_left < 40 then
+
+            local diff = TUNING.STACK_SIZE_SMALLITEM - target.uses_left
+            local stacksize = 1
+
+            if item.components.stackable then
+                stacksize = item.components.stackable:StackSize()
+            end
+
+            -- 实际可叠数量
+            local add = math.min(diff, stacksize)
+            target.uses_left = target.uses_left + add
+
+            -- 移除对应数量的食物
+            if item.components.stackable then
+                item.components.stackable:Get(add):Remove()
+            else
+                item:Remove()
+            end
+
+            -- 更新食物装饰名字显示
+            if target.InitName then
+                target:InitName()
+            end
+
+            if doer.SoundEmitter then
+                doer.SoundEmitter:PlaySound("wintersfeast2019/winters_feast/table/fx")
+            end
+            SpawnPrefab("winters_feast_depletefood").Transform:SetPosition(target.Transform:GetWorldPosition())
+
+            return true
+        end
+    end
+
+    return false
+end
+
+ACTION_STACK_DECOR_FOOD.distance = 1.5
+AddAction(ACTION_STACK_DECOR_FOOD)
+
 -- 只能把东西放到目前现有的4个桌子上
 AddComponentAction("USEITEM", "inventoryitem", function(inst, doer, target, actions, right)
     if not target or not doer or not inst then return end
+    if not inst:HasTag("preparedfood") then return end
     if doer.prefab == "warly" and doer:HasTag("warly_true_delicious_desk") then
         local isTable = target.prefab == "wood_table_round"
             or target.prefab == "wood_table_square"
             or target.prefab == "stone_table_round"
             or target.prefab == "stone_table_square"
         if not target:HasTag("hasfurnituredecoritem") and isTable then
-            if inst:HasTag("preparedfood") and inst.prefab ~= "warly_sky_pie_baked" then
+            if inst.prefab ~= "warly_sky_pie_baked" then
                 table.insert(actions, ACTIONS.PLACE_FOOD_ON_TABLE)
             end
+        elseif target.prefab == "decor_food" then
+            table.insert(actions, ACTIONS.STACK_DECOR_FOOD)
         end
     end
 end)
@@ -1175,11 +1242,15 @@ end)
 AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.PLACE_FOOD_ON_TABLE, "give"))
 AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.PLACE_FOOD_ON_TABLE, "give"))
 
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.STACK_DECOR_FOOD, "give"))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.STACK_DECOR_FOOD, "give"))
+
 -- 兼容排队论
 local actionqueuer_status = pcall(require, "components/actionqueuer")
 if actionqueuer_status then
     if AddActionQueuerAction then
         AddActionQueuerAction("leftclick", ACTION_PLACE_FOOD_ON_TABLE.id, true)
+        AddActionQueuerAction("leftclick", ACTION_STACK_DECOR_FOOD.id, true)
     end
 end
 
