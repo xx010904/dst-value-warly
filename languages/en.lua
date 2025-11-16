@@ -66,7 +66,7 @@ STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_MAKE_TITLE = "Burdened Pot"
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_MAKE_DESC = "Warly can stack pots on his back to shield friends from all attacks, but it consumes sanity and hunger. He can also redistribute the stacked pots."
 
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_FLUNG_TITLE = "Flung Pot"
-STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_FLUNG_DESC = "When the pot reaches its limit, Warly flings it in all directions."
+STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_FLUNG_DESC = "When the pot reaches its limit, Warly flings it in all directions, dealing massive damage."
 
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_SCAPEGOAT_TITLE = "Scapegoat"
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_SCAPEGOAT_DESC = "While carrying stacked pots, Warly has a chance to summon a scapegoat to take damage when attacked, and gaining more loot upon their defeat."
@@ -79,7 +79,7 @@ STRINGS.SKILLTREE.WARLY.WARLY_SPICER_DISMANTLE_TITLE = "Spice Extractor"
 STRINGS.SKILLTREE.WARLY.WARLY_SPICER_DISMANTLE_DESC = "Warly can use his Portable Seasoning Station to dismantle seasoned food, obtaining the original food and spices."
 
 STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG_TITLE = "Spice Detector"
-STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG_DESC = "Warly's trusty Portable Grinding Mill can dig the ground to obtain spices."
+STRINGS.SKILLTREE.WARLY.WARLY_BLENDER_DIG_DESC = "Warly's trusty Portable Grinding Mill can dig the ground to obtain spices, or a hound."
 
 -- Fast Foodie
 STRINGS.SKILLTREE.WARLY.WARLY_COOKER_FASTER_1_LOCK_DESC = "Learn 4 Multicooker skills to unlock."

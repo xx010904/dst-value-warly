@@ -647,7 +647,7 @@ end)
 -- SECTION2.2: 改造便携研磨器 便携香料站
 --========================================================
 --------------------------------------------------------------------------
--- 冷却时间
+-- 研磨器 冷却时间
 --------------------------------------------------------------------------
 local FLAVOR_COOLDOWN = 400 -- 1天冷却
 
@@ -682,7 +682,7 @@ local function StartFlavorCooldown(player)
 end
 
 --------------------------------------------------------------------------
--- 动作定义
+-- 研磨器 动作定义
 --------------------------------------------------------------------------
 local SEARCH_FLAVOR = AddAction("SEARCH_FLAVOR", STRINGS.ACTIONS.SEARCH_FLAVOR, function(act)
     local inst = act.invobject
@@ -714,7 +714,7 @@ end)
 SEARCH_FLAVOR.priority = 10
 
 --------------------------------------------------------------------------
--- 注册动作入口
+-- 研磨器 注册动作入口
 --------------------------------------------------------------------------
 AddComponentAction("INVENTORY", "inventoryitem", function(inst, doer, actions)
     -- 技能树控制是否能挖
@@ -737,7 +737,7 @@ AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.SEARCH_FLAVOR, search
 AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.SEARCH_FLAVOR, searchSg))
 
 --------------------------------------------------------------------------
--- prefab 扩展
+-- 研磨器 prefab 扩展
 --------------------------------------------------------------------------
 AddPrefabPostInit("portableblender_item", function(inst)
     if not TheWorld.ismastersim then
@@ -773,7 +773,7 @@ end)
 
 
 --------------------------------------------------------------------------
--- 拆解调味的食物
+-- 香料站 拆解调味的食物
 --------------------------------------------------------------------------
 -- 注册新的动作
 local USE_SPICE_CONVERT = AddAction("USE_SPICE_CONVERT", STRINGS.ACTIONS.USE_SPICE_CONVERT, function(act)

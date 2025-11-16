@@ -214,54 +214,19 @@ local function OnArmorBroke(owner, data)
         table.insert(angles, offset_angle + i * math.pi / 3)
     end
 
-    -- 是否整组触发二段甩（可由技能树控制）
-    -- local will_second = owner and owner.components.skilltreeupdater and owner.components.skilltreeupdater:IsActivated("warly_crockpot_jump")
-    local will_second = true -- 改成 false 就只炸一段
-
-    -- 🔹 函数：生成锅实体并有概率敲坏掉落材料
     local function TrySpawnPotWithSmash(bomb, bx, by, bz, owner)
-        -- 处理敲坏概率
         if not bomb:IsValid() then return end
-
-        local do_smash = false -- 是否触发坏锅（可由技能树控制）废案
-        local loot_list = {}
-
-        if do_smash then
-            -- 坏锅：掉落固定原材料
-            loot_list = {
-                {name="goldnugget", count=1},
-                {name="charcoal", count=3},
-                {name="twigs", count=3},
-            }
-        else
-            -- 没坏锅：掉落锅本身
-            loot_list = {
-                {name="portablecookpot_item", count=1},
-            }
-        end
-
-        -- 投掷掉落物
-        for _, loot in ipairs(loot_list) do
-            for i = 1, loot.count do
-                local item = SpawnPrefab(loot.name)
-                if item then
-                    LaunchAt(item, bomb, owner, -1, 0.5, 0, 0)
-                end
-            end
+        local item = SpawnPrefab("portablecookpot_item")
+        if item then
+            LaunchAt(item, bomb, owner, -1, 0.5, 0, 0)
         end
     end
 
     -- 🔹 通用甩炸弹逻辑
     local function ThrowBomb(dirx, dirz)
         local bomb = SpawnPrefab("bomb_crockpot")
-        if not bomb then
-            print("[BackArmor] Spawn bomb failed")
-            return
-        end
-
         bomb._throw_dir = Vector3(dirx, 0, dirz)
-        bomb._is_second = false
-        bomb.should_spawn_pot = not will_second -- ❗️如果不会触发二段，就在一段生成锅
+        bomb.should_spawn_pot = false
 
         local old_onhit = bomb.components.complexprojectile and bomb.components.complexprojectile.onhitfn or nil
 
@@ -280,17 +245,11 @@ local function OnArmorBroke(owner, data)
             end
 
             -- 有触发二段：生成第二段炸弹
-            local second = SpawnPrefab("bomb_crockpot")
-            if not second then
-                print("[BackArmor] Spawn second bomb failed")
-                return
-            end
+            local second_bomb = SpawnPrefab("bomb_crockpot")
+            second_bomb._throw_dir = bomb_inst._throw_dir
+            second_bomb.should_spawn_pot = true -- 第二段一定生成锅
 
-            second._is_second = true
-            second._throw_dir = bomb_inst._throw_dir
-            second.should_spawn_pot = true -- 第二段一定生成锅
-
-            local second_old_onhit = second.components.complexprojectile and second.components.complexprojectile.onhitfn or nil
+            local second_old_onhit = second_bomb.components.complexprojectile and second_bomb.components.complexprojectile.onhitfn or nil
 
             -- 第二段 OnHit
             local function SecondOnHit(sec_inst, att2, tgt2)
@@ -303,17 +262,17 @@ local function OnArmorBroke(owner, data)
                 end
             end
 
-            if second.components.complexprojectile then
-                second.components.complexprojectile:SetOnHit(SecondOnHit)
+            if second_bomb.components.complexprojectile then
+                second_bomb.components.complexprojectile:SetOnHit(SecondOnHit)
             end
 
             -- 发射第二段炸弹
-            second.Transform:SetPosition(bx, by + 1, bz)
-            if second.components.complexprojectile then
+            second_bomb.Transform:SetPosition(bx, by + 1, bz)
+            if second_bomb.components.complexprojectile then
                 local tx = bx + dirx * radius
                 local tz = bz + dirz * radius
                 local targetPos = Vector3(tx, by, tz)
-                second.components.complexprojectile:Launch(targetPos, owner, nil)
+                second_bomb.components.complexprojectile:Launch(targetPos, owner, nil)
             end
         end
 

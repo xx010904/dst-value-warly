@@ -106,10 +106,12 @@ local function PlaySequence(inst)
                                 local hound = SpawnPrefab("hound")
                                 hound.Transform:SetPosition(x + math.random() * 0.3, y, z + math.random() * 0.3)
                                 hound.sg:GoToState("mutated_spawn")
+                                -- hound.components.health:SetPercent(math.random())
                             else
                                 local worm = SpawnPrefab("worm")
                                 worm.Transform:SetPosition(x + math.random() * 0.3, y, z + math.random() * 0.3)
                                 worm.sg:GoToState("lure_enter")
+                                -- worm.components.health:SetPercent(math.random())
                             end
                         else
                             local item = SpawnPrefab(spicePrefab)
