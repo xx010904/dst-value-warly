@@ -137,6 +137,7 @@ local function MakeSpicedFood(inst, cooker, chef)
 
                 -- ✅ 直接给沃利本人生成飞饼
                 local chefMark = SpawnPrefab("improv_question_mark_fx")
+                chefMark.AnimState:PlayAnimation("idle2", true)
                 chefMark.entity:SetParent(chef.entity)
                 chefMark.Transform:SetPosition(0, 3, 0)
                 prefab_to_spawn = "warly_sky_pie_boomerang"

@@ -1,44 +1,52 @@
-local function OnPigCoinPostInit(inst)
-    -- 保存原始的 spell 方法
-    if inst and inst.components.spellcaster then
-        local original_spell = inst.components.spellcaster.spell
-        -- Hook 新的 spell 方法
-        inst.components.spellcaster.spell = function(inst, target, pos, caster)
-            -- 召唤 60 只精英
-            for i = 1, 2 do
-                -- 召唤精英的方法
-                local function custom_spellfn(inst, target, pos, caster)
-                    if caster ~= nil then
-                        local pos = caster:GetPosition()
+AddPrefabPostInit("spoiled_food", function(inst)
+    inst:AddComponent("activespoiledcloudtool")
+end)
 
-                        -- 创建精英
-                        local elite = SpawnPrefab("pigelitefighter" .. math.random(4))
-                        elite.Transform:SetPosition(pos.x,
-                            (caster.components.rider ~= nil and caster.components.rider:IsRiding()) and 3 or 0, pos.z)
-                        elite.components.follower:SetLeader(caster)
-                        elite.components.health:SetInvincible(true)
+local SPOILED_ON_SACK = Action({ priority = 1, mount_valid = true })
+SPOILED_ON_SACK.id = "SPOILED_ON_SACK"
+SPOILED_ON_SACK.str = "Use Spoiled Food"
+SPOILED_ON_SACK.fn = function(act)
+    local target = act.target
+    local item = act.invobject
+    local doer = act.doer
 
-                        -- 设置精英位置
-                        local theta = math.random() * PI2
-                        local offset = FindWalkableOffset(pos, theta, 2.5, 16, true, true, nil, false, true)
-                            or FindWalkableOffset(pos, theta, 2.5, 16, false, false, nil, false, true)
-                            or Vector3(0, 0, 0)
-                        pos.x, pos.y, pos.z = pos.x + offset.x, 0, pos.z + offset.z
-                        elite.sg:GoToState("spawnin", { dest = pos })
+    if target and target.prefab == "beargerfur_sack" and item then
+        local stacksize = item.components.stackable and item.components.stackable.stacksize or 1
+        local buffname = "spoiled_cloud_buff" -- 对应你的 buff 名称
 
-                        -- 设置精英存在时间（例如：60秒）
-                        elite.components.timer:SetTimeLeft("despawn_timer", 180)
-                    end
-                end
-
-                custom_spellfn(inst, target, pos, caster)
-            end
-            -- 调用原始的 spell 方法
-            if original_spell then
-                original_spell(inst, target, pos, caster)
-            end
+        -- 添加或刷新 buff
+        if not target:HasDebuff(buffname) then
+            target:AddDebuff(buffname, buffname)
         end
+
+        -- 获取 buff 实例并设置持续时间
+        local buff_inst = target:GetDebuff(buffname)
+        if buff_inst and buff_inst.components.timer then
+            local time_left = buff_inst.components.timer:GetTimeLeft("lifetime")
+            buff_inst.components.timer:SetTimeLeft("lifetime", stacksize + time_left)
+        end
+
+        -- 消耗腐烂物
+        if item.components.stackable then
+            item.components.stackable:Get():Remove()
+        else
+            item:Remove()
+        end
+
+        return true
     end
+    return false
 end
 
-AddPrefabPostInit("pig_coin", OnPigCoinPostInit)
+AddAction(SPOILED_ON_SACK)
+
+
+AddComponentAction("USEITEM", "activespoiledcloudtool", function(inst, doer, target, actions)
+    if target.prefab == "beargerfur_sack" then
+        table.insert(actions, ACTIONS.SPOILED_ON_SACK)
+    end
+end)
+
+-- 定义SG
+AddStategraphActionHandler("wilson", GLOBAL.ActionHandler(GLOBAL.ACTIONS.SPOILED_ON_SACK, "give"))
+AddStategraphActionHandler("wilson_client", GLOBAL.ActionHandler(GLOBAL.ACTIONS.SPOILED_ON_SACK, "give"))
