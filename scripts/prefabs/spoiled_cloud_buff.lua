@@ -1,10 +1,14 @@
+local EXPLODETARGET_MUST_TAGS = { "_health", "_combat" }
+local EXPLODETARGET_CANT_TAGS = { "INLIMBO", "notarget", "noattack", "flight", "invisible", "wall", "player", "companion", "structure" }
+
 local function damage_nearby(inst, target)
     if not target or not target:IsValid() then return end
     local x, y, z = target.Transform:GetWorldPosition()
-    local ents = TheSim:FindEntities(x, y, z, 3, {"_combat"}, {"player"})
+    local ents = TheSim:FindEntities(x, y, z, 4.88, EXPLODETARGET_MUST_TAGS, EXPLODETARGET_CANT_TAGS)
     for _, ent in ipairs(ents) do
         if ent.components.health and not ent:HasTag("player") then
-            ent.components.health:DoDelta(-5) -- 每 tick 造成 5 点伤害
+            ent.components.health:DoDelta(-4.9) -- 每 tick 造成伤害
+            ent.components.combat:GetAttacked(target, 0.1)
         end
     end
 end
@@ -14,10 +18,10 @@ local function OnAttached(inst, target)
     inst._target = target
 
     -- 定期造成伤害
-    inst._damagetask = inst:DoPeriodicTask(1, function() damage_nearby(inst, target) end)
+    inst._damagetask = inst:DoPeriodicTask(10*FRAMES, function() damage_nearby(inst, target) end)
 
     -- 持续时间
-    inst.components.timer:StartTimer("lifetime", inst._duration or 5)
+    inst.components.timer:StartTimer("lifetime", 1)
 end
 
 local function OnDetached(inst)
@@ -31,7 +35,10 @@ end
 
 local function ontimerdone(inst, data)
     if data.name == "lifetime" then
-        inst.components.debuff:Stop()
+        inst.AnimState:PlayAnimation("sporecloud_pst")
+        inst:ListenForEvent("animover", function (inst)
+            inst.components.debuff:Stop()
+        end)
     end
 end
 
@@ -49,6 +56,7 @@ local function fn()
     inst.AnimState:SetBank("sporecloud")
     inst.AnimState:SetBuild("sporecloud")
     inst.AnimState:PlayAnimation("sporecloud_pre")
+    inst.AnimState:PushAnimation("sporecloud_loop", true)
     inst.AnimState:SetLightOverride(.3)
     inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
 

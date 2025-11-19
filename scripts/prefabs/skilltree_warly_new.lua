@@ -461,6 +461,7 @@ local function BuildSkillsData(SkillTreeFns)
             tags = { "allegiance", "lunar", "lunar_favor" },
             locks = { "warly_allegiance_lock_1", "warly_allegiance_lock_3", "warly_allegiance_lock_5" },
             onactivate = function(inst, fromload)
+                inst:AddTag("warly_allegiance_lunar")
                 inst:AddTag("player_lunar_aligned")
                 local damagetyperesist = inst.components.damagetyperesist
                 if damagetyperesist then
@@ -474,6 +475,7 @@ local function BuildSkillsData(SkillTreeFns)
                 end
             end,
             ondeactivate = function(inst, fromload)
+                inst:RemoveTag("warly_allegiance_lunar")
                 inst:RemoveTag("player_lunar_aligned")
                 local damagetyperesist = inst.components.damagetyperesist
                 if damagetyperesist then

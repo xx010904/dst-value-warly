@@ -4,34 +4,30 @@ end)
 
 local SPOILED_ON_SACK = Action({ priority = 1, mount_valid = true })
 SPOILED_ON_SACK.id = "SPOILED_ON_SACK"
-SPOILED_ON_SACK.str = "Use Spoiled Food"
+SPOILED_ON_SACK.str = STRINGS.ACTIONS.SPOILED_ON_SACK
 SPOILED_ON_SACK.fn = function(act)
     local target = act.target
     local item = act.invobject
     local doer = act.doer
 
-    if target and target.prefab == "beargerfur_sack" and item then
+    if doer and doer:HasTag("warly_allegiance_lunar") and target and target.prefab == "beargerfur_sack" and item then
         local stacksize = item.components.stackable and item.components.stackable.stacksize or 1
-        local buffname = "spoiled_cloud_buff" -- 对应你的 buff 名称
+        local buffname = "spoiled_cloud_buff"
 
         -- 添加或刷新 buff
-        if not target:HasDebuff(buffname) then
-            target:AddDebuff(buffname, buffname)
+        if not doer:HasDebuff(buffname) then
+            doer:AddDebuff(buffname, buffname)
         end
 
         -- 获取 buff 实例并设置持续时间
-        local buff_inst = target:GetDebuff(buffname)
+        local buff_inst = doer:GetDebuff(buffname)
         if buff_inst and buff_inst.components.timer then
             local time_left = buff_inst.components.timer:GetTimeLeft("lifetime")
-            buff_inst.components.timer:SetTimeLeft("lifetime", stacksize + time_left)
+            buff_inst.components.timer:SetTimeLeft("lifetime", stacksize * 2.5 + time_left)
         end
 
         -- 消耗腐烂物
-        if item.components.stackable then
-            item.components.stackable:Get():Remove()
-        else
-            item:Remove()
-        end
+        item:Remove()
 
         return true
     end
@@ -42,11 +38,135 @@ AddAction(SPOILED_ON_SACK)
 
 
 AddComponentAction("USEITEM", "activespoiledcloudtool", function(inst, doer, target, actions)
-    if target.prefab == "beargerfur_sack" then
+    if doer:HasTag("warly_allegiance_lunar") and target.prefab == "beargerfur_sack" then
         table.insert(actions, ACTIONS.SPOILED_ON_SACK)
     end
 end)
 
--- 定义SG
-AddStategraphActionHandler("wilson", GLOBAL.ActionHandler(GLOBAL.ACTIONS.SPOILED_ON_SACK, "give"))
-AddStategraphActionHandler("wilson_client", GLOBAL.ActionHandler(GLOBAL.ACTIONS.SPOILED_ON_SACK, "give"))
+-- 加个新的动作
+local warlyIdleState = State{
+    name = "spoiled_on_sack",  -- 新状态名称
+    tags = { "doing", "busy" },
+
+    onenter = function(inst)
+        -- 进入状态时无敌
+        inst.components.health.invincible = true
+        if inst.components.playercontroller ~= nil then
+            inst.components.playercontroller:RemotePausePrediction()
+            inst.components.playercontroller:Enable(false)
+            inst.components.playercontroller:EnableMapControls(false)
+        end
+        inst.components.inventory:Hide()
+        inst:SetCameraDistance(14)
+
+        -- 停止角色移动
+        inst.sg:SetTimeout(66 * FRAMES)  -- 设置超时为 66 帧（动画持续时间）
+        inst.components.locomotor:Stop()  -- 停止移动
+
+        -- 播放 idle_warly 动画
+        inst.AnimState:PlayAnimation("idle_warly", false)
+        inst.AnimState:SetTime(0)  -- 确保动画从头开始播放
+
+        inst:PerformBufferedAction()
+    end,
+
+    timeline =
+    {
+        -- 在 66 帧后移除 "busy" 状态，切换回空闲状态
+        TimeEvent(66 * FRAMES, function(inst)
+            inst.sg:RemoveStateTag("busy")
+        end),
+    },
+
+    ontimeout = function(inst)
+        -- 动画播放完后切换到 idle 状态
+        inst.AnimState:PlayAnimation("idle", true)
+        inst.sg:GoToState("idle", true)
+    end,
+
+    events =
+    {
+        -- 动画队列完成时，切换到 idle 状态
+        EventHandler("animqueueover", function(inst)
+            if inst.AnimState:AnimDone() then
+                inst.sg:GoToState("idle")
+            end
+        end),
+    },
+
+    onexit = function(inst)
+        -- 清除缓冲的动作（如果有）
+        inst:ClearBufferedAction()
+        if inst.components.playercontroller ~= nil then
+            inst.components.playercontroller:EnableMapControls(true)
+            inst.components.playercontroller:Enable(true)
+        end
+        inst:SetCameraDistance()
+        if not inst.sg.statemem.keep_open then
+            inst.components.inventory:Show()
+        end
+        -- 离开状态时取消无敌
+        inst.components.health.invincible = false
+    end,
+}
+
+-- 将状态添加到服务端的 StateGraph
+AddStategraphState('wilson', warlyIdleState)
+
+
+local warlyIdleState_Client = State{
+    name = "spoiled_on_sack",  -- 新状态名称
+    tags = { "doing", "busy" },
+    server_states = { "spoiled_on_sack" },  -- 确保客户端和服务端同步状态
+
+    onenter = function(inst)
+        -- 停止角色移动
+        inst.components.locomotor:Stop()  -- 停止移动
+
+        -- 播放 idle_warly 动画
+        inst.AnimState:PlayAnimation("idle_warly", false)
+        inst.AnimState:SetTime(0)  -- 确保动画从头开始播放
+
+        -- 设置超时，确保动画播放 66 帧
+        inst.sg:SetTimeout(66 * FRAMES)
+
+        inst:PerformPreviewBufferedAction()
+    end,
+
+    timeline =
+    {
+        -- 在 66 帧后移除 "busy" 状态，切换回空闲状态
+        TimeEvent(66 * FRAMES, function(inst)
+            inst.sg:RemoveStateTag("busy")
+        end),
+    },
+
+    ontimeout = function(inst)
+        -- 动画播放完后切换到 idle 状态
+        inst.AnimState:PlayAnimation("idle", true)
+        inst.sg:GoToState("idle", true)
+    end,
+
+    events =
+    {
+        -- 动画队列完成时，切换到 idle 状态
+        EventHandler("animqueueover", function(inst)
+            if inst.AnimState:AnimDone() then
+                inst.sg:GoToState("idle")
+            end
+        end),
+    },
+
+    onexit = function(inst)
+        -- 清除缓冲的动作（如果有）
+        inst:ClearBufferedAction()
+    end,
+}
+
+-- 将状态添加到客户端的 StateGraph
+AddStategraphState('wilson_client', warlyIdleState_Client)
+
+
+-- 为 wilson 和 wilson_client 添加新的动作处理
+AddStategraphActionHandler("wilson", GLOBAL.ActionHandler(GLOBAL.ACTIONS.SPOILED_ON_SACK, "spoiled_on_sack"))
+AddStategraphActionHandler("wilson_client", GLOBAL.ActionHandler(GLOBAL.ACTIONS.SPOILED_ON_SACK, "spoiled_on_sack"))
