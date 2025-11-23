@@ -1,21 +1,46 @@
 local EXPLODETARGET_MUST_TAGS = { "_health", "_combat" }
 local EXPLODETARGET_CANT_TAGS = { "INLIMBO", "notarget", "noattack", "flight", "invisible", "wall", "player", "companion", "structure" }
 
+local function AlignToTarget(inst, target)
+    inst.Transform:SetRotation(target.Transform:GetRotation())
+end
+
+local function OnChangeFollowSymbol(inst, target, followsymbol, followoffset)
+    inst.Follower:FollowSymbol(target.GUID, followsymbol, followoffset.x, followoffset.y, followoffset.z)
+end
+
 local function damage_nearby(inst, target)
     if not target or not target:IsValid() then return end
     local x, y, z = target.Transform:GetWorldPosition()
     local ents = TheSim:FindEntities(x, y, z, 4.88, EXPLODETARGET_MUST_TAGS, EXPLODETARGET_CANT_TAGS)
     for _, ent in ipairs(ents) do
         if ent.components.health and not ent:HasTag("player") then
-            ent.components.health:DoDelta(-4.9) -- 每 tick 造成伤害
+            ent.components.health:DoDelta(-5.0) -- 每 tick 造成伤害
             ent.components.combat:GetAttacked(target, 0.1)
+        end
+    end
+    local time_left = inst.components.timer:GetTimeLeft("lifetime")
+    if time_left and time_left > 2 then
+        for i = 1, 6 do
+            local fx = SpawnPrefab("spoiled_cloud_fx")
+            if fx ~= nil then
+                fx.entity:SetParent(inst.entity)
+                fx.Transform:SetRotation(i * 60)
+            end
         end
     end
 end
 
-local function OnAttached(inst, target)
-    inst.entity:SetParent(target.entity)
+local function OnAttached(inst, target, followsymbol, followoffset)
     inst._target = target
+    inst.entity:SetParent(target.entity)
+    OnChangeFollowSymbol(inst, target, followsymbol, Vector3(followoffset.x, 100, followoffset.z)) --y越小，位置越高
+
+    if inst._followtask ~= nil then
+        inst._followtask:Cancel()
+    end
+    inst._followtask = inst:DoPeriodicTask(0, AlignToTarget, nil, target)
+    AlignToTarget(inst, target)
 
     -- 定期造成伤害
     inst._damagetask = inst:DoPeriodicTask(10*FRAMES, function() damage_nearby(inst, target) end)
@@ -59,6 +84,8 @@ local function fn()
     inst.AnimState:PushAnimation("sporecloud_loop", true)
     inst.AnimState:SetLightOverride(.3)
     inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+
+    inst.Transform:SetFourFaced()
 
     if not TheWorld.ismastersim then
         return inst

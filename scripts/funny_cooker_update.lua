@@ -290,7 +290,10 @@ local function doFunnyCook(inst, idiot, food_name, op)
     ApplyTalking(inst, op)
 
     -- 恢复逻辑
-    ApplyRecovery(inst, idiot, food_name, op)
+    local hasSkill = inst and inst.components.skilltreeupdater and inst.components.skilltreeupdater:IsActivated("warly_funny_cook_spice")
+    if hasSkill then
+        ApplyRecovery(inst, idiot, food_name, op)
+    end
 end
 
 -- =========================================================

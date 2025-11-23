@@ -56,6 +56,7 @@ PrefabFiles = {
 	"portableblender_sacrifice_fx",
 	"portableblender_soil_fx",
 	"spoiled_cloud_buff",
+	"spoiled_cloud_fx",
     -- 其他 prefab 名称...
 }
 

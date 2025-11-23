@@ -11,13 +11,13 @@ STRINGS.SKILLTREE.WARLY.WARLY_BONESOUP_BUFF_TITLE = "Eat Alone I"
 STRINGS.SKILLTREE.WARLY.WARLY_BONESOUP_BUFF_DESC = "Warly can taste the protection of the bone ancestors from the 「Bone Bouillon」."
 
 STRINGS.SKILLTREE.WARLY.WARLY_CREPES_BUFF_TITLE = "Eat Alone II"
-STRINGS.SKILLTREE.WARLY.WARLY_CREPES_BUFF_DESC = "The super sweetness of 「Fresh Fruit Crepes」 makes Warly extremely excited in battle."
+STRINGS.SKILLTREE.WARLY.WARLY_CREPES_BUFF_DESC = "The sweetness of 「Fresh Fruit Crepes」 makes Warly's spirits soar and movement speed surge as the battle grows more perilous."
 
 STRINGS.SKILLTREE.WARLY.WARLY_POTATO_BUFF_TITLE = "Eat Alone III"
 STRINGS.SKILLTREE.WARLY.WARLY_POTATO_BUFF_DESC = "Even Warly, after eating 「Puffed Potato Soufflé」, finds his mind taken over by potatoes, attacking instead of thinking."
 
 STRINGS.SKILLTREE.WARLY.WARLY_SEAFOOD_BUFF_TITLE = "Eat Alone IV"
-STRINGS.SKILLTREE.WARLY.WARLY_SEAFOOD_BUFF_DESC = "The slippery texture of 「Moqueca」 allows Warly to run faster the more dangerous the situation he encounters."
+STRINGS.SKILLTREE.WARLY.WARLY_SEAFOOD_BUFF_DESC = "Sfter eating 「Moqueca」, allows Warly to wield rising torrents in battle."
 
 -- Share Food
 STRINGS.SKILLTREE.WARLY.WARLY_MONSTERTARTARE_BUFF_TITLE = "Not Eat Alone I"
@@ -30,13 +30,13 @@ STRINGS.SKILLTREE.WARLY.WARLY_GOURMET_1_LOCK_DESC = "Learn 2 Gourmet skills to u
 
 -- Meal-worthy Play
 STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_BASE_TITLE = "Meal-worthy Play"
-STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_BASE_DESC = "When Warly sees a Meal-worthy Play (noob move), he's shocked, anger-satiated, blood pressure spiking—he immediately cook a dish to go with it."
+STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_BASE_DESC = "When Warly sees a outrageous Meal-worthy Play (noob move), he immediately cook a dish to go with it."
 
 STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_SPICE_TITLE = "Exaggerate"
-STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_SPICE_DESC = "Warly may improvise by adding a seasoning to the dishes cooked for Meal-worthy Play."
+STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_SPICE_DESC = "Meal-worthy Plays will leave Warly shocked, stuffed with anger, and his blood pressure soaring (restoring Sanity, Hunger, and Health immediately), and add a seasoning to the dish."
 
 STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_FEAST_TITLE = "The Feast"
-STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_FEAST_DESC = "When a survivor nearby dies, Warly will immediately start the feast, cooking four dishes and a soup. Warly can use Cooking Power to revive himself."
+STRINGS.SKILLTREE.WARLY.WARLY_FUNNY_COOK_FEAST_DESC = "When a survivor nearby dies, Warly will immediately start the feast, cooking four dishes and a soup. Warly with Cooking Power can resurrect immediately after death."
 
 -- True Delicious
 STRINGS.SKILLTREE.WARLY.WARLY_TRUE_DELICIOUS_DESK_TITLE = "True Delicious Warning"
@@ -90,11 +90,11 @@ STRINGS.SKILLTREE.WARLY.WARLY_COOKER_FASTER_DESC = "Warly can quickly use portab
 -- Allegiance
 STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LOCK_1_DESC = "Unlocks after learning 12 skills."
 
-STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_SHADOW_TITLE = "The Ripper Butcher"
-STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_SHADOW_DESC = "The Queen will reward your loyalty by unlocking power from wielding a Shadow Maul. Warly can wield the Shadow Maul to unleash a bloodied long hook and drag targets, and he can also craft the Half-Baked Shadow Maul."
+STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_SHADOW_TITLE = "The Shadow Butcher"
+STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_SHADOW_DESC = "The Queen will reward your loyalty by unlocking power from slaughter. Warly can wield the Shadow Maul to unleash a bloodied long hook and drag targets, and he can also craft the Half-Baked Shadow Maul."
 
-STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LUNAR_TITLE = "The Midnight Butcher"
-STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LUNAR_DESC = "The Cryptic Founder will reward your curiosity by showing you the power of slaughter. On a full moon night, or after being slain by Warly's Brightshade weapons, pigmen can be revived by Warly to join the fight."
+STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LUNAR_TITLE = "The Lunar Butcher"
+STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LUNAR_DESC = "The Cryptic Founder will reward your curiosity by showing you the power of slaughter. Warly can activate the Polar Bearger Bin using Rot, spawning a toxic cloud that deals continuous damage."
 
 
 -- =============================================================================

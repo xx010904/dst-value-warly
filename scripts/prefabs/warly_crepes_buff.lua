@@ -1,148 +1,118 @@
-local BUFF_DURATION = 300        -- 5分钟
-local TARGET_SAN_PERCENT = 0.9   -- san目标百分比
+local BUFF_DURATION = 300
+local UPDATE_PERIOD = 0.5
+local AURA_RANGE = 20
 
--- 每分钟恢复量设定
-local SANITY_RECOVER_COMBAT = 100
-local SANITY_RECOVER_IDLE = 10
+-- 每个敌人每秒回复精神量
+local SANITY_PER_ENEMY = 1
+local TARGET_SAN_PERCENT = 0.9
 
--- 每秒更新一次（包括冷却递减与理智恢复）
-local UPDATE_PERIOD = 1
-local COMBAT_COOLDOWN_SECONDS = 10
 
-local function _OnCombatEvent(inst, target)
-    -- 任何一次攻击或被攻击都会触发冷却（重置为10）
-    inst._crepes_combat_cooldown = COMBAT_COOLDOWN_SECONDS
+-------------------------------------------------------------------
+-- 计算附近敌人数量
+-------------------------------------------------------------------
+local function CountNearbyEnemies(inst)
+    local x, y, z = inst.Transform:GetWorldPosition()
+    local ents = TheSim:FindEntities(x, y, z, AURA_RANGE, { "_combat" }, { "player", "INLIMBO" })
+
+    local n = 0
+
+    for _, e in ipairs(ents) do
+        if e.components.combat and e.components.combat.target == inst then
+            n = n + 1
+        end
+        if e:HasTag("hostile") then
+            n = n + 1
+        end
+        if e:HasTag("epic") then
+            n = n + 3
+        end
+    end
+
+    return math.min(n, 25)
 end
 
-local function StartSanityControl(inst, target)
-    if not (target and target.components.sanity) then
+-------------------------------------------------------------------
+-- 启动 buff
+-------------------------------------------------------------------
+local function StartBuff(inst, target)
+    if not target.components.sanity or not target.components.locomotor then
         return
     end
 
-    -- 清除之前的 periodic 任务（如果有）
-    if inst._crepes_sanity_control_task then
-        inst._crepes_sanity_control_task:Cancel()
-        inst._crepes_sanity_control_task = nil
-    end
+    inst._task = target:DoPeriodicTask(UPDATE_PERIOD, function()
+        local count = CountNearbyEnemies(target)
 
-    -- 清除并重置任何旧的监听
-    if inst._crepes_listeners then
-        for _, v in pairs(inst._crepes_listeners) do
-            if v.event and v.fn and target then
-                target:RemoveEventCallback(v.event, v.fn, v.source or target)
-            end
-        end
-    end
-    inst._crepes_listeners = {}
+        ---------------------------------------------------------
+        -- ① 根据敌人数回复精神
+        ---------------------------------------------------------
+        local san = target.components.sanity
+        local max_san = san.max * TARGET_SAN_PERCENT
+        local cur = san.current
 
-    -- 初始化冷却（0 表示非冷却状态）
-    inst._crepes_combat_cooldown = 0
-
-    -- 立即重置理智
-    target.components.sanity:SetPercent(0.85)
-
-    -- 监听被攻击与攻击事件：被攻击一般发 "attacked"，主动攻击常用 "onattack"
-    local attacked_fn = function() _OnCombatEvent(inst, target) end
-    local onattack_fn = function() _OnCombatEvent(inst, target) end
-
-    target:ListenForEvent("attacked", attacked_fn, target)   -- 被攻击
-    target:ListenForEvent("onattackother", onattack_fn, target)   -- 主动攻击（通用事件）
-    -- 记录以便移除
-    table.insert(inst._crepes_listeners, { event = "attacked", fn = attacked_fn, source = target })
-    table.insert(inst._crepes_listeners, { event = "onattackother", fn = onattack_fn, source = target })
-
-    -- 每秒任务：递减冷却并按状态恢复理智（但不超过目标百分比上限）
-    -- CD期间其实是战斗期间，就给多的恢复和蜂王冠的效果
-    inst._crepes_sanity_control_task = target:DoPeriodicTask(UPDATE_PERIOD, function()
-        if not (target and target.components.sanity) then
-            return
+        if cur < max_san and count > 0 then
+            local delta = SANITY_PER_ENEMY * count * UPDATE_PERIOD
+            san.current = math.min(cur + delta, max_san)
         end
 
-        local absorb = 0
-
-        -- 冷却递减（若>0）
-        if inst._crepes_combat_cooldown and inst._crepes_combat_cooldown > 0 then
-            inst._crepes_combat_cooldown = inst._crepes_combat_cooldown - UPDATE_PERIOD
-            if inst._crepes_combat_cooldown < 0 then
-                inst._crepes_combat_cooldown = 0
-            end
-            -- 获得蜂王帽的反转效果
-            absorb = TUNING.ARMOR_HIVEHAT_SANITY_ABSORPTION
-        end
-
-        local max_san = target.components.sanity.max * TARGET_SAN_PERCENT
-        local cur_san = target.components.sanity.current or 0
-
-        if cur_san < max_san then
-            -- 冷却期间恢复较快，非冷却恢复慢
-            local per_min = (inst._crepes_combat_cooldown and inst._crepes_combat_cooldown > 0) and SANITY_RECOVER_COMBAT or SANITY_RECOVER_IDLE
-            local rate_per_sec = per_min / 60
-            target.components.sanity.current = math.min(cur_san + rate_per_sec * UPDATE_PERIOD, max_san)
-        else
-            absorb = 0
-        end
-
-        target.components.sanity.neg_aura_absorb = absorb
-    end, UPDATE_PERIOD)
+        ---------------------------------------------------------
+        -- ② 根据敌人数提升移动速度
+        --     原公式：1 + 0.2 * sqrt(count)
+        ---------------------------------------------------------
+        local mult = 1 + 0.2 * math.sqrt(count)
+        target.components.locomotor:SetExternalSpeedMultiplier(
+            inst, "warly_crepes_buff", mult
+        )
+    end)
 end
 
-local function StopSanityControl(inst, target)
-    -- 取消 periodic 任务
-    if inst._crepes_sanity_control_task then
-        inst._crepes_sanity_control_task:Cancel()
-        inst._crepes_sanity_control_task = nil
+-------------------------------------------------------------------
+-- 停止 buff
+-------------------------------------------------------------------
+local function StopBuff(inst, target)
+    if inst._task then
+        inst._task:Cancel()
+        inst._task = nil
     end
 
-    -- 移除监听
-    if inst._crepes_listeners and target then
-        for _, v in pairs(inst._crepes_listeners) do
-            if v.event and v.fn and v.source then
-                v.source:RemoveEventCallback(v.event, v.fn, v.source)
-            end
-        end
+    if target.components.locomotor then
+        target.components.locomotor:RemoveExternalSpeedMultiplier(
+            inst, "warly_crepes_buff"
+        )
     end
-    inst._crepes_listeners = nil
-    inst._crepes_combat_cooldown = nil
-
-    -- 移除蜂王帽的反转效果
-    target.components.sanity.neg_aura_absorb = 0
 end
 
+
+-------------------------------------------------------------------
+-- Debuff 生命周期
+-------------------------------------------------------------------
 local function OnAttached(inst, target)
     inst.entity:SetParent(target.entity)
-    target:AddTag("warly_crepes_buff")
 
-    StartSanityControl(inst, target)
-    if target.components.talker then
-        target.components.talker:Say(GetString(target, "ANNOUNCE_CREPES_BUFF_ATTACHED"))
-    end
+    StartBuff(inst, target)
 
-    -- Buff持续5分钟
+    inst:AddComponent("timer")
     inst.components.timer:StartTimer("expire", BUFF_DURATION)
 end
 
 local function OnDetached(inst, target)
-    StopSanityControl(inst, target)
-    if target and target.components.talker then
-        target.components.talker:Say(GetString(target, "ANNOUNCE_CREPES_BUFF_DETACHED"))
-    end
-    if target then
-        target:RemoveTag("warly_crepes_buff")
-    end
+    StopBuff(inst, target)
     inst:Remove()
 end
 
+
+-------------------------------------------------------------------
+-- Prefab
+-------------------------------------------------------------------
 local function fn()
     local inst = CreateEntity()
 
     inst.entity:AddTransform()
     inst.entity:AddFollower()
-    inst.entity:AddAnimState()
     inst.entity:AddNetwork()
 
     inst:AddTag("FX")
-    inst:AddTag("CLASSIFIED")
     inst:AddTag("NOCLICK")
+    inst:AddTag("CLASSIFIED")
     inst:AddTag("debuff")
 
     inst.entity:SetPristine()
@@ -156,7 +126,6 @@ local function fn()
     inst.components.debuff:SetDetachedFn(OnDetached)
     inst.components.debuff.keepondespawn = true
 
-    inst:AddComponent("timer")
     inst:ListenForEvent("timerdone", function(inst, data)
         if data.name == "expire" then
             inst.components.debuff:Stop()

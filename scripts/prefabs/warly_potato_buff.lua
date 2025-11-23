@@ -106,6 +106,7 @@ local function fn()
     inst:AddComponent("debuff")
     inst.components.debuff:SetAttachedFn(OnAttached)
     inst.components.debuff:SetDetachedFn(OnDetached)
+    inst.components.debuff.keepondespawn = true
 
     inst:AddComponent("timer")
     inst:ListenForEvent("timerdone", function(inst, data)
