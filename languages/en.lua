@@ -7,23 +7,23 @@ STRINGS.SKILLTREE.PANELS.MULTICOOKER = "MULTICOOKER"
 STRINGS.SKILLTREE.WARLY = {}
 
 -- Eat Alone
-STRINGS.SKILLTREE.WARLY.WARLY_BONESOUP_BUFF_TITLE = "Eat Alone I"
+STRINGS.SKILLTREE.WARLY.WARLY_BONESOUP_BUFF_TITLE = "Selfish Eater I"
 STRINGS.SKILLTREE.WARLY.WARLY_BONESOUP_BUFF_DESC = "Warly can taste the protection of the bone ancestors from the 「Bone Bouillon」."
 
-STRINGS.SKILLTREE.WARLY.WARLY_CREPES_BUFF_TITLE = "Eat Alone II"
+STRINGS.SKILLTREE.WARLY.WARLY_CREPES_BUFF_TITLE = "Selfish Eater II"
 STRINGS.SKILLTREE.WARLY.WARLY_CREPES_BUFF_DESC = "The sweetness of 「Fresh Fruit Crepes」 makes Warly's spirits soar and movement speed surge as the battle grows more perilous."
 
-STRINGS.SKILLTREE.WARLY.WARLY_POTATO_BUFF_TITLE = "Eat Alone III"
+STRINGS.SKILLTREE.WARLY.WARLY_POTATO_BUFF_TITLE = "Selfish Eater III"
 STRINGS.SKILLTREE.WARLY.WARLY_POTATO_BUFF_DESC = "Even Warly, after eating 「Puffed Potato Soufflé」, finds his mind taken over by potatoes, attacking instead of thinking."
 
-STRINGS.SKILLTREE.WARLY.WARLY_SEAFOOD_BUFF_TITLE = "Eat Alone IV"
+STRINGS.SKILLTREE.WARLY.WARLY_SEAFOOD_BUFF_TITLE = "Selfish Eater IV"
 STRINGS.SKILLTREE.WARLY.WARLY_SEAFOOD_BUFF_DESC = "「Moqueca」reminds Warly of his seafaring days, allowing him to reclaim the power to wield gushing torrents in battle."
 
 -- Share Food
-STRINGS.SKILLTREE.WARLY.WARLY_MONSTERTARTARE_BUFF_TITLE = "Not Eat Alone I"
-STRINGS.SKILLTREE.WARLY.WARLY_MONSTERTARTARE_BUFF_DESC = "Warly doesn't always eat alone, he's happy to share his Monster Tartare」 with his Pigman friends."
+STRINGS.SKILLTREE.WARLY.WARLY_MONSTERTARTARE_BUFF_TITLE = "Not Selfish Eater I"
+STRINGS.SKILLTREE.WARLY.WARLY_MONSTERTARTARE_BUFF_DESC = "Warly doesn't always eat alone, he's happy to share his 「Monster Tartare」 with his Pigman friends."
 
-STRINGS.SKILLTREE.WARLY.WARLY_SHARE_BUFF_TITLE = "Not Eat Alone II"
+STRINGS.SKILLTREE.WARLY.WARLY_SHARE_BUFF_TITLE = "Not Selfish Eater II"
 STRINGS.SKILLTREE.WARLY.WARLY_SHARE_BUFF_DESC = "The general effects Warly gains from tasting meals can be shared with nearby friends, including Pigman friends."
 
 STRINGS.SKILLTREE.WARLY.WARLY_GOURMET_1_LOCK_DESC = "Learn 2 Gourmet skills to unlock."
