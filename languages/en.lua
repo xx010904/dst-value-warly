@@ -17,11 +17,11 @@ STRINGS.SKILLTREE.WARLY.WARLY_POTATO_BUFF_TITLE = "Eat Alone III"
 STRINGS.SKILLTREE.WARLY.WARLY_POTATO_BUFF_DESC = "Even Warly, after eating 「Puffed Potato Soufflé」, finds his mind taken over by potatoes, attacking instead of thinking."
 
 STRINGS.SKILLTREE.WARLY.WARLY_SEAFOOD_BUFF_TITLE = "Eat Alone IV"
-STRINGS.SKILLTREE.WARLY.WARLY_SEAFOOD_BUFF_DESC = "Sfter eating 「Moqueca」, allows Warly to wield rising torrents in battle."
+STRINGS.SKILLTREE.WARLY.WARLY_SEAFOOD_BUFF_DESC = "「Moqueca」reminds Warly of his seafaring days, allowing him to reclaim the power to wield gushing torrents in battle."
 
 -- Share Food
 STRINGS.SKILLTREE.WARLY.WARLY_MONSTERTARTARE_BUFF_TITLE = "Not Eat Alone I"
-STRINGS.SKILLTREE.WARLY.WARLY_MONSTERTARTARE_BUFF_DESC = "Warly doesn't always eat alone; he's happy to share his Monster Tartare」 with his Pigman friends."
+STRINGS.SKILLTREE.WARLY.WARLY_MONSTERTARTARE_BUFF_DESC = "Warly doesn't always eat alone, he's happy to share his Monster Tartare」 with his Pigman friends."
 
 STRINGS.SKILLTREE.WARLY.WARLY_SHARE_BUFF_TITLE = "Not Eat Alone II"
 STRINGS.SKILLTREE.WARLY.WARLY_SHARE_BUFF_DESC = "The general effects Warly gains from tasting meals can be shared with nearby friends, including Pigman friends."
@@ -59,7 +59,7 @@ STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_BAKED_TITLE = "Dense Baked Pie"
 STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_BAKED_DESC = "Warly can bake pies over fire to make Dense Baked Pies that he himself never gets tired of eating, and are extremely durable for storage."
 
 STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_FAVORITE_TITLE = "Dream Dish"
-STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_FAVORITE_DESC = "Warly's magical cooking can turn the pie into the favorite food of his friends(or Crabby Hermit), and his own beloved Void Sky Pie."
+STRINGS.SKILLTREE.WARLY.WARLY_SKY_PIE_FAVORITE_DESC = "Warly's magical cooking can turn the pie into the favorite food of his friends(or the Crabby Hermit), and his own beloved Clean and Hygienic Sky Pie."
 
 -- Burdened Pot
 STRINGS.SKILLTREE.WARLY.WARLY_CROCKPOT_MAKE_TITLE = "Burdened Pot"
@@ -94,7 +94,7 @@ STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_SHADOW_TITLE = "The Shadow Butcher"
 STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_SHADOW_DESC = "The Queen will reward your loyalty by unlocking power from slaughter. Warly can wield the Shadow Maul to unleash a bloodied long hook and drag targets, and he can also craft the Half-Baked Shadow Maul."
 
 STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LUNAR_TITLE = "The Lunar Butcher"
-STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LUNAR_DESC = "The Cryptic Founder will reward your curiosity by showing you the power of slaughter. Warly can activate the Polar Bearger Bin using Rot, spawning a toxic cloud that deals continuous damage."
+STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LUNAR_DESC = "The Cryptic Founder will reward your curiosity by showing you the power of slaughter. Warly can use the Polar Bearger Bin and Rot to create a toxic rotting cloud, and can craft a Cat Tail Bin."
 
 
 -- =============================================================================
@@ -103,6 +103,7 @@ STRINGS.SKILLTREE.WARLY.WARLY_ALLEGIANCE_LUNAR_DESC = "The Cryptic Founder will 
 STRINGS.NAMES.ARMOR_CROCKPOT = "Burdened Pot"
 STRINGS.NAMES.SCAPEGOAT = "Scapegoat"
 STRINGS.NAMES.SHADOW_BATTLEAXE_YOUNG = "Half-Baked Shadow Maul"
+STRINGS.NAMES.COONFUR_SACK = "Cat Tail Bin"
 STRINGS.NAMES.WARLY_SKY_PIE = "Pie In The Sky"
 STRINGS.NAMES.WARLY_SKY_PIE_BAKED = "Dense Baked Pie"
 STRINGS.NAMES.WARLY_SKY_PIE_BOOMERANG = "Clean and Hygienic Sky Pie"
@@ -111,13 +112,16 @@ STRINGS.NAMES.IMPROV_INSPIRATION = "Cooking Power"
 STRINGS.NAMES.NOOB_CHICKEN = "Noob Chicken"
 
 STRINGS.RECIPE_DESC.ARMOR_CROCKPOT = "Blacken your pot, so you can take the blame."
-STRINGS.RECIPE_DESC.SHADOW_BATTLEAXE_YOUNG = "It will never wake up again."
+STRINGS.RECIPE_DESC.SHADOW_BATTLEAXE_YOUNG = "It shall never wake up again."
+STRINGS.RECIPE_DESC.COONFUR_SACK = "It shall never be holy again."
 STRINGS.RECIPE_DESC.WARLY_SKY_PIE = "Dream pies can actually fill your stomach."
 
 STRINGS.CHARACTERS.WARLY.DESCRIBE.ARMOR_CROCKPOT = "Your pot's all black now —— guess who's taking the blame?"
 STRINGS.CHARACTERS.GENERIC.DESCRIBE.ARMOR_CROCKPOT = "A pot for taking all the blame."
 STRINGS.CHARACTERS.WARLY.DESCRIBE.SHADOW_BATTLEAXE_YOUNG = "Not fully done, but still quite usable."
 STRINGS.CHARACTERS.GENERIC.DESCRIBE.SHADOW_BATTLEAXE_YOUNG = "The chef's youthful version of the Shadow Maul."
+STRINGS.CHARACTERS.WARLY.DESCRIBE.COONFUR_SACK = "The cat tail isn't completely useless."
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.COONFUR_SACK = "The chef's cat fur thermal bucket."
 STRINGS.CHARACTERS.WARLY.DESCRIBE.WARLY_SKY_PIE = "A masterpiece from thin air!"
 STRINGS.CHARACTERS.GENERIC.DESCRIBE.WARLY_SKY_PIE = "This might actually fill me up."
 STRINGS.CHARACTERS.WARLY.DESCRIBE.WARLY_SKY_PIE_BAKED = "Baked into solid form!"
@@ -133,8 +137,8 @@ STRINGS.CHARACTERS.WARLY.ANNOUNCE_CREPES_BUFF_ATTACHED = "Super sweetness lifts 
 STRINGS.CHARACTERS.WARLY.ANNOUNCE_CREPES_BUFF_DETACHED = "The super sweetness has faded away."
 STRINGS.CHARACTERS.WARLY.ANNOUNCE_POTATO_BUFF_ATTACHED = "I can feel the boundless power of the potato!"
 STRINGS.CHARACTERS.WARLY.ANNOUNCE_POTATO_BUFF_DETACHED = "The power of the potato has left me."
-STRINGS.CHARACTERS.WARLY.ANNOUNCE_SEAFOOD_BUFF_ATTACHED = "I feel slippery all over!"
-STRINGS.CHARACTERS.WARLY.ANNOUNCE_SEAFOOD_BUFF_DETACHED = "I've lost that slippery feeling."
+STRINGS.CHARACTERS.WARLY.ANNOUNCE_SEAFOOD_BUFF_ATTACHED = "Recalling the surging power of the torrents."
+STRINGS.CHARACTERS.WARLY.ANNOUNCE_SEAFOOD_BUFF_DETACHED = "The power of the torrents has faded."
 
 STRINGS.CHARACTERS.GENERIC.ANNOUNCE_BAD_EAT_COMMOM =
 {

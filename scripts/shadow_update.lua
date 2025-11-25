@@ -183,8 +183,11 @@ USESHADOWHOOK.fn = function(act)
                     inst:DoAttackEffects(doer, target)
                     -- 只有非 companion 且非 leader 的目标才受伤害
                     if not target:HasTag("companion") and not (doer.components.leader and doer.components.leader:IsFollower(target)) then
-                        target.components.health:DoDelta(-(inst.level * 12 - 11), nil, inst)
-
+                        local health_delta = inst.level * 12 - 11
+                        -- 不会致死
+                        if target.components.health.currenthealth > health_delta then
+                            target.components.health:DoDelta(-health_delta, nil, inst)
+                        end
                         -- 吸血要2级才会(1到4级)
                         if inst.level > 1 and doer.components.health.currenthealth < doer.components.health.maxhealth then
                             local suck = 1.1

@@ -187,9 +187,23 @@ local function ScanNearbyPlayers(inst)
     -- 给新进入范围的玩家加 redirectfn
     for _, p in ipairs(players) do
         if p ~= owner and not inst._teammates[p] then
-            ApplyDamageRedirect(inst, p)
-            inst._teammates[p] = true
-            -- print("[BackArmor] Applied damage modifier and redirect to:", tostring(p))
+            -- 检查玩家身上是否装备了 armor_crockpot
+            local has_armor_crockpot = false
+            if p.components.inventory then
+                for _, v in pairs(EQUIPSLOTS) do
+                    local item = p.components.inventory:GetEquippedItem(v)
+                    if item and item.prefab == "armor_crockpot" then
+                        has_armor_crockpot = true
+                        break
+                    end
+                end
+            end
+
+            if not has_armor_crockpot then
+                ApplyDamageRedirect(inst, p)
+                inst._teammates[p] = true
+                -- print("[BackArmor] Applied damage modifier and redirect to:", tostring(p))
+            end
         end
     end
 end

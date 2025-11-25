@@ -202,7 +202,7 @@ local function HireNearbyPigmen(inst, giver, item)
                                 dummy.components.edible.healthvalue = 0
                                 dummy.components.edible.hungervalue = 0
                                 dummy.components.edible.sanityvalue = 0
-                                dummy.components.edible.foodtype = FOODTYPE.GENERIC
+                                dummy.components.edible.foodtype = FOODTYPE.GOODIES
                                 dummy:AddTag("dummyfood")
                                 local success = pig.components.eater:Eat(dummy)
                                 if not success then
@@ -259,6 +259,24 @@ AddPrefabPostInit("pigman", function(inst)
             HireNearbyPigmen(inst, giver, item)
             if inst.components.health ~= nil then
                 inst.components.health:SetPercent(1)
+            end
+            -- 为了增加怪物鞑靼的调味料buff
+            if inst.components.eater ~= nil then
+                local dummy = SpawnPrefab(item.prefab)
+                if dummy then
+                    -- 属性归零，不增加血量/饥饿/精神
+                    if dummy.components.edible ~= nil then
+                        dummy.components.edible.healthvalue = 0
+                        dummy.components.edible.hungervalue = 0
+                        dummy.components.edible.sanityvalue = 0
+                        dummy.components.edible.foodtype = FOODTYPE.GOODIES
+                        dummy:AddTag("dummyfood")
+                        local success = inst.components.eater:Eat(dummy)
+                        if not success then
+                            dummy:Remove()
+                        end
+                    end
+                end
             end
             changeWere(inst)
             if item then

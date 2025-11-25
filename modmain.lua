@@ -9,6 +9,7 @@ Assets = {
     Asset("ANIM", "anim/warly_sky_pie_boomerang.zip"),
     Asset("ANIM", "anim/improv_cooking_power.zip"),
     Asset("ANIM", "anim/spell_icons_warly.zip"),
+    Asset("ANIM", "anim/coonfur_sack.zip"),
 	-- Asset("ANIM", "anim/ui_beard_3x1.zip"),
     Asset("IMAGE", "images/inventoryimages/armor_crockpot.tex"),
 	Asset("ATLAS", "images/inventoryimages/armor_crockpot.xml"),
@@ -26,6 +27,10 @@ Assets = {
 	Asset("ATLAS", "images/inventoryimages/improv_cooking_power.xml"),
     Asset("IMAGE", "images/inventoryimages/improv_cooking_power_actived.tex"),
 	Asset("ATLAS", "images/inventoryimages/improv_cooking_power_actived.xml"),
+	Asset("IMAGE", "images/inventoryimages/coonfur_sack.tex"),
+	Asset("ATLAS", "images/inventoryimages/coonfur_sack.xml"),
+    Asset("IMAGE", "images/inventoryimages/coonfur_sack_open.tex"),
+	Asset("ATLAS", "images/inventoryimages/coonfur_sack_open.xml"),
 }
 
 PrefabFiles = {
@@ -55,8 +60,11 @@ PrefabFiles = {
 	"warly_truedelicious_buff",
 	"portableblender_sacrifice_fx",
 	"portableblender_soil_fx",
+	"coonfur_sack",
 	"spoiled_cloud_buff",
+	"spoiled_cloud_base_fx",
 	"spoiled_cloud_fx",
+	"spoiled_cloud_debuff",
     -- 其他 prefab 名称...
 }
 
@@ -66,6 +74,8 @@ RegisterInventoryItemAtlas("images/inventoryimages/warly_sky_pie.xml", "warly_sk
 RegisterInventoryItemAtlas("images/inventoryimages/portablecookpot_item_actived.xml", "portablecookpot_item_actived.tex")
 RegisterInventoryItemAtlas("images/inventoryimages/improv_cooking_power.xml", "improv_cooking_power.tex")
 RegisterInventoryItemAtlas("images/inventoryimages/improv_cooking_power_actived.xml", "improv_cooking_power_actived.tex")
+RegisterInventoryItemAtlas("images/inventoryimages/coonfur_sack.xml", "coonfur_sack.tex")
+RegisterInventoryItemAtlas("images/inventoryimages/coonfur_sack_open.xml", "coonfur_sack_open.tex")
 
 --Make Global
 local require = GLOBAL.require
@@ -91,17 +101,11 @@ elseif GetModConfigData("LanguageSetting") == "english" then
 end
 
 -- 这将执行 xxx.lua 中的所有代码
-local function import_if_enabled(config_key, script_path)
-    if GetModConfigData(config_key) then
-        modimport(script_path)
-    end
-end
-import_if_enabled("lonely_eater_switch",     "scripts/lonely_eater_update.lua")
-import_if_enabled("funny_cooker_switch",     "scripts/funny_cooker_update.lua")
-import_if_enabled("crockpot_carrier_switch", "scripts/crockpot_carrier_update.lua")
-import_if_enabled("lunar_switch",            "scripts/lunar_update.lua")
-import_if_enabled("shadow_switch",           "scripts/shadow_update.lua")
-
+modimport("scripts/lonely_eater_update.lua")
+modimport("scripts/funny_cooker_update.lua")
+modimport("scripts/crockpot_carrier_update.lua")
+modimport("scripts/lunar_update.lua")
+modimport("scripts/shadow_update.lua")
 -- 技能树
 modimport("scripts/skilltree_update.lua")
 modimport("scripts/warly_update.lua")

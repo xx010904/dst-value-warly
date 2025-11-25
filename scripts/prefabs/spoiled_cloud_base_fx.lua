@@ -1,6 +1,6 @@
 local function ontimerdone(inst, data)
     if data.name == "lifetime" then
-        inst.AnimState:PlayAnimation("sporecloud_overlay_pst")
+        inst.AnimState:PlayAnimation("sporecloud_base_pst")
         inst:ListenForEvent("animover", function (inst)
             inst:Remove()
         end)
@@ -20,15 +20,15 @@ local function fn()
 
     inst.Transform:SetFourFaced()
 
-    inst.AnimState:SetBank("sporecloud")
-    inst.AnimState:SetBuild("sporecloud")
-    inst.AnimState:PlayAnimation("sporecloud_overlay_pre")
-    inst.AnimState:PushAnimation("sporecloud_overlay_loop", true)
-    -- inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
-    -- inst.AnimState:SetLayer(LAYER_BACKGROUND)
-    -- inst.AnimState:SetSortOrder(-1)
-    -- inst.AnimState:SetFinalOffset(-1)
-	inst.AnimState:SetMultColour(1, 1, 1, 0.47)
+    inst.AnimState:SetBank("sporecloud_base")
+    inst.AnimState:SetBuild("sporecloud_base")
+    inst.AnimState:PlayAnimation("sporecloud_base_pre")
+    inst.AnimState:PushAnimation("sporecloud_base_idle", true)
+    inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
+    inst.AnimState:SetLayer(LAYER_BACKGROUND)
+    inst.AnimState:SetSortOrder(3)
+    inst.AnimState:SetFinalOffset(-1)
+	inst.AnimState:SetMultColour(1, 1, 1, 0.7)
     local s = 0.87
     inst.Transform:SetScale(s, s, s)
     inst.AnimState:SetLightOverride(.3)
@@ -50,4 +50,4 @@ local function fn()
     return inst
 end
 
-return Prefab("spoiled_cloud_fx", fn)
+return Prefab("spoiled_cloud_base_fx", fn)

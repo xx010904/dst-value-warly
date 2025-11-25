@@ -2,13 +2,17 @@ local isCh = locale == "zh" or locale == "zhr"
 version = "1.0.0"
 name = isCh and "数值怪沃利" or "The Value Monster: Warly"
 description = isCh and 
-"大厨有三弱。一弱是能力可以被他人共享，因此我设计了一些必须大厨出场才能触发的技能点；二弱是回血能力有限，因此我增加了一些防御相关的技能点；三弱是获取buff料理不易，再加新料理新调料只会更难玩，所以我加了新的获取方式。当然啦，数值增强技能点也是很重要的，比如直接加buff时长的..."..
+"大厨有三弱，一是食物buff共享，因此我不加新料理，而是加了很多自己才能用的食物buff和战斗生活技能"..
+"\n二是回复能力弱，因此我加了很多特别的直接间接回复方式、消除食物记忆方式和防御方式"..
+"\n三是获取料理和调味料困难，因此我加了很多特别的料理原材料和调味料的获取方式"..
 "\n󰀐感谢赏玩！"..
 "\n\n〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓"..
 "\n󰀅完整更新日志可以在创意工坊查看"..
 "\n"
 or
-"todo"..
+"The chef has three weaknesses. First, shared food buffs, so instead of new recipes, I added buffs and skills only for the chef."..
+"\nSecond, weak healing, so I added special healing methods, food memory removal, and defense mechanisms."..
+"\nThird, difficulty in obtaining recipes and seasonings, so I added unique ways to gather ingredients and seasonings."..
 "\n󰀐Thanks to enjoy!"..
 "\n\n〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓"..
 "\n󰀅Full changelog available on the Workshop"..
@@ -51,66 +55,5 @@ configuration_options =
             {description = "default", data = "default", hover = "default"},
         },
         default = "default",
-    },
-
-    Subtitle(isCh and "机制开关" or "Mechanism Switches"),
-    {
-        name = "lonely_eater_switch",
-        label = isCh and "吃独食" or "Eat Alone",
-        hover = isCh and "启用沃利的吃独食技能树" or "Enable Warly's 'Eat Alone'  Skill Tree",
-        options =
-        {
-            { description = isCh and "开" or "On", data = true,  hover = isCh and "启用" or "Enable" },
-            { description = isCh and "关" or "Off", data = false, hover = isCh and "关闭" or "Disable" },
-        },
-        default = true,
-    },
-
-    {
-        name = "funny_cooker_switch",
-        label = isCh and "下饭操作" or "Meal-worthy Play",
-        hover = isCh and "启用沃利的下饭操作技能树" or "Enable Warly's 'Meal-worthy Play' Skill Tree",
-        options =
-        {
-            { description = isCh and "开" or "On", data = true,  hover = isCh and "启用" or "Enable" },
-            { description = isCh and "关" or "Off", data = false, hover = isCh and "关闭" or "Disable" },
-        },
-        default = true,
-    },
-
-    {
-        name = "crockpot_carrier_switch",
-        label = isCh and "背锅侠" or "Crockpot Carrier",
-        hover = isCh and "启用沃利的背锅侠技能树" or "Enable Warly's 'Crockpot Carrier' Skill Tree",
-        options =
-        {
-            { description = isCh and "开" or "On", data = true,  hover = isCh and "启用" or "Enable" },
-            { description = isCh and "关" or "Off", data = false, hover = isCh and "关闭" or "Disable" },
-        },
-        default = true,
-    },
-
-    {
-        name = "lunar_switch",
-        label = isCh and "月亮机制" or "Lunar System",
-        hover = isCh and "启用月亮主题的强化机制" or "Enable lunar-themed enhancement system",
-        options =
-        {
-            { description = isCh and "开" or "On", data = true,  hover = isCh and "启用" or "Enable" },
-            { description = isCh and "关" or "Off", data = false, hover = isCh and "关闭" or "Disable" },
-        },
-        default = true,
-    },
-
-    {
-        name = "shadow_switch",
-        label = isCh and "暗影机制" or "Shadow System",
-        hover = isCh and "启用暗影主题的强化机制" or "Enable shadow-themed enhancement system",
-        options =
-        {
-            { description = isCh and "开" or "On", data = true,  hover = isCh and "启用" or "Enable" },
-            { description = isCh and "关" or "Off", data = false, hover = isCh and "关闭" or "Disable" },
-        },
-        default = true,
     },
 }
