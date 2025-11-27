@@ -100,6 +100,8 @@ elseif GetModConfigData("LanguageSetting") == "english" then
     modimport("languages/en")
 end
 
+GLOBAL.warlyvalueconfig.burdenPotDurability = GetModConfigData("burdenPotDurability")
+
 -- 这将执行 xxx.lua 中的所有代码
 modimport("scripts/lonely_eater_update.lua")
 modimport("scripts/funny_cooker_update.lua")

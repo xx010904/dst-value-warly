@@ -1,7 +1,9 @@
+local burdenPotDurability = warlyvalueconfig.burdenPotDurability or 666
+
 local SCAN_RADIUS = 10
 local SANITY_RATIO = 0.1
 local HUNGER_RATIO = 0.1
-local ARMOR_DURABILITY = 666
+local ARMOR_DURABILITY = burdenPotDurability
 
 local function OnBlocked(owner)
     owner.SoundEmitter:PlaySound("dontstarve/wilson/hit_metal")
@@ -213,6 +215,12 @@ local function OnArmorBroke(owner, data)
     local inst = data.armor
     if not (inst and inst:IsValid()) then return end
 
+    local hasFlungSkill = owner and owner.components.skilltreeupdater and owner.components.skilltreeupdater:IsActivated("warly_crockpot_flung")
+    -- print("甩锅技能树：", hasFlungSkill)
+    if not hasFlungSkill then -- 技能树控制是否开启
+        return
+    end
+
     local x, y, z = owner.Transform:GetWorldPosition()
     local radius = 6 -- 投掷距离，可根据需求修改
 
@@ -318,11 +326,7 @@ local function onequip(inst, owner)
     inst:ListenForEvent("blocked", OnBlocked, owner)
 
     -- 监听破碎
-    local hasFlungSkill = owner and owner.components.skilltreeupdater and owner.components.skilltreeupdater:IsActivated("warly_crockpot_flung")
-    -- print("甩锅技能树：", hasFlungSkill)
-    if hasFlungSkill then -- 技能树控制是否开启
-        owner:ListenForEvent("armorbroke", OnArmorBroke)
-    end
+    owner:ListenForEvent("armorbroke", OnArmorBroke)
 
     -- 定期扫描队友
     inst._scantask = inst:DoPeriodicTask(1, ScanNearbyPlayers)
