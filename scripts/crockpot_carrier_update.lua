@@ -15,9 +15,12 @@
 -- 2 原版的部署/回收便携厨具都变快
 -- 3 新增的分锅/香料站分离/研磨器挖地/厨师袋调味都加快
 
+local chefPouchBuffDuration = warlyvalueconfig.chefPouchBuffDuration or 10
+local grinderDigCooldown = warlyvalueconfig.grinderDigCooldown or 1
 --========================================================
 -- Section 1：背锅锅制作配方
 --========================================================
+
 AddRecipe2("armor_crockpot",
     {
         Ingredient("portablecookpot_item", 0),
@@ -516,7 +519,7 @@ local function UpgradeSpicePack(inst, doer, spice_type)
         inst:AddComponent("perishable")
         inst:AddTag("show_spoilage")
     end
-    inst.components.perishable:SetPerishTime(TUNING.TOTAL_DAY_TIME * 10)
+    inst.components.perishable:SetPerishTime(TUNING.TOTAL_DAY_TIME * chefPouchBuffDuration)
     inst.components.perishable:StartPerishing()
 
     ----------------------------------------------------
@@ -649,7 +652,7 @@ end)
 --------------------------------------------------------------------------
 -- 研磨器 冷却时间
 --------------------------------------------------------------------------
-local FLAVOR_COOLDOWN = 400 -- 1天冷却
+local FLAVOR_COOLDOWN = grinderDigCooldown * 450 -- 不到1天冷却
 
 -- 启动冷却
 local function StartFlavorCooldown(player)

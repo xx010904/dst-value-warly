@@ -1,3 +1,5 @@
+local youthShadowMaceDurability = warlyvalueconfig.youthShadowMaceDurability or 150
+
 local function OnEquip(inst, owner)
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
@@ -160,8 +162,8 @@ local function fn()
     inst.components.inventoryitem.atlasname = "images/inventoryimages/shadow_battleaxe_young.xml"
 
     inst:AddComponent("finiteuses")
-    inst.components.finiteuses:SetMaxUses(150)
-    inst.components.finiteuses:SetUses(150)
+    inst.components.finiteuses:SetMaxUses(youthShadowMaceDurability)
+    inst.components.finiteuses:SetUses(youthShadowMaceDurability)
     inst.components.finiteuses:SetConsumption(ACTIONS.CHOP, 1)
     inst.components.finiteuses:SetOnFinished(inst.Remove)
 

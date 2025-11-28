@@ -1,3 +1,4 @@
+local dreamDishChance = warlyvalueconfig.dreamDishChance or 0.05
 local cooking = require("cooking")
 
 local function OnEaten(inst, eater)
@@ -128,7 +129,12 @@ local function MakeSpicedFood(inst, cooker, chef)
             chef.warly_skypie_accum_chance = chef.warly_skypie_accum_chance or 0
 
             -- 累积随机值 0.01 ~ 0.09
-            local increment = math.random() * 0.08 + 0.01
+            local avg = dreamDishChance or 0.05
+            -- 平均值计算逆推随机上限，让整个区间平均为 avg
+            -- 区间平均：(lower + upper) / 2 = avg
+            local lower = 0.01
+            local upper = 2 * avg - lower  -- 反推 upper 值
+            local increment = math.random() * (upper - lower) + lower
             chef.warly_skypie_accum_chance = chef.warly_skypie_accum_chance + increment
 
             -- 累积触发

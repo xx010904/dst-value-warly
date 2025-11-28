@@ -30,6 +30,9 @@
 -- =========================================================
 -- SECTION1 胡乱料理全表（含恢复与抛锅概率）
 -- =========================================================
+local shockReoveryMultiplier = warlyvalueconfig.shockReoveryMultiplier or 1
+local cookingPowerChanceMultiplier = warlyvalueconfig.cookingPowerChanceMultiplier or 1
+
 local spicedfoods = require("spicedfoods")
 
 local FOOD_RECOVERY_TABLE = {
@@ -171,7 +174,7 @@ local function GetCookingPowerCount(inst)
 end
 
 -- =========================================================
--- 抛锅函数
+-- 加厨力or抛锅函数
 -- =========================================================
 local function SpawnCookPotFX(chef, idiot, meal, force_throw)
     if not chef then return end
@@ -239,9 +242,9 @@ local function ApplyRecovery(inst, idiot, food_name, operation)
     local sanity_delta = sanity_base + (math.random() * 2 - 1) * sanity_variation
     local health_delta = health_base + (math.random() * 2 - 1) * health_variation
 
-    inst.components.hunger:DoDelta(hunger_delta)
-    inst.components.sanity:DoDelta(sanity_delta)
-    inst.components.health:DoDelta(health_delta)
+    inst.components.hunger:DoDelta(hunger_delta * shockReoveryMultiplier)
+    inst.components.sanity:DoDelta(sanity_delta * shockReoveryMultiplier)
+    inst.components.health:DoDelta(health_delta * shockReoveryMultiplier)
 end
 
 -- =========================================================
@@ -268,7 +271,7 @@ local function doFunnyCook(inst, idiot, food_name, op)
     local min_mult = 0.8
     local max_mult = 1.2
     -- 生成一次随机浮动值
-    local chance = base_chance * (math.random() * (max_mult - min_mult) + min_mult)
+    local chance = base_chance * (math.random() * (max_mult - min_mult) + min_mult) * cookingPowerChanceMultiplier
     inst.warly_throw_pot_accum_chance = inst.warly_throw_pot_accum_chance + chance
     while inst.warly_throw_pot_accum_chance >= 1 do
         inst.warly_throw_pot_accum_chance = inst.warly_throw_pot_accum_chance - 1
