@@ -100,13 +100,18 @@ elseif GetModConfigData("LanguageSetting") == "english" then
     modimport("languages/en")
 end
 
-GLOBAL.warlyvalueconfig.burdenPotDurability = GetModConfigData("burdenPotDurability")
+GLOBAL.warlyvalueconfig.selfishEaterBuffDuration = GetModConfigData("selfishEaterBuffDuration")
 GLOBAL.warlyvalueconfig.dreamDishChance = GetModConfigData("dreamDishChance")
 GLOBAL.warlyvalueconfig.shockReoveryMultiplier = GetModConfigData("shockReoveryMultiplier")
 GLOBAL.warlyvalueconfig.cookingPowerChanceMultiplier = GetModConfigData("cookingPowerChanceMultiplier")
+GLOBAL.warlyvalueconfig.burdenPotDurability = GetModConfigData("burdenPotDurability")
+GLOBAL.warlyvalueconfig.scapegoatHornDropChance = GetModConfigData("scapegoatHornDropChance")
 GLOBAL.warlyvalueconfig.chefPouchBuffDuration = GetModConfigData("chefPouchBuffDuration")
+GLOBAL.warlyvalueconfig.chefPouchSpiceSanMultiplier = GetModConfigData("chefPouchSpiceSanMultiplier")
 GLOBAL.warlyvalueconfig.grinderDigCooldown = GetModConfigData("grinderDigCooldown")
 GLOBAL.warlyvalueconfig.youthShadowMaceDurability = GetModConfigData("youthShadowMaceDurability")
+GLOBAL.warlyvalueconfig.rottenCloudDurationPerRot = GetModConfigData("rottenCloudDurationPerRot")
+GLOBAL.warlyvalueconfig.pigmanRotCloudFX = GetModConfigData("pigmanRotCloudFX")
 
 -- 这将执行 xxx.lua 中的所有代码
 modimport("scripts/lonely_eater_update.lua")

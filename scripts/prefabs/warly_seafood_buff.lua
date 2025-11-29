@@ -1,4 +1,4 @@
-local BUFF_DURATION = 300 -- buff 持续时间（秒）
+local selfishEaterBuffDuration = warlyvalueconfig.selfishEaterBuffDuration or 300
 
 -- 小型爆炸参数
 local AOE_RADIUS = 2.4
@@ -150,7 +150,7 @@ local function OnAttached(inst, target)
     target:ListenForEvent("onattackother", func, target)
 
     -- buff 持续时间
-    inst.components.timer:StartTimer("expire", BUFF_DURATION)
+    inst.components.timer:StartTimer("expire", selfishEaterBuffDuration)
 end
 
 local function OnDetached(inst, target)

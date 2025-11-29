@@ -1,4 +1,5 @@
-local BUFF_DURATION = 300
+local selfishEaterBuffDuration = warlyvalueconfig.selfishEaterBuffDuration or 300
+-- print("Warly Mod: selfishEaterBuffDuration", selfishEaterBuffDuration)
 local UPDATE_PERIOD = 0.5
 local AURA_RANGE = 20
 
@@ -91,7 +92,7 @@ local function OnAttached(inst, target)
     StartBuff(inst, target)
 
     inst:AddComponent("timer")
-    inst.components.timer:StartTimer("expire", BUFF_DURATION)
+    inst.components.timer:StartTimer("expire", selfishEaterBuffDuration)
 end
 
 local function OnDetached(inst, target)

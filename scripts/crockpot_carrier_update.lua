@@ -16,7 +16,9 @@
 -- 3 新增的分锅/香料站分离/研磨器挖地/厨师袋调味都加快
 
 local chefPouchBuffDuration = warlyvalueconfig.chefPouchBuffDuration or 10
+local chefPouchSpiceSanMultiplier = warlyvalueconfig.chefPouchSpiceSanMultiplier or 1
 local grinderDigCooldown = warlyvalueconfig.grinderDigCooldown or 1
+local scapegoatHornDropChance = warlyvalueconfig.scapegoatHornDropChance or 0.25
 --========================================================
 -- Section 1：背锅锅制作配方
 --========================================================
@@ -150,17 +152,11 @@ AddPrefabPostInit("lightninggoat", function(goat)
             local x, y, z = goat.Transform:GetWorldPosition()
             -- 替罪羊被击杀后可能掉落羊角
             goat:ListenForEvent("death", function(goat, data)
-                if math.random() < 0.25 then
+                if math.random() < scapegoatHornDropChance then
                     -- 掉落一个羊角
                     local horn = SpawnPrefab("lightninggoathorn")
                     if horn then
                         horn.Transform:SetPosition(x, y, z)
-                    end
-                else
-                    -- 掉落一个电子元件
-                    local transistor = SpawnPrefab("transistor")
-                    if transistor then
-                        transistor.Transform:SetPosition(x, y, z)
                     end
                 end
             end)
@@ -427,7 +423,7 @@ AddPrefabPostInit("spicepack", function(inst)
             -- ))
         end
 
-        local dapper = TUNING.DAPPERNESS_MED * total
+        local dapper = TUNING.DAPPERNESS_MED * chefPouchSpiceSanMultiplier * total
         equippable.dapperness = dapper
         -- print(string.format("[SpicePack] 总加成种类数: %.2f，对应理智恢复: %.2f", total, dapper))
     end)

@@ -1,4 +1,4 @@
-local BUFF_DURATION = 300  -- 5分钟buff持续时间
+local selfishEaterBuffDuration = warlyvalueconfig.selfishEaterBuffDuration or 300
 local SHIELD_VARIATIONS = 3
 local INVINCIBLE_TIME = 0.33
 local DODGE_CHANCE = 0.25 -- 每次被攻击有25%几率触发闪避
@@ -56,7 +56,7 @@ local function OnAttached(inst, target)
     end
 
     -- buff持续时间
-    inst.components.timer:StartTimer("expire", BUFF_DURATION)
+    inst.components.timer:StartTimer("expire", selfishEaterBuffDuration)
 end
 
 local function OnDetached(inst, target)

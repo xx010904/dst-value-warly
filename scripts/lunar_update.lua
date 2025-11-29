@@ -1,3 +1,5 @@
+local rottenCloudDurationPerRot = warlyvalueconfig.rottenCloudDurationPerRot or 2.5
+
 AddPrefabPostInit("spoiled_food", function(inst)
     inst:AddComponent("activespoiledcloudtool")
 end)
@@ -26,9 +28,9 @@ SPOILED_ON_SACK.fn = function(act)
     if doer and doer:HasTag("warly_allegiance_lunar") and target and item then
         local damage = 0
         if target.prefab == "beargerfur_sack" then
-            damage = 5.12
+            damage = 5.2
         elseif target.prefab == "coonfur_sack" then
-            damage = 2.56
+            damage = 2.6
         else
             return
         end
@@ -45,7 +47,7 @@ SPOILED_ON_SACK.fn = function(act)
         if buff_inst and buff_inst.components.timer then
             buff_inst.damage = damage
             local time_left = buff_inst.components.timer:GetTimeLeft("lifetime")
-            buff_inst.components.timer:SetTimeLeft("lifetime", stacksize * 2.5 + time_left)
+            buff_inst.components.timer:SetTimeLeft("lifetime", stacksize * rottenCloudDurationPerRot + time_left)
             buff_inst:PlusFxLastTime()
         end
 

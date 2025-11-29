@@ -1,4 +1,4 @@
-local BUFF_DURATION = 300 -- buff 持续时间（秒）
+local selfishEaterBuffDuration = warlyvalueconfig.selfishEaterBuffDuration or 300
 
 local function UpdateDamage(inst, target)
     if target.components.combat and target.components.hunger then
@@ -52,7 +52,7 @@ local function OnAttached(inst, target)
         target.components.talker:Say(GetString(target, "ANNOUNCE_POTATO_BUFF_ATTACHED"))
     end
 
-    inst.components.timer:StartTimer("expire", BUFF_DURATION)
+    inst.components.timer:StartTimer("expire", selfishEaterBuffDuration)
 end
 
 local function OnDetached(inst, target)

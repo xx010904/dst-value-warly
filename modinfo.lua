@@ -1,5 +1,5 @@
 local isCh = locale == "zh" or locale == "zhr"
-version = "1.0.2"
+version = "1.0.3"
 name = isCh and "数值怪沃利" or "The Value Monster: Warly"
 description = isCh and
     "大厨有三弱，一是食物buff共享，因此我不加新料理，而是加了很多自己才能用的食物buff和战斗生活技能" ..
@@ -57,40 +57,43 @@ configuration_options =
         default = "default",
     },
 
-    Subtitle(isCh and "背锅锅" or "Burdened Pot"),
+    Subtitle(isCh and "吃独食" or "Selfish Eater"),
     {
-        name = "burdenPotDurability",
-        label = isCh and "背锅锅的耐久度" or "Burdened Pot Durability",
-        hover = isCh and "设置背锅锅的耐久度数值"
-            or "Set the durability value of the Burdened Pot",
+        name = "selfishEaterBuffDuration",
+        label = isCh and "吃独食BUFF持续时间" or "Selfish Eater Buff Duration",
+        hover = isCh and "设置吃独食BUFF的持续时间（秒）"
+            or "Set the duration (in seconds) of the Selfish Eater Buff",
         options =
         {
             {
-                description = isCh and "较低" or "Low",
-                data = 333,
-                hover = isCh and "背锅锅只有 333 点耐久"
-                    or "Burdened Pot has only 333 durability"
+                description = isCh and "较短" or "Short",
+                data = 200,
+                hover = isCh and "吃独食BUFF持续 200 秒"
+                    or "The Selfish Eater Buff lasts 200 seconds"
             },
+
             {
                 description = isCh and "正常" or "Normal",
-                data = 666,
-                hover = isCh and "背锅锅有 666 点耐久"
-                    or "Burdened Pot has 666 durability"
+                data = 300,
+                hover = isCh and "吃独食BUFF持续 300 秒"
+                    or "The Selfish Eater Buff lasts 300 seconds"
             },
+
             {
-                description = isCh and "较高" or "High",
-                data = 999,
-                hover = isCh and "背锅锅有 999 点耐久"
-                    or "Burdened Pot has 999 durability"
+                description = isCh and "较长" or "Long",
+                data = 400,
+                hover = isCh and "吃独食BUFF持续 400 秒"
+                    or "The Selfish Eater Buff lasts 400 seconds"
             },
+
             {
                 description = isCh and "离谱" or "Absurd",
-                data = 1333,
-                hover = isCh and "背锅锅有 1333 点耐久"
-                    or "Burdened Pot has 1333 durability"
-            }
+                data = 500,
+                hover = isCh and "吃独食BUFF持续 500 秒"
+                    or "The Selfish Eater Buff lasts 500 seconds"
+            },
         },
-        default = 666,
+        default = 300,
     },
 
     Subtitle(isCh and "画饼饼" or "Pie In the Sky"),
@@ -122,7 +125,7 @@ configuration_options =
             {
                 description = isCh and "离谱" or "Absurd",
                 data = 0.09,
-                hover = isCh and "梦想料理平均触发概率约 9%，十分荒谬"
+                hover = isCh and "梦想料理平均触发概率约 9%"
                     or "Dream Dish triggers at an absurdly high 9% average chance"
             },
         },
@@ -140,25 +143,25 @@ configuration_options =
             {
                 description = isCh and "较低" or "Low",
                 data = 0.5,
-                hover = isCh and "下饭操作震惊的回复倍率为 0.5 倍"
+                hover = isCh and "下饭操作震惊的回复倍率为0.5"
                     or "Shock response at 0.5× during Meal-Worth Play"
             },
             {
                 description = isCh and "正常" or "Normal",
                 data = 1,
-                hover = isCh and "下饭操作震惊的回复倍率为 1 倍"
+                hover = isCh and "下饭操作震惊的回复倍率为1"
                     or "Shock response at normal 1× during Meal-Worth Play"
             },
             {
                 description = isCh and "较高" or "High",
                 data = 1.5,
-                hover = isCh and "下饭操作震惊的回复倍率为 1.5 倍"
+                hover = isCh and "下饭操作震惊的回复倍率为1.5"
                     or "Shock response at 1.5× during Meal-Worth Play"
             },
             {
                 description = isCh and "离谱" or "Absurd",
                 data = 2,
-                hover = isCh and "下饭操作震惊的回复倍率为 2 倍，非常夸张"
+                hover = isCh and "下饭操作震惊的回复倍率为2"
                     or "Shock response at an absurdly high 2× during Meal-Worth Play"
             },
         },
@@ -167,40 +170,110 @@ configuration_options =
 
     {
         name = "cookingPowerChanceMultiplier",
-        label = isCh and "获得厨力获取概率比率" or " Cooking Power Chance Multiplier",
-        hover = isCh and "设置下饭操作时获得厨力的平均触发概率比率"
+        label = isCh and "获得厨力获取概率的倍率" or " Cooking Power Chance Multiplier",
+        hover = isCh and "设置下饭操作时获得厨力的平均触发概率的倍率"
             or "Set the average chance to gain Cooking Power during  Meal-Worth Play",
         options =
         {
             {
                 description = isCh and "较低" or "Low",
                 data = 0.5,
-                hover = isCh and "下饭操作厨力获取概率倍率为 0.5 倍"
+                hover = isCh and "下饭操作厨力获取概率的倍率为0.5"
                     or "Shock response at 0.5× during Meal-Worth Play"
             },
             {
                 description = isCh and "正常" or "Normal",
                 data = 1,
-                hover = isCh and "下饭操作厨力获取概率倍率为 1 倍"
+                hover = isCh and "下饭操作厨力获取概率的倍率为1"
                     or "Shock response at normal 1× during Meal-Worth Play"
             },
             {
                 description = isCh and "较高" or "High",
                 data = 1.5,
-                hover = isCh and "下饭操作厨力获取概率倍率为 1.5 倍"
+                hover = isCh and "下饭操作厨力获取概率的倍率为1.5"
                     or "Shock response at 1.5× during Meal-Worth Play"
             },
             {
                 description = isCh and "离谱" or "Absurd",
                 data = 2,
-                hover = isCh and "下饭操作厨力获取概率倍率为 2 倍，非常夸张"
+                hover = isCh and "下饭操作厨力获取概率的倍率为2倍"
                     or "Shock response at an absurdly high 2× during Meal-Worth Play"
             },
         },
         default = 1,
     },
 
-    Subtitle(isCh and "调味厨具" or "Seasoning Utensile"),
+    Subtitle(isCh and "背锅锅" or "Burdened Pot"),
+    {
+        name = "burdenPotDurability",
+        label = isCh and "背锅锅的耐久度" or "Burdened Pot Durability",
+        hover = isCh and "设置背锅锅的耐久度数值"
+            or "Set the durability value of the Burdened Pot",
+        options =
+        {
+            {
+                description = isCh and "较低" or "Low",
+                data = 333,
+                hover = isCh and "背锅锅只有 333 点耐久"
+                    or "Burdened Pot has only 333 durability"
+            },
+            {
+                description = isCh and "正常" or "Normal",
+                data = 666,
+                hover = isCh and "背锅锅有 666 点耐久"
+                    or "Burdened Pot has 666 durability"
+            },
+            {
+                description = isCh and "较高" or "High",
+                data = 999,
+                hover = isCh and "背锅锅有 999 点耐久"
+                    or "Burdened Pot has 999 durability"
+            },
+            {
+                description = isCh and "离谱" or "Absurd",
+                data = 1332,
+                hover = isCh and "背锅锅有 1332 点耐久"
+                    or "Burdened Pot has 1332 durability"
+            }
+        },
+        default = 666,
+    },
+    {
+        name = "scapegoatHornDropChance",
+        label = isCh and "替罪羊额外掉落羊角概率" or "Scapegoat Extra Horn Drop Chance",
+        hover = isCh and "设置替罪羊死亡时额外掉落羊角的概率"
+            or "Set the chance for Scapegoat to drop an extra horn on death",
+        options =
+        {
+            {
+                description = isCh and "较低" or "Low",
+                data = 0.10,
+                hover = isCh and "只有 10% 的概率额外掉落羊角"
+                    or "Only 10% chance to drop an extra horn"
+            },
+            {
+                description = isCh and "正常" or "Normal",
+                data = 0.25,
+                hover = isCh and "有 25% 的概率额外掉落羊角"
+                    or "25% chance to drop an extra horn"
+            },
+            {
+                description = isCh and "较高" or "High",
+                data = 0.40,
+                hover = isCh and "有 40% 的概率额外掉落羊角"
+                    or "40% chance to drop an extra horn"
+            },
+            {
+                description = isCh and "离谱" or "Absurd",
+                data = 0.55,
+                hover = isCh and "高达 55% 的概率额外掉落羊角"
+                    or "A whopping 55% chance to drop an extra horn"
+            },
+        },
+        default = 0.25,
+    },
+
+    Subtitle(isCh and "入味厨具" or "Spice Cookware"),
     {
         name = "chefPouchBuffDuration",
         label = isCh and "厨师袋调味持续天数" or "Chef Pouch Seasoning Duration",
@@ -237,6 +310,43 @@ configuration_options =
             },
         },
         default = 10,
+    },
+    {
+        name = "chefPouchSpiceSanMultiplier",
+        label = isCh and "厨师袋回理智值" or "Chef Pouch SAN",
+        hover = isCh and "设置厨师袋内装的每个调味的料理的基础回理智值值"
+            or "Set the base daily sanity gained per seasoned food in the Chef Pouch",
+        options =
+        {
+            {
+                description = isCh and "较低" or "Low",
+                data = 0.5,
+                hover = isCh and "每个调味的料理提供每天13.3基础回理智值"
+                    or "Each seasoned food provides 13.3 base SAN per day"
+            },
+
+            {
+                description = isCh and "正常" or "Normal",
+                data = 1,
+                hover = isCh and "每个调味的料理提供每天26.6基础回理智值"
+                    or "Each seasoned food provides 26.6 base SAN per day (default)"
+            },
+
+            {
+                description = isCh and "较高" or "High",
+                data = 1.5,
+                hover = isCh and "每个调味的料理提供每天39.9基础回理智值"
+                    or "Each seasoned food provides 39.9 base SAN per day"
+            },
+
+            {
+                description = isCh and "离谱" or "Absurd",
+                data = 2,
+                hover = isCh and "每个调味的料理提供每天53.3基础回理智值"
+                    or "Each seasoned food provides 53.3 base SAN per day"
+            },
+        },
+        default = 1,
     },
     {
         name = "grinderDigCooldown",
@@ -315,6 +425,68 @@ configuration_options =
             },
         },
         default = 150,
+    },
+
+    {
+        name = "rottenCloudDurationPerRot",
+        label = isCh and "每个腐烂物提供的腐烂云雾持续时间" or "Rotten Cloud Duration per Rot",
+        hover = isCh and "设置每个腐烂物能产生的腐烂云雾持续时间"
+            or "Set how long each rot contributes to the rotten cloud duration",
+        options =
+        {
+
+            {
+                description = isCh and "较短" or "Short",
+                data = 2,
+                hover = isCh and "每个腐烂物提供 2 秒的腐烂云雾"
+                    or "Each rot provides 2 seconds of rotten cloud"
+            },
+
+            {
+                description = isCh and "正常" or "Normal",
+                data = 2.5,
+                hover = isCh and "每个腐烂物提供 2.5 秒的腐烂云雾"
+                    or "Each rot provides 2.5 seconds of rotten cloud"
+            },
+
+            {
+                description = isCh and "长" or "Long",
+                data = 3.5,
+                hover = isCh and "每个腐烂物提供 3.5 秒的腐烂云雾"
+                    or "Each rot provides 3.5 seconds of rotten cloud"
+            },
+
+            {
+                description = isCh and "离谱" or "Absurd",
+                data = 4,
+                hover = isCh and "每个腐烂物提供夸张的 4 秒腐烂云雾"
+                    or "Each rot provides an absurd 4 seconds of rotten cloud"
+            },
+        },
+        default = 2.5,
+    },
+
+    {
+        name = "pigmanRotCloudFX",
+        label = isCh and "视觉增强版腐烂云雾" or "Enhanced Rot Cloud FX",
+        hover = isCh and "启用更逼真的腐烂云雾视觉效果"
+            or "Enable a more realistic visual effect for rot cloud.",
+        options =
+        {
+            {
+                description = isCh and "开启" or "On",
+                data = 1,
+                hover = isCh and "看起来像强壮的战士一样的腐烂云雾效果"
+                    or "Looks like a strongman rot cloud effect"
+            },
+            {
+                description = isCh and "关闭" or "Off",
+                data = 0,
+                hover = isCh and "平平无奇的腐烂云雾效果"
+                    or "Just a plain rot cloud effect"
+            },
+        },
+        default = 1,
     },
 
 }
