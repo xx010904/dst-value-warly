@@ -1,5 +1,5 @@
 local isCh = locale == "zh" or locale == "zhr"
-version = "1.0.4"
+version = "1.0.5"
 name = isCh and "数值怪沃利" or "The Value Monster: Warly"
 description = isCh and
     "大厨有三弱，一是食物buff共享，因此我不加新料理，而是加了很多自己才能用的食物buff和战斗生活技能" ..
@@ -95,39 +95,75 @@ configuration_options =
         },
         default = 300,
     },
+    {
+        name = "boneBouillonShieldChance",
+        label = isCh and "骨头汤护盾概率" or "Bone Bouillon Shield Chance",
+        hover = isCh and "设置食用骨头汤时触发无敌护盾的概率"
+            or "Set the chance to trigger an invincibility shield when eating Bone Bouillon",
+        options =
+        {
+            {
+                description = isCh and "较低" or "Low",
+                data = 0.15,
+                hover = isCh and "只有 15% 的概率触发无敌护盾"
+                    or "Only a 15% chance to trigger the invincibility shield"
+            },
 
+            {
+                description = isCh and "正常" or "Normal",
+                data = 0.25,
+                hover = isCh and "有 25% 的概率触发无敌护盾（默认）"
+                    or "A 25% chance to trigger the invincibility shield (default)"
+            },
+
+            {
+                description = isCh and "较高" or "High",
+                data = 0.35,
+                hover = isCh and "有 35% 的概率触发无敌护盾"
+                    or "A 35% chance to trigger the invincibility shield"
+            },
+
+            {
+                description = isCh and "离谱" or "Absurd",
+                data = 0.45,
+                hover = isCh and "有 45% 的概率触发无敌护盾"
+                    or "An absurd 45% chance to trigger the invincibility shield"
+            },
+        },
+        default = 0.25,
+    },
     {
         name = "fruitCrepeMaxSan",
-        label = isCh and "鲜果可丽饼最高回SAN比例" or "Fruit Crepe Max SAN",
-        hover = isCh and "设置食用鲜果可丽饼时能回的最大SAN比例"
+        label = isCh and "鲜果可丽饼最高回理智比例" or "Fruit Crepe Max SAN",
+        hover = isCh and "设置食用鲜果可丽饼时能回的最大理智比例"
             or "Set the maximum SAN restored by eating a Fruit Crepe",
         options =
         {
             {
                 description = isCh and "较低" or "Low",
                 data = 0.85,
-                hover = isCh and "SAN只回到最大值的85%"
+                hover = isCh and "理智只回到最大值的85%"
                     or "SAN is restored only up to 85% of the maximum"
             },
 
             {
                 description = isCh and "正常" or "Normal",
                 data = 0.9,
-                hover = isCh and "SAN只回到最大值的90%"
+                hover = isCh and "理智只回到最大值的90%"
                     or "SAN is restored only up to 90% of the maximum "
             },
 
             {
                 description = isCh and "较高" or "High",
                 data = 0.95,
-                hover = isCh and "SAN只回到最大值的95%"
+                hover = isCh and "理智只回到最大值的95%"
                     or "SAN is restored only up to 95% of the maximum "
             },
 
             {
                 description = isCh and "离谱" or "Absurd",
                 data = 1,
-                hover = isCh and "SAN可完全回满"
+                hover = isCh and "理智可完全回满"
                     or "SAN can be fully restored"
             },
         },
@@ -135,36 +171,36 @@ configuration_options =
     },
     {
         name = "moquecaTorrentDamage",
-        label = isCh and "海鲜杂烩洪流攻击力" or "Moqueca Torrent Damage",
-        hover = isCh and "设置海鲜杂烩召唤洪流的攻击力"
+        label = isCh and "海鲜杂烩洪流伤害" or "Moqueca Torrent Damage",
+        hover = isCh and "设置海鲜杂烩召唤洪流的伤害"
             or "Set the damage of the torrent summoned by Moqueca",
         options =
         {
             {
                 description = isCh and "较低" or "Low",
                 data = 5,
-                hover = isCh and "洪流攻击力为5"
+                hover = isCh and "洪流伤害为5"
                     or "Torrent damage is 5"
             },
 
             {
                 description = isCh and "正常" or "Normal",
                 data = 10,
-                hover = isCh and "洪流攻击力为10"
+                hover = isCh and "洪流伤害为10"
                     or "Torrent damage is 10"
             },
 
             {
                 description = isCh and "较高" or "High",
                 data = 15,
-                hover = isCh and "洪流攻击力为15"
+                hover = isCh and "洪流伤害为15"
                     or "Torrent damage is 15"
             },
 
             {
                 description = isCh and "离谱" or "Absurd",
                 data = 20,
-                hover = isCh and "洪流攻击力为20"
+                hover = isCh and "洪流伤害为20"
                     or "Torrent damage is 20"
             },
         },
@@ -206,13 +242,47 @@ configuration_options =
         },
         default = 0.05,
     },
+    {
+        name = "flyingPieMaxCount",
+        label = isCh and "飞饼最大同时数量" or "Max Flying Pies",
+        hover = isCh and "设置飞饼技能同时能飞出的最大数量"
+            or "Set the maximum number of Flying Pies that can be active at the same time",
+        options =
+        {
+            {
+                description = isCh and "较少" or "Low",
+                data = 2,
+                hover = isCh and "最多同时飞出 2 个飞饼"
+                    or "Allows up to 2 Flying Pies at the same time",
+            },
+            {
+                description = isCh and "正常" or "Normal",
+                data = 3,
+                hover = isCh and "最多同时飞出 3 个飞饼（默认）"
+                    or "Allows up to 3 Flying Pies at the same time (default)",
+            },
+            {
+                description = isCh and "较多" or "High",
+                data = 4,
+                hover = isCh and "最多同时飞出 4 个飞饼"
+                    or "Allows up to 4 Flying Pies at the same time",
+            },
+            {
+                description = isCh and "离谱" or "Absurd",
+                data = 5,
+                hover = isCh and "最多同时飞出 5 个飞饼"
+                    or "Allows up to 5 Flying Pies at the same time",
+            },
+        },
+        default = 3,
+    },
 
     Subtitle(isCh and "真香警告" or "True Duration Warning"),
     {
         name = "lingeringFlavorBuffRange",
-        label = isCh and "余香犹在持续时间" or "Lingering Flavor Duration",
+        label = isCh and "余香犹在持续时间" or "Lingering Taste Duration",
         hover = isCh and "设置余香犹在buff的持续时间上下限，实际时间会根据吃摆盘料理时的饥饿度计算，越饿持续时间越长"
-            or "Set the min and max duration of the Lingering Flavor buff, actual duration will be calculated based on hunger when eating plated food, the hungrier the longer",
+            or "Set the Lingering Taste' min and max duration, actual will be calculated based on hunger, the hungrier the longer",
         options =
         {
             {
@@ -281,7 +351,6 @@ configuration_options =
         },
         default = 1,
     },
-
     {
         name = "cookingPowerChanceMultiplier",
         label = isCh and "获得厨力获取概率的倍率" or " Cooking Power Chance Multiplier",
@@ -315,6 +384,40 @@ configuration_options =
             },
         },
         default = 1,
+    },
+    {
+        name = "warlyNoobSlow",
+        label = isCh and "菜鸡减速效果" or "Noob Slow Effect",
+        hover = isCh and "设置被菜鸡诅咒减速的速度倍率"
+            or "Set the speed multiplier for the Noob Chicken curse",
+        options =
+        {
+            {
+                description = isCh and "较低" or "Low",
+                data = 0.1333,
+                hover = isCh and "速度为正常速度的 13.33%"
+                    or "Speed is 13.33% of normal"
+            },
+            {
+                description = isCh and "正常" or "Normal",
+                data = 0.2333,
+                hover = isCh and "速度为正常速度的 23.33%"
+                    or "Speed is 23.33% of normal"
+            },
+            {
+                description = isCh and "较高" or "High",
+                data = 0.3333,
+                hover = isCh and "速度为正常速度的 33.33%"
+                    or "Speed is 33.33% of normal"
+            },
+            {
+                description = isCh and "离谱" or "Absurd",
+                data = 0.4333,
+                hover = isCh and "速度为正常速度的 43.33%"
+                    or "Speed is 43.33% of normal"
+            },
+        },
+        default = 0.2333,
     },
 
     Subtitle(isCh and "背锅锅" or "Burdened Pot"),
@@ -351,6 +454,74 @@ configuration_options =
             }
         },
         default = 666,
+    },
+    {
+        name = "burdenPotDamageLoss",
+        label = isCh and "背锅锅受击损失比例" or "Burdened Pot Hit Loss Ratio",
+        hover = isCh and "设置穿戴背锅锅时，免疫生命伤害后会损失多少比例的饥饿与理智"
+            or "Set the percentage of prevented damage converted into Hunger and Sanity loss while wearing the Burdened Pot",
+        options =
+        {
+            {
+                description = isCh and "较弱" or "Weak",
+                data = 0.16,
+                hover = isCh and "受到攻击时损失相当于伤害 16% 的饥饿与理智"
+                    or "Lose Hunger and Sanity equal to 16% of the prevented damage",
+            },
+            {
+                description = isCh and "正常" or "Normal",
+                data = 0.13,
+                hover = isCh and "受到攻击时损失相当于伤害 13% 的饥饿与理智"
+                    or "Lose Hunger and Sanity equal to 13% of the prevented damage",
+            },
+            {
+                description = isCh and "较强" or "Strong",
+                data = 0.10,
+                hover = isCh and "受到攻击时损失相当于伤害 10% 的饥饿与理智"
+                    or "Lose Hunger and Sanity equal to 10% of the prevented damage",
+            },
+            {
+                description = isCh and "离谱" or "Absurd",
+                data = 0.07,
+                hover = isCh and "受到攻击时损失相当于伤害 7% 的饥饿与理智"
+                    or "Lose Hunger and Sanity equal to 7% of the prevented damage",
+            },
+        },
+        default = 0.13,
+    },
+    {
+        name = "flungPotImpactDamage",
+        label = isCh and "甩锅中心震点伤害" or "Flung Pot Impact Damage",
+        hover = isCh and "设置甩锅时每个锅中心震点的伤害值，越靠近中心伤害越高"
+            or "Set the damage dealt at the center of each Burdened Pot when thrown; damage is higher near the center",
+        options =
+        {
+            {
+                description = isCh and "较弱" or "Weak",
+                data = 150,
+                hover = isCh and "每个锅中心震点伤害为 150"
+                    or "Each pot's central impact deals 150 damage"
+            },
+            {
+                description = isCh and "正常" or "Normal",
+                data = 225,
+                hover = isCh and "每个锅中心震点伤害为 225"
+                    or "Each pot's central impact deals 225 damage"
+            },
+            {
+                description = isCh and "较强" or "Strong",
+                data = 300,
+                hover = isCh and "每个锅中心震点伤害为 300"
+                    or "Each pot's central impact deals 300 damage"
+            },
+            {
+                description = isCh and "离谱" or "Absurd",
+                data = 375,
+                hover = isCh and "每个锅中心震点伤害为 375"
+                    or "Each pot's central impact deals 375 damage"
+            },
+        },
+        default = 225,
     },
     {
         name = "scapegoatHornDropChance",

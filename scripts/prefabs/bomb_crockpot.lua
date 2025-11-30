@@ -1,3 +1,4 @@
+local flungPotImpactDamage = warlyvalueconfig.flungPotImpactDamage or 225
 local assets = {}
 local prefabs = {}
 
@@ -37,8 +38,8 @@ local function OnHit(inst, attacker, target)
 		if not inst:IsValid() then return end
 
 		local explosive_range = 6
-		local max_damage = 300 -- 中心最大伤害
-		local min_damage = 100 -- 边缘最小伤害
+		local max_damage = flungPotImpactDamage -- 中心最大伤害
+		local min_damage = flungPotImpactDamage / 3 -- 边缘最小伤害
 
 		-- 搜索范围内所有可被攻击的实体
 		local etargets = TheSim:FindEntities(x, y, z, explosive_range, EXPLODETARGET_MUST_TAGS, EXPLODETARGET_CANT_TAGS)

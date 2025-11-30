@@ -101,13 +101,18 @@ elseif GetModConfigData("LanguageSetting") == "english" then
 end
 
 GLOBAL.warlyvalueconfig.selfishEaterBuffDuration = GetModConfigData("selfishEaterBuffDuration")
+GLOBAL.warlyvalueconfig.boneBouillonShieldChance = GetModConfigData("boneBouillonShieldChance")
 GLOBAL.warlyvalueconfig.fruitCrepeMaxSan = GetModConfigData("fruitCrepeMaxSan")
 GLOBAL.warlyvalueconfig.moquecaTorrentDamage = GetModConfigData("moquecaTorrentDamage")
 GLOBAL.warlyvalueconfig.dreamDishChance = GetModConfigData("dreamDishChance")
+GLOBAL.warlyvalueconfig.flyingPieMaxCount = GetModConfigData("flyingPieMaxCount")
 GLOBAL.warlyvalueconfig.lingeringFlavorBuffRange = GetModConfigData("lingeringFlavorBuffRange")
 GLOBAL.warlyvalueconfig.shockReoveryMultiplier = GetModConfigData("shockReoveryMultiplier")
 GLOBAL.warlyvalueconfig.cookingPowerChanceMultiplier = GetModConfigData("cookingPowerChanceMultiplier")
+GLOBAL.warlyvalueconfig.warlyNoobSlow = GetModConfigData("warlyNoobSlow")
 GLOBAL.warlyvalueconfig.burdenPotDurability = GetModConfigData("burdenPotDurability")
+GLOBAL.warlyvalueconfig.burdenPotDamageLoss = GetModConfigData("burdenPotDamageLoss")
+GLOBAL.warlyvalueconfig.flungPotImpactDamage = GetModConfigData("flungPotImpactDamage")
 GLOBAL.warlyvalueconfig.scapegoatHornDropChance = GetModConfigData("scapegoatHornDropChance")
 GLOBAL.warlyvalueconfig.chefPouchBuffDuration = GetModConfigData("chefPouchBuffDuration")
 GLOBAL.warlyvalueconfig.chefPouchSpiceSanMultiplier = GetModConfigData("chefPouchSpiceSanMultiplier")

@@ -1,7 +1,8 @@
 local selfishEaterBuffDuration = warlyvalueconfig.selfishEaterBuffDuration or 300
+local boneBouillonShieldChance = warlyvalueconfig.boneBouillonShieldChance or 0.25
 local SHIELD_VARIATIONS = 3
 local INVINCIBLE_TIME = 0.33
-local DODGE_CHANCE = 0.25 -- 每次被攻击有25%几率触发闪避
+local DODGE_CHANCE = boneBouillonShieldChance -- 每次被攻击有25%几率触发闪避
 
 local function PickShield()
     return "shadow_shield"..tostring(math.random(1, SHIELD_VARIATIONS))

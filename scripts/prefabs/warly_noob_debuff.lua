@@ -1,3 +1,5 @@
+local warlyNoobSlow = warlyvalueconfig.warlyNoobSlow or 0.2333
+
 local NUM_PERDS = 3
 local RADIUS = 6.5       -- 跑动半径
 local ROTATE_SPEED = 1.5 -- 每秒旋转速度（弧度）
@@ -137,7 +139,7 @@ local function OnAttached(inst, target)
     inst.components.timer:StartTimer("expire", BUFF_DURATION_BASE)
     -- print("菜鸡buff剩余时间", inst.components.timer:GetTimeLeft("expire"))
 
-    target.components.locomotor:SetExternalSpeedMultiplier(inst, "warly_noob_debuff", 0.2333)
+    target.components.locomotor:SetExternalSpeedMultiplier(inst, "warly_noob_debuff", warlyNoobSlow)
 end
 
 local function OnDetached(inst, target)

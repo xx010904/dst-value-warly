@@ -1,8 +1,9 @@
 local burdenPotDurability = warlyvalueconfig.burdenPotDurability or 666
+local burdenPotDamageLoss = warlyvalueconfig.burdenPotDamageLoss or 0.13
 
 local SCAN_RADIUS = 10
-local SANITY_RATIO = 0.1
-local HUNGER_RATIO = 0.1
+local SANITY_RATIO = burdenPotDamageLoss
+local HUNGER_RATIO = burdenPotDamageLoss
 local ARMOR_DURABILITY = burdenPotDurability
 
 local function OnBlocked(owner)

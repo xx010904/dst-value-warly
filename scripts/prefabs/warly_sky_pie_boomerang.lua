@@ -1,3 +1,5 @@
+local flyingPieMaxCount = warlyvalueconfig.flyingPieMaxCount or 3
+
 local function UpdateDamage(inst, attacker)
     if inst.components.perishable and inst.components.weapon then
         local perishable = inst.components.perishable
@@ -9,7 +11,7 @@ local function UpdateDamage(inst, attacker)
 
         -- 发射物数量：新鲜度 0% → 1；100% → 3
         if hasSkill then -- 技能树控制
-            inst.max_projectiles = math.min(1 + math.floor(freshness * 3), 3)
+            inst.max_projectiles = math.min(1 + math.floor(freshness * flyingPieMaxCount), flyingPieMaxCount)
         else
             inst.max_projectiles = 1
         end
