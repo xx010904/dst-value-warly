@@ -293,6 +293,7 @@ AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.PASS_THE_POT, 
 -- === 保存与加载 调味状态 ===
 local function OnSave(inst, data)
     data.spice_upgrade = inst._spice_upgrade
+    data.force_equippable = inst.force_equippable
 
     -- 保存 perishable 剩余时间
     if inst.components.perishable then
@@ -320,6 +321,13 @@ local function OnLoad(inst, data)
     if not data then return end
 
     inst._spice_upgrade = data.spice_upgrade
+    inst.force_equippable = data.force_equippable
+
+    -- 兼容永不妥协，让其可以装备在身上
+    if not inst.components.equippable and inst.force_equippable then
+        inst:AddComponent("equippable")
+        inst.components.equippable.equipslot = EQUIPSLOTS.BODY
+    end
 
     if inst._spice_upgrade then
         -- 恢复辣椒保暖
@@ -487,6 +495,10 @@ local function ClearSpiceBuff(inst)
         inst.components.equippable.walkspeedmult = 1
     end
     inst._spice_upgrade = nil
+    if inst.force_equippable then
+        inst:RemoveComponent("equippable")
+        inst.force_equippable = nil
+    end
 end
 
 local function UpgradeSpicePack(inst, doer, spice_type)
@@ -506,6 +518,13 @@ local function UpgradeSpicePack(inst, doer, spice_type)
     if inst._on_spice_expire ~= nil then
         inst:RemoveEventCallback("perished", inst._on_spice_expire)
         inst._on_spice_expire = nil
+    end
+
+    -- 兼容永不妥协，让其可以装备在身上
+    if not inst.components.equippable then
+        inst:AddComponent("equippable")
+        inst.components.equippable.equipslot = EQUIPSLOTS.BODY
+        inst.force_equippable = true
     end
 
     ----------------------------------------------------
