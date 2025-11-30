@@ -1,8 +1,9 @@
 local selfishEaterBuffDuration = warlyvalueconfig.selfishEaterBuffDuration or 300
+local moquecaTorrentDamage = warlyvalueconfig.moquecaTorrentDamage or 10
 
 -- 小型爆炸参数
 local AOE_RADIUS = 2.4
-local AOE_DAMAGE = 10
+local AOE_DAMAGE = moquecaTorrentDamage
 
 -- 排除查找时的 tags
 local AREAATTACK_MUST_TAGS = { "_combat", "_health" }

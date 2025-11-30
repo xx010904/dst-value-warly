@@ -1,5 +1,5 @@
 local isCh = locale == "zh" or locale == "zhr"
-version = "1.0.3"
+version = "1.0.4"
 name = isCh and "数值怪沃利" or "The Value Monster: Warly"
 description = isCh and
     "大厨有三弱，一是食物buff共享，因此我不加新料理，而是加了很多自己才能用的食物buff和战斗生活技能" ..
@@ -96,6 +96,81 @@ configuration_options =
         default = 300,
     },
 
+    {
+        name = "fruitCrepeMaxSan",
+        label = isCh and "鲜果可丽饼最高回SAN比例" or "Fruit Crepe Max SAN",
+        hover = isCh and "设置食用鲜果可丽饼时能回的最大SAN比例"
+            or "Set the maximum SAN restored by eating a Fruit Crepe",
+        options =
+        {
+            {
+                description = isCh and "较低" or "Low",
+                data = 0.85,
+                hover = isCh and "SAN只回到最大值的85%"
+                    or "SAN is restored only up to 85% of the maximum"
+            },
+
+            {
+                description = isCh and "正常" or "Normal",
+                data = 0.9,
+                hover = isCh and "SAN只回到最大值的90%"
+                    or "SAN is restored only up to 90% of the maximum "
+            },
+
+            {
+                description = isCh and "较高" or "High",
+                data = 0.95,
+                hover = isCh and "SAN只回到最大值的95%"
+                    or "SAN is restored only up to 95% of the maximum "
+            },
+
+            {
+                description = isCh and "离谱" or "Absurd",
+                data = 1,
+                hover = isCh and "SAN可完全回满"
+                    or "SAN can be fully restored"
+            },
+        },
+        default = 0.9,
+    },
+    {
+        name = "moquecaTorrentDamage",
+        label = isCh and "海鲜杂烩洪流攻击力" or "Moqueca Torrent Damage",
+        hover = isCh and "设置海鲜杂烩召唤洪流的攻击力"
+            or "Set the damage of the torrent summoned by Moqueca",
+        options =
+        {
+            {
+                description = isCh and "较低" or "Low",
+                data = 5,
+                hover = isCh and "洪流攻击力为5"
+                    or "Torrent damage is 5"
+            },
+
+            {
+                description = isCh and "正常" or "Normal",
+                data = 10,
+                hover = isCh and "洪流攻击力为10"
+                    or "Torrent damage is 10"
+            },
+
+            {
+                description = isCh and "较高" or "High",
+                data = 15,
+                hover = isCh and "洪流攻击力为15"
+                    or "Torrent damage is 15"
+            },
+
+            {
+                description = isCh and "离谱" or "Absurd",
+                data = 20,
+                hover = isCh and "洪流攻击力为20"
+                    or "Torrent damage is 20"
+            },
+        },
+        default = 10,
+    },
+
     Subtitle(isCh and "画饼饼" or "Pie In the Sky"),
     {
         name = "dreamDishChance",
@@ -130,6 +205,45 @@ configuration_options =
             },
         },
         default = 0.05,
+    },
+
+    Subtitle(isCh and "真香警告" or "True Duration Warning"),
+    {
+        name = "lingeringFlavorBuffRange",
+        label = isCh and "余香犹在持续时间" or "Lingering Flavor Duration",
+        hover = isCh and "设置余香犹在buff的持续时间上下限，实际时间会根据吃摆盘料理时的饥饿度计算，越饿持续时间越长"
+            or "Set the min and max duration of the Lingering Flavor buff, actual duration will be calculated based on hunger when eating plated food, the hungrier the longer",
+        options =
+        {
+            {
+                description = isCh and "较低" or "Low",
+                data = 300,
+                hover = isCh and "持续时间在 300 到 600 秒之间"
+                    or "Duration will range from 300 to 600 seconds"
+            },
+
+            {
+                description = isCh and "正常" or "Normal",
+                data = 400,
+                hover = isCh and "持续时间在 400 到 800 秒之间"
+                    or "Duration will range from 400 to 800 seconds"
+            },
+
+            {
+                description = isCh and "较高" or "High",
+                data = 500,
+                hover = isCh and "持续时间在 500 到 1000 秒之间"
+                    or "Duration will range from 500 to 1000 seconds"
+            },
+
+            {
+                description = isCh and "离谱" or "Absurd",
+                data = 600,
+                hover = isCh and "持续时间在 600 到 1200 秒之间"
+                    or "Duration will range from 600 to 1200 seconds"
+            },
+        },
+        default = 400
     },
 
     Subtitle(isCh and "下饭操作" or "Meal-Worth Play"),

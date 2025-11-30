@@ -101,7 +101,10 @@ elseif GetModConfigData("LanguageSetting") == "english" then
 end
 
 GLOBAL.warlyvalueconfig.selfishEaterBuffDuration = GetModConfigData("selfishEaterBuffDuration")
+GLOBAL.warlyvalueconfig.fruitCrepeMaxSan = GetModConfigData("fruitCrepeMaxSan")
+GLOBAL.warlyvalueconfig.moquecaTorrentDamage = GetModConfigData("moquecaTorrentDamage")
 GLOBAL.warlyvalueconfig.dreamDishChance = GetModConfigData("dreamDishChance")
+GLOBAL.warlyvalueconfig.lingeringFlavorBuffRange = GetModConfigData("lingeringFlavorBuffRange")
 GLOBAL.warlyvalueconfig.shockReoveryMultiplier = GetModConfigData("shockReoveryMultiplier")
 GLOBAL.warlyvalueconfig.cookingPowerChanceMultiplier = GetModConfigData("cookingPowerChanceMultiplier")
 GLOBAL.warlyvalueconfig.burdenPotDurability = GetModConfigData("burdenPotDurability")

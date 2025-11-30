@@ -151,8 +151,8 @@ local function changeWere(pig)
     if pig.components.werebeast then
         pig.components.werebeast:SetOnWereFn(nil)
         pig.components.werebeast:SetOnNormalFn(nil)
-        pig.components.werebeast.SetNormal = function () end
-        pig.components.werebeast.SetWere = function () end
+        pig.components.werebeast.SetNormal = function() end
+        pig.components.werebeast.SetWere = function() end
         -- pig.components.werebeast:WatchWorldState("isfullmoon", function(self, isfullmoon)
         --     if not isfullmoon then
         --         self.inst.components.health:Kill()

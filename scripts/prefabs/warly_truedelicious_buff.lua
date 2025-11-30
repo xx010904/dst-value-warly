@@ -1,5 +1,6 @@
-local MIN_DURATION = 400
-local MAX_DURATION = 800
+local lingeringFlavorBuffRange = warlyvalueconfig.lingeringFlavorBuffRange or 400
+local MIN_DURATION = lingeringFlavorBuffRange
+local MAX_DURATION = lingeringFlavorBuffRange * 2
 local TICK_RATE = 10 -- 每多少秒 tick 一次
 local TICK_AMOUNT = 0.5 -- 每次 tick 恢复多少
 

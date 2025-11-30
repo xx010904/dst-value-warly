@@ -1,11 +1,12 @@
 local selfishEaterBuffDuration = warlyvalueconfig.selfishEaterBuffDuration or 300
+local fruitCrepeMaxSan = warlyvalueconfig.fruitCrepeMaxSan or 0.9
 -- print("Warly Mod: selfishEaterBuffDuration", selfishEaterBuffDuration)
 local UPDATE_PERIOD = 0.5
 local AURA_RANGE = 20
 
 -- 每个敌人每秒回复精神量
 local SANITY_PER_ENEMY = 1
-local TARGET_SAN_PERCENT = 0.9
+local TARGET_SAN_PERCENT = fruitCrepeMaxSan
 
 
 -------------------------------------------------------------------
