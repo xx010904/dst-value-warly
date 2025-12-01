@@ -200,7 +200,8 @@ local function SpawnCookPotFX(chef, idiot, meal, force_throw)
         proj.doer = chef
         proj.meal = meal
         proj.Transform:SetPosition(x, y, z)
-        proj.components.complexprojectile:Launch(Vector3(spawn_x + math.random(), spawn_y + math.random(), spawn_z + math.random()), chef)
+        proj.components.complexprojectile:Launch(
+            Vector3(spawn_x + math.random(), spawn_y + math.random(), spawn_z + math.random()), chef)
     end
 end
 
@@ -293,7 +294,8 @@ local function doFunnyCook(inst, idiot, food_name, op)
     ApplyTalking(inst, op)
 
     -- 恢复逻辑
-    local hasSkill = inst and inst.components.skilltreeupdater and inst.components.skilltreeupdater:IsActivated("warly_funny_cook_spice")
+    local hasSkill = inst and inst.components.skilltreeupdater and
+        inst.components.skilltreeupdater:IsActivated("warly_funny_cook_spice")
     if hasSkill then
         ApplyRecovery(inst, idiot, food_name, op)
     end
@@ -480,7 +482,8 @@ AddPlayerPostInit(function(dead)
                             end
                             -- 回复三维
                             local recover = 2.5 * stack_size
-                            dead.components.health:SetVal(recover + dead.components.health.currenthealth, cookingPower or dead)
+                            dead.components.health:SetVal(recover + dead.components.health.currenthealth,
+                                cookingPower or dead)
                             dead.components.health:DoDelta(0)
                             dead.components.hunger:SetCurrent(recover + dead.components.hunger.current)
                             dead.components.sanity:DoDelta(recover, false)
@@ -678,6 +681,26 @@ AddRecipeToFilter("warly_sky_pie", "CHARACTER")
 -- 可以右键点击动作“画饼”的锅
 -- ----------------------------------------------------------
 -- 1) Hook portablecookpot_item prefab，本体逻辑：扫描、激活标志、提示
+local function resetPotIcon(inst)
+    if inst.components.inventoryitem then
+        if inst.linked_skinname then
+            local imageName = inst.linked_skinname .. "_item"
+            inst.components.inventoryitem.imagename = imageName
+            inst.components.inventoryitem.atlasname = GetInventoryItemAtlas(imageName .. ".tex")
+        else
+            inst.components.inventoryitem.imagename = "portablecookpot_item"
+            inst.components.inventoryitem.atlasname = "images/inventoryimages2.xml"
+        end
+    end
+end
+local function activePotPieIcon(inst)
+    if inst.components.inventoryitem then
+        -- print("should_activate inst.linked_skinname=", inst.linked_skinname)
+        -- print("should_activate inst.skin_id=", inst.skin_id)
+        inst.components.inventoryitem.imagename = "portablecookpot_item_actived"
+        inst.components.inventoryitem.atlasname = "images/inventoryimages/portablecookpot_item_actived.xml"
+    end
+end
 AddPrefabPostInit("portablecookpot_item", function(inst)
     if not TheWorld.ismastersim then
         return
@@ -694,8 +717,7 @@ AddPrefabPostInit("portablecookpot_item", function(inst)
                     inst:RemoveTag("active_pot_pie")
                     inst.pie_target = nil
                     if inst.components.inventoryitem then
-                        inst.components.inventoryitem.imagename = "portablecookpot_item"
-                        inst.components.inventoryitem.atlasname = "images/inventoryimages2.xml"
+                        resetPotIcon(inst)
                     end
                     return
                 end
@@ -721,9 +743,7 @@ AddPrefabPostInit("portablecookpot_item", function(inst)
                     if not inst:HasTag("active_pot_pie") then
                         inst:AddTag("active_pot_pie")
                         if inst.components.inventoryitem then
-                            inst.components.inventoryitem.imagename = "portablecookpot_item_actived"
-                            inst.components.inventoryitem.atlasname =
-                            "images/inventoryimages/portablecookpot_item_actived.xml"
+                            activePotPieIcon(inst)
                         end
                         if owner.components.talker then
                             owner.components.talker:Say(GetString(owner, "ANNOUNCE_NEED_PIE"))
@@ -734,8 +754,7 @@ AddPrefabPostInit("portablecookpot_item", function(inst)
                         inst:RemoveTag("active_pot_pie")
                         inst.pie_target = nil
                         if inst.components.inventoryitem then
-                            inst.components.inventoryitem.imagename = "portablecookpot_item"
-                            inst.components.inventoryitem.atlasname = "images/inventoryimages2.xml"
+                            resetPotIcon(inst)
                         end
                     end
                 end
@@ -751,8 +770,7 @@ AddPrefabPostInit("portablecookpot_item", function(inst)
         inst:RemoveTag("active_pot_pie")
         inst.pie_target = nil
         if inst.components.inventoryitem then
-            inst.components.inventoryitem.imagename = "portablecookpot_item"
-            inst.components.inventoryitem.atlasname = "images/inventoryimages2.xml"
+            resetPotIcon(inst)
         end
     end
 
@@ -855,8 +873,7 @@ local ACTIVATE_POT_PIE = AddAction("ACTIVATE_POT_PIE", STRINGS.ACTIONS.ACTIVATE_
     -- 物品不能使用
     inst:RemoveTag("active_pot_pie")
     inst.pie_target = nil
-    inst.components.inventoryitem.imagename = "portablecookpot_item"
-    inst.components.inventoryitem.atlasname = "images/inventoryimages2.xml"
+    resetPotIcon(inst)
 
     return true
 end)
@@ -1186,7 +1203,6 @@ ACTION_STACK_DECOR_FOOD.fn = function(act)
 
     if target ~= nil and target.prefab == "decor_food" and item ~= nil then
         if target.mimic_food == item.prefab and target.uses_left and target.uses_left < 40 then
-
             local diff = TUNING.STACK_SIZE_SMALLITEM - target.uses_left
             local stacksize = 1
 
