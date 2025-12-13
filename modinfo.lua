@@ -1,5 +1,5 @@
 local isCh = locale == "zh" or locale == "zhr"
-version = "1.0.6"
+version = "1.0.7"
 name = isCh and "数值怪沃利" or "The Value Monster: Warly"
 description = isCh and
     "大厨有三弱，一是食物buff共享，因此我不加新料理，而是加了很多自己才能用的食物buff和战斗生活技能" ..
@@ -250,7 +250,7 @@ configuration_options =
         options =
         {
             {
-                description = isCh and "较少" or "Low",
+                description = isCh and "较少" or "Few",
                 data = 2,
                 hover = isCh and "最多同时飞出 2 个飞饼"
                     or "Allows up to 2 Flying Pies at the same time",
@@ -262,7 +262,7 @@ configuration_options =
                     or "Allows up to 3 Flying Pies at the same time (default)",
             },
             {
-                description = isCh and "较多" or "High",
+                description = isCh and "较多" or "Many",
                 data = 4,
                 hover = isCh and "最多同时飞出 4 个飞饼"
                     or "Allows up to 4 Flying Pies at the same time",
@@ -551,7 +551,7 @@ configuration_options =
             {
                 description = isCh and "离谱" or "Absurd",
                 data = 0.55,
-                hover = isCh and "高达 55% 的概率额外掉落羊角"
+                hover = isCh and "有 55% 的概率额外掉落羊角"
                     or "A whopping 55% chance to drop an extra horn"
             },
         },
@@ -590,7 +590,7 @@ configuration_options =
             {
                 description = isCh and "离谱" or "Absurd",
                 data = 20,
-                hover = isCh and "调味效果荒谬地持续 20 天"
+                hover = isCh and "厨师袋的调味效果可持续 20 天"
                     or "Seasoning on the Chef Pouch lasts an absurd 20 days"
             },
         },
@@ -599,39 +599,70 @@ configuration_options =
     {
         name = "chefPouchSpiceSanMultiplier",
         label = isCh and "厨师袋回理智值" or "Chef Pouch SAN",
-        hover = isCh and "设置厨师袋内装的每个调味的料理的基础回理智值值"
-            or "Set the base daily sanity gained per seasoned food in the Chef Pouch",
+        hover = isCh and "设置厨师袋内每组（最多40个）调味料理每天提供的回理智值"
+            or "Set the daily SAN provided per seasoned food stack (up to 40 items) in the Chef Pouch",
         options =
         {
             {
                 description = isCh and "较低" or "Low",
                 data = 0.5,
-                hover = isCh and "每个调味的料理提供每天13.3基础回理智值"
-                    or "Each seasoned food provides 13.3 base SAN per day"
+                hover = isCh and "每组调味料理每天约提供 9.8 点理智"
+                    or "Each seasoned food stack provides ~9.8 SAN per day"
             },
-
             {
                 description = isCh and "正常" or "Normal",
                 data = 1,
-                hover = isCh and "每个调味的料理提供每天26.6基础回理智值"
-                    or "Each seasoned food provides 26.6 base SAN per day (default)"
+                hover = isCh and "每组调味料理每天约提供 19.7 点理智"
+                    or "Each seasoned food stack provides ~19.7 SAN per day"
             },
-
             {
                 description = isCh and "较高" or "High",
                 data = 1.5,
-                hover = isCh and "每个调味的料理提供每天39.9基础回理智值"
-                    or "Each seasoned food provides 39.9 base SAN per day"
+                hover = isCh and "每组调味料理每天约提供 29.6 点理智"
+                    or "Each seasoned food stack provides ~29.6 SAN per day"
             },
-
             {
                 description = isCh and "离谱" or "Absurd",
                 data = 2,
-                hover = isCh and "每个调味的料理提供每天53.3基础回理智值"
-                    or "Each seasoned food provides 53.3 base SAN per day"
+                hover = isCh and "每组调味料理每天约提供 39.4 点理智"
+                    or "Each seasoned food stack provides ~39.4 SAN per day"
             },
         },
         default = 1,
+    },
+    {
+        name = "chefPouchSlotCount",
+        label = isCh and "厨师袋格子数量" or "Chef Pouch Slots",
+        hover = isCh and "设置调味的厨师袋内格子的数量"
+            or "Set the number of slots in the Spiced Chef Pouch",
+        options =
+        {
+            {
+                description = isCh and "较少" or "Few",
+                data = 6,
+                hover = isCh and "调味的厨师袋有 6 个格子"
+                    or "Spiced Chef Pouch has 6 slots"
+            },
+            {
+                description = isCh and "正常" or "Normal",
+                data = 8,
+                hover = isCh and "调味的厨师袋有 8 个格子"
+                    or "Spiced Chef Pouch has 8 slots"
+            },
+            {
+                description = isCh and "较多" or "Many",
+                data = 10,
+                hover = isCh and "调味的厨师袋有 10 个格子"
+                    or "Spiced Chef Pouch has 10 slots"
+            },
+            {
+                description = isCh and "离谱" or "Absurd",
+                data = 12,
+                hover = isCh and "调味的厨师袋有 12 个格子"
+                    or "Spiced Chef Pouch has 12 slots"
+            },
+        },
+        default = 8,
     },
     {
         name = "grinderDigCooldown",

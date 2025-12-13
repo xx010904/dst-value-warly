@@ -10,6 +10,7 @@ Assets = {
     Asset("ANIM", "anim/improv_cooking_power.zip"),
     Asset("ANIM", "anim/spell_icons_warly.zip"),
     Asset("ANIM", "anim/coonfur_sack.zip"),
+	Asset("ANIM", "anim/ui_krampusbag_2x5.zip"),
 	-- Asset("ANIM", "anim/ui_beard_3x1.zip"),
     Asset("IMAGE", "images/inventoryimages/armor_crockpot.tex"),
 	Asset("ATLAS", "images/inventoryimages/armor_crockpot.xml"),
@@ -41,6 +42,7 @@ PrefabFiles = {
 	"warly_seafood_buff",
 	"armor_crockpot",
 	"bomb_crockpot",
+	"spicepack_big",
 	"shadow_hook_head_fx",
 	"shadow_hook_link_fx",
 	"shadow_hook_debuff",
@@ -116,6 +118,7 @@ GLOBAL.warlyvalueconfig.flungPotImpactDamage = GetModConfigData("flungPotImpactD
 GLOBAL.warlyvalueconfig.scapegoatHornDropChance = GetModConfigData("scapegoatHornDropChance")
 GLOBAL.warlyvalueconfig.chefPouchBuffDuration = GetModConfigData("chefPouchBuffDuration")
 GLOBAL.warlyvalueconfig.chefPouchSpiceSanMultiplier = GetModConfigData("chefPouchSpiceSanMultiplier")
+GLOBAL.warlyvalueconfig.chefPouchSlotCount = GetModConfigData("chefPouchSlotCount")
 GLOBAL.warlyvalueconfig.grinderDigCooldown = GetModConfigData("grinderDigCooldown")
 GLOBAL.warlyvalueconfig.youthShadowMaceDurability = GetModConfigData("youthShadowMaceDurability")
 GLOBAL.warlyvalueconfig.rottenCloudDurationPerRot = GetModConfigData("rottenCloudDurationPerRot")

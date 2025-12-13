@@ -15,10 +15,9 @@
 -- 2 原版的部署/回收便携厨具都变快
 -- 3 新增的分锅/香料站分离/研磨器挖地/厨师袋调味都加快
 
-local chefPouchBuffDuration = warlyvalueconfig.chefPouchBuffDuration or 10
-local chefPouchSpiceSanMultiplier = warlyvalueconfig.chefPouchSpiceSanMultiplier or 1
 local grinderDigCooldown = warlyvalueconfig.grinderDigCooldown or 1
 local scapegoatHornDropChance = warlyvalueconfig.scapegoatHornDropChance or 0.25
+local chefPouchSlotCount = warlyvalueconfig.chefPouchSlotCount or 8
 --========================================================
 -- Section 1：背锅锅制作配方
 --========================================================
@@ -290,302 +289,128 @@ AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.PASS_THE_POT, 
 --========================================================
 -- SECTION2: 改造厨师包
 --========================================================
--- === 保存与加载 调味状态 ===
-local function OnSave(inst, data)
-    data.spice_upgrade = inst._spice_upgrade
-    data.force_equippable = inst.force_equippable
+-- 大厨师袋定义
+local containers = require("containers")
+local params = containers.params
+-- 大厨师袋格子生成函数
+local function create_spicepack_params(name, chefPouchSlotCount)
+    local rows, animbank, animbuild, y_offset = 0, "", "", 0
 
-    -- 保存 perishable 剩余时间
-    if inst.components.perishable then
-        data.perish_remaining = inst.components.perishable:GetPercent()
+    if chefPouchSlotCount == 6 then
+        rows = 3
+        animbank = "ui_icepack_2x3"
+        animbuild = "ui_icepack_2x3"
+        y_offset = 75
+    elseif chefPouchSlotCount == 8 then
+        rows = 4
+        animbank = "ui_backpack_2x4"
+        animbuild = "ui_backpack_2x4"
+        y_offset = 114
+    elseif chefPouchSlotCount == 10 then
+        rows = 5
+        animbank = "ui_krampusbag_2x5"
+        animbuild = "ui_krampusbag_2x5"
+        y_offset = 114
+    elseif chefPouchSlotCount == 12 then
+        rows = 6
+        animbank = "ui_piggyback_2x6"
+        animbuild = "ui_piggyback_2x6"
+        y_offset = 170
+    else
+        -- 默认 8 格
+        rows = 4
+        animbank = "ui_backpack_2x4"
+        animbuild = "ui_backpack_2x4"
+        y_offset = 114
     end
 
-    -- 保存技能树相关倍率或buff
-    if inst._spice_upgrade then
-        if inst._spice_upgrade == "spice_chili" and inst.components.insulator then
-            data.insulation = inst.components.insulator:GetInsulation()
-        elseif inst._spice_upgrade == "spice_garlic" and inst.components.waterproofer then
-            data.has_waterproofer = true
-            if inst:HasTag("goggles") then
-                data.has_goggles_tag = true
-            end
-        elseif inst._spice_upgrade == "spice_sugar" and inst.components.equippable then
-            data.walkspeedmult = inst.components.equippable.walkspeedmult
-        elseif inst._spice_upgrade == "spice_salt" and inst.components.preserver then
-            data.preserver_mult = inst.components.preserver.perish_rate_mult
-        end
+    local pack_params =
+    {
+        widget =
+        {
+            slotpos = {},
+            animbank = animbank,
+            animbuild = animbuild,
+            pos = Vector3(-5, -90, 0),
+        },
+        issidewidget = true,
+        type = "pack",
+        openlimit = 1,
+    }
+
+    for y = 0, rows - 1 do
+        table.insert(pack_params.widget.slotpos, Vector3(-162, -75 * y + y_offset, 0))
+        table.insert(pack_params.widget.slotpos, Vector3(-162 + 75, -75 * y + y_offset, 0))
     end
+
+    params[name] = pack_params
+end
+-- 创建四个厨师袋
+for _, spice in ipairs({"spicepack_chili", "spicepack_salt", "spicepack_garlic", "spicepack_sugar"}) do
+    create_spicepack_params(spice, chefPouchSlotCount)
 end
 
-local function OnLoad(inst, data)
-    if not data then return end
+-- 香料厨师袋：调味料给厨师包使用
+local function IsValidSpicePack(inst)
+    local valid_packs = {
+        ["spicepack"] = true,
+        ["spicepack_salt"] = true,
+        ["spicepack_chili"] = true,
+        ["spicepack_garlic"] = true,
+        ["spicepack_sugar"] = true,
+    }
 
-    inst._spice_upgrade = data.spice_upgrade
-    inst.force_equippable = data.force_equippable
-
-    -- 兼容永不妥协，让其可以装备在身上
-    if not inst.components.equippable and inst.force_equippable then
-        inst:AddComponent("equippable")
-        inst.components.equippable.equipslot = EQUIPSLOTS.BODY
+    local prefab_lower = string.lower(inst.prefab or "")
+    if valid_packs[prefab_lower] then
+        return true
     end
-
-    if inst._spice_upgrade then
-        -- 恢复辣椒保暖
-        if inst._spice_upgrade == "spice_chili" then
-            if inst.components.insulator == nil then
-                inst:AddComponent("insulator")
-            end
-            inst.components.insulator:SetWinter()
-            inst.components.insulator:SetInsulation(data.insulation or TUNING.INSULATION_LARGE * 2)
-
-            -- 恢复蒜粉防水防沙
-        elseif inst._spice_upgrade == "spice_garlic" then
-            inst:AddTag("goggles")
-            if data.has_waterproofer and inst.components.waterproofer == nil then
-                inst:AddComponent("waterproofer")
-            end
-
-            -- 恢复盐保鲜倍率
-        elseif inst._spice_upgrade == "spice_salt" then
-            if inst.components.preserver == nil then
-                inst:AddComponent("preserver")
-            end
-            inst.components.preserver:SetPerishRateMultiplier(data.preserver_mult or TUNING.BEARGERFUR_SACK_PRESERVER_RATE)
-
-            -- 恢复甜加移速
-        elseif inst._spice_upgrade == "spice_sugar" then
-            if inst.components.equippable == nil then
-                inst:AddComponent("equippable")
-            end
-            inst.components.equippable.walkspeedmult = data.walkspeedmult or 1.25
-        end
-
-        -- 恢复 perishable
-        if inst.components.perishable == nil then
-            inst:AddComponent("perishable")
-            inst:AddTag("show_spoilage")
-        end
-        inst.components.perishable:SetPerishTime(TUNING.TOTAL_DAY_TIME * 10)
-        inst.components.perishable:StartPerishing()
-        if data.perish_remaining then
-            inst.components.perishable:SetPercent(data.perish_remaining)
-        end
-    end
+    return false
 end
-
-----------------------------------------------------
--- 舒适厨师包：定期检测owner状态和里面装有多少东西
-----------------------------------------------------
-AddPrefabPostInit("spicepack", function(inst)
-    if not TheWorld.ismastersim then
-        return
-    end
-
-    -- 这里是厨师包保存调味状态
-    inst.OnSave = OnSave
-    inst.OnLoad = OnLoad
-
-    -- 这里是厨师包定期检测owner和容器内容的代码
-    inst:DoPeriodicTask(1, function(inst)
-        local container = inst.components.container
-        local equippable = inst.components.equippable
-        if not container or not equippable then
-            return
-        end
-
-        local owner = inst.components.inventoryitem and inst.components.inventoryitem:GetGrandOwner()
-        if not (owner and owner:HasTag("player")) then
-            equippable.dapperness = 0
-            return
-        end
-
-        local hasSkill = owner.components.skilltreeupdater and
-            owner.components.skilltreeupdater:IsActivated("warly_spicepack_upgrade")
-
-        if not hasSkill then
-            equippable.dapperness = 0
-            return
-        end
-
-        local food_count = {}
-        for k = 1, container.numslots do
-            local item = container:GetItemInSlot(k)
-            if item and item:HasTag("spicedfood") and string.find(item.prefab, "spice_") then
-                local prefab = item.prefab
-                local count = item.components.stackable and item.components.stackable:StackSize() or 1
-                food_count[prefab] = (food_count[prefab] or 0) + count
-                -- print(string.format("[SpicePack] Slot %d 检测到调料食物: %s (数量 %d)", k, prefab, count))
-            end
-        end
-
-        local total = 0
-        for prefab, count in pairs(food_count) do
-            -- 计算递增加成，最多算40个
-            local capped = math.min(count, 40)
-            local extra = (capped - 1) * 0.05
-            total = total + 1 + extra
-
-            -- print(string.format(
-            --     "[SpicePack] 食物种类: %s ×%d → capped=%d → 计入 %.2f",
-            --     prefab, count, capped, 1 + extra
-            -- ))
-        end
-
-        local dapper = TUNING.DAPPERNESS_MED * chefPouchSpiceSanMultiplier * total
-        equippable.dapperness = dapper
-        -- print(string.format("[SpicePack] 总加成种类数: %.2f，对应理智恢复: %.2f", total, dapper))
-    end)
-end)
-
--- 公共方法：快速扔地再捡起来，用于刷新UI或重新绑定组件
-local function DropAndPickup(inst, doer)
-    if not (inst and inst:IsValid() and doer and doer:IsValid()) then
-        return
-    end
-
-    local inv = doer.components.inventory
-    if not inv then
-        return
-    end
-
-    -- 检查物品是否在玩家身上（容器、背包、装备都算）
-    local is_held = false
-    if inst.components.inventoryitem then
-        local owner = inst.components.inventoryitem.owner
-        if owner == doer or (owner and owner.components.inventoryitem and owner.components.inventoryitem.owner == doer) then
-            is_held = true
-        end
-    end
-
-    -- 如果确实在玩家身上，就执行“扔出再拾回”
-    if is_held then
-        inv:DropItem(inst, true, true)
-        inst:DoTaskInTime(0, function(d)
-            if d and d:IsValid() and doer and doer:IsValid() and doer.components.inventory then
-                -- 确认物品可拾取
-                if d.components.inventoryitem and not d.components.inventoryitem:IsHeld() and d.components.equippable then
-                    doer.components.inventory:Equip(d)
-                    -- d.components.equippable:Equip(doer, true)
-                    -- 可选日志：
-                    -- print("[SpicePack] Dropped and picked up:", d.prefab)
-                end
-            end
-        end)
-    end
-end
-
-----------------------------------------------------
--- -- SECTION2.1:香料厨师袋：调味料给厨师包使用
-----------------------------------------------------
-local function ClearSpiceBuff(inst)
-    -- print("过期回调：恢复原状", inst._spice_upgrade)
-    if inst._spice_upgrade == "spice_chili" and inst.components.insulator then
-        inst:RemoveComponent("insulator")
-    elseif inst._spice_upgrade == "spice_garlic" then
-        inst:RemoveTag("goggles")
-        if inst.components.waterproofer then
-            inst:RemoveComponent("waterproofer")
-            inst:RemoveTag("waterproofer")
-        end
-    elseif inst._spice_upgrade == "spice_salt" then
-        if inst.components.preserver then
-            inst:RemoveComponent("preserver")
-        end
-    elseif inst._spice_upgrade == "spice_sugar" and inst.components.equippable then
-        inst.components.equippable.walkspeedmult = 1
-    end
-    inst._spice_upgrade = nil
-    if inst.force_equippable then
-        inst:RemoveComponent("equippable")
-        inst.force_equippable = nil
-    end
-end
-
 local function UpgradeSpicePack(inst, doer, spice_type)
     if doer == nil or doer.prefab ~= "warly" then
         return false
     end
 
-    ----------------------------------------------------
-    -- 💀 清理已有料理状态
-    ----------------------------------------------------
-    if inst._spice_upgrade ~= nil then
-        -- 移除旧buff
-        ClearSpiceBuff(inst)
-    end
-
-    -- 移除旧的perishable事件
-    if inst._on_spice_expire ~= nil then
-        inst:RemoveEventCallback("perished", inst._on_spice_expire)
-        inst._on_spice_expire = nil
-    end
-
-    -- 兼容永不妥协，让其可以装备在身上
-    if not inst.components.equippable then
-        inst:AddComponent("equippable")
-        inst.components.equippable.equipslot = EQUIPSLOTS.BODY
-        inst.force_equippable = true
-    end
-
-    ----------------------------------------------------
-    -- ✅ 确保 perishable 存在（持续10天）
-    ----------------------------------------------------
-    if inst.components.perishable == nil then
-        inst:AddComponent("perishable")
-        inst:AddTag("show_spoilage")
-    end
-    inst.components.perishable:SetPerishTime(TUNING.TOTAL_DAY_TIME * chefPouchBuffDuration)
-    inst.components.perishable:StartPerishing()
-
-    ----------------------------------------------------
-    -- 🌶️ 根据调料添加新的buff
-    ----------------------------------------------------
-    -- 🌶️ 辣椒：添加保暖
-    if spice_type == "spice_chili" then
-        if inst.components.insulator == nil then
-            inst:AddComponent("insulator")
+    -- 生成新的厨师袋
+    local suffix = string.match(spice_type, "^spice_(%w+)$")
+    if suffix then
+        local prefab_name = "spicepack_" .. string.lower(suffix)
+        local skin_build, skin_id = inst:GetSkinBuild(), inst.skin_id
+        if skin_build == nil or skin_build == "" or skin_id == 0 then
+            skin_build, skin_id = nil, nil
         end
-        inst.components.insulator:SetWinter()
-        inst.components.insulator:SetInsulation(TUNING.INSULATION_LARGE * 2)
-        inst._spice_upgrade = "spice_chili"
-        -- 🧄 蒜粉：添加防水 + 防沙
-    elseif spice_type == "spice_garlic" then
-        if inst.components.waterproofer == nil then
-            inst:AddComponent("waterproofer")
-            inst:AddTag("waterproofer")
-        end
-        inst:AddTag("goggles")
-        inst._spice_upgrade = "spice_garlic"
-        -- 🧂 盐：提升保鲜率
-    elseif spice_type == "spice_salt" then
-        if inst.components.preserver == nil then
-            inst:AddComponent("preserver")
-        end
-        inst.components.preserver:SetPerishRateMultiplier(TUNING.BEARGERFUR_SACK_PRESERVER_RATE)
-        inst._spice_upgrade = "spice_salt"
-        -- 🍯 甜：增加移动速度
-    elseif spice_type == "spice_sugar" then
-        if inst.components.equippable == nil then
-            inst:AddComponent("equippable")
-        end
-        inst.components.equippable.walkspeedmult = 1.25
-        inst._spice_upgrade = "spice_sugar"
-    end
 
-    DropAndPickup(inst, doer)
+        local big_pack = SpawnPrefab(prefab_name, skin_build, skin_id)
 
-    ----------------------------------------------------
-    -- 💀 绑定过期回调：恢复原状
-    ----------------------------------------------------
-    inst._on_spice_expire = function(inst)
-        if inst and doer then
-            ClearSpiceBuff(inst)
-            inst:RemoveComponent("perishable")
-            inst:RemoveTag("show_spoilage")
-            DropAndPickup(inst, doer)
+        if big_pack and big_pack.components.container and inst.components.container then
+            -- 转移物品
+            local old_container = inst.components.container
+            local new_container = big_pack.components.container
+            local items = old_container:GetAllItems()
+            for _, item in ipairs(items) do
+                if item:IsValid() then
+                    old_container:RemoveItem(item, true)
+                    local success = new_container:GiveItem(item)
+                    if not success then
+                        item.Transform:SetPosition(inst.Transform:GetWorldPosition())
+                        Launch(item, item, 0.1)
+                    end
+                end
+            end
+
+            -- 放给原 owner
+            local owner = inst.components.inventoryitem and inst.components.inventoryitem:GetGrandOwner()
+            if owner and owner.components.inventory and inst.components.equippable then
+                owner.components.inventory:Unequip(inst.components.equippable.equipslot)
+                owner.components.inventory:Equip(big_pack)
+            else
+                big_pack.Transform:SetPosition(inst.Transform:GetWorldPosition())
+                Launch(big_pack, big_pack, 0.1)
+            end
         end
+
+        inst:Remove()
     end
-    inst:ListenForEvent("perished", inst._on_spice_expire)
 
     if doer.components.talker then
         doer.components.talker:Say(GetString(doer, "ANNOUNCE_SPICEPACK_UPGRADE"))
@@ -602,7 +427,7 @@ SPICEPACK_UPGRADE.fn = function(act)
     if act.invobject and act.target and act.doer then
         local doer = act.doer
         local hasSkill = doer:HasTag("warly_spicepack_upgrade")
-        if hasSkill and act.invobject:HasTag("spice") and string.find(act.invobject.prefab, "spice_") then
+        if hasSkill and act.invobject:HasTag("spice") and string.find(act.invobject.prefab, "spice_") and IsValidSpicePack(act.target) then
             act.invobject.components.stackable:Get():Remove()
             UpgradeSpicePack(act.target, act.doer, act.invobject.prefab)
             return true
@@ -613,7 +438,7 @@ AddAction(SPICEPACK_UPGRADE)
 
 -- 添加使用动作：右键用香料升级 技能树控制
 AddComponentAction("USEITEM", "spicesacktool", function(inst, doer, target, actions, right)
-    if right and string.find(inst.prefab, "spice_") and target and target.prefab == "spicepack" and doer.prefab == "warly" then
+    if right and string.find(inst.prefab, "spice_") and target and IsValidSpicePack(target) and doer.prefab == "warly" then
         local hasSkill = doer:HasTag("warly_spicepack_upgrade")
         if hasSkill then
             table.insert(actions, ACTIONS.SPICEPACK_UPGRADE)
@@ -659,6 +484,12 @@ AddPrefabPostInit("spice_salt", function(inst)
     end
     inst:AddComponent("spicesacktool")
 end)
+
+---- 新厨师袋的皮肤 大厨师袋
+PREFAB_SKINS["spicepack_chili"] = PREFAB_SKINS["spicepack"]
+PREFAB_SKINS["spicepack_sugar"] = PREFAB_SKINS["spicepack"]
+PREFAB_SKINS["spicepack_garlic"] = PREFAB_SKINS["spicepack"]
+PREFAB_SKINS["spicepack_salt"] = PREFAB_SKINS["spicepack"]
 
 
 --========================================================
@@ -799,7 +630,8 @@ local USE_SPICE_CONVERT = AddAction("USE_SPICE_CONVERT", STRINGS.ACTIONS.USE_SPI
     local target = act.target
     local spicer = act.invobject
 
-    local hasSkill = doer.components.skilltreeupdater and doer.components.skilltreeupdater:IsActivated("warly_spicer_dismantle")
+    local hasSkill = doer.components.skilltreeupdater and
+        doer.components.skilltreeupdater:IsActivated("warly_spicer_dismantle")
     if doer.prefab ~= "warly" or not hasSkill then
         print("奇怪的人使用调味拆解工具", doer.components.skilltreeupdater:IsActivated("warly_spicer_dismantle"))
         return false
