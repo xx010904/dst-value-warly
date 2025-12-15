@@ -105,6 +105,7 @@ end
 GLOBAL.warlyvalueconfig.selfishEaterBuffDuration = GetModConfigData("selfishEaterBuffDuration")
 GLOBAL.warlyvalueconfig.boneBouillonShieldChance = GetModConfigData("boneBouillonShieldChance")
 GLOBAL.warlyvalueconfig.fruitCrepeMaxSan = GetModConfigData("fruitCrepeMaxSan")
+GLOBAL.warlyvalueconfig.potatoMaxDamage = GetModConfigData("potatoMaxDamage")
 GLOBAL.warlyvalueconfig.moquecaTorrentDamage = GetModConfigData("moquecaTorrentDamage")
 GLOBAL.warlyvalueconfig.dreamDishChance = GetModConfigData("dreamDishChance")
 GLOBAL.warlyvalueconfig.flyingPieMaxCount = GetModConfigData("flyingPieMaxCount")

@@ -1,34 +1,59 @@
 local selfishEaterBuffDuration = warlyvalueconfig.selfishEaterBuffDuration or 300
+local potatoMaxDamage = warlyvalueconfig.potatoMaxDamage or 2.0
 
 local function UpdateDamage(inst, target)
-    if target.components.combat and target.components.hunger then
-        local hunger_percent = target.components.hunger:GetPercent()
-        -- 普通伤害倍率：20%以下为1倍，80%以上为2倍
-        local mult = 1 + math.clamp((hunger_percent - 0.2) / 0.6, 0, 1)
-        target.components.combat.externaldamagemultipliers:SetModifier(inst, mult, "potatotorte_buff")
+    if not (target and target:IsValid()) then return end
+    if not (target.components.combat and target.components.hunger) then return end
 
-        -- 位面伤害加成
-        local item = target.components.inventory and target.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
-        if item and item.components.planardamage and item.components.planardamage:GetDamage() > 0 and not item:HasTag("magicweapon") then
-            -- 位面伤害映射：20%以下为0，80%以上为25，中间线性映射5~25
-            local planar_bonus
-            if hunger_percent <= 0.2 then
-                planar_bonus = 0
-            elseif hunger_percent >= 0.8 then
-                planar_bonus = 25
-            else
-                -- 线性映射 0.2~0.8 -> 5~25
-                planar_bonus = 5 + (hunger_percent - 0.2) / (0.8 - 0.2) * (25 - 5)
-            end
-            item.components.planardamage:AddBonus(target, planar_bonus, "potatotorte_buff")
-            -- 保存当前附加的位面武器，方便移除
-            if target._potato_planar_weapon ~= item then
-                if target._potato_planar_weapon and target._potato_planar_weapon.components.planardamage then
-                    target._potato_planar_weapon.components.planardamage:RemoveBonus(target, "potatotorte_buff")
-                end
-                target._potato_planar_weapon = item
-            end
+    local hunger_percent = target.components.hunger:GetPercent()
+    hunger_percent = math.clamp(hunger_percent, 0, 1) -- 保证在 0~1 之间
+
+    -- -----------------------------
+    -- 1️⃣ 设置普通伤害倍数
+    -- -----------------------------
+    local mult
+    if hunger_percent >= 0.9 then
+        mult = potatoMaxDamage
+    else
+        mult = 0.5 + (hunger_percent / 0.9) * (potatoMaxDamage - 0.5)
+    end
+    target.components.combat.externaldamagemultipliers:SetModifier(inst, mult, "potatotorte_buff")
+
+    -- -----------------------------
+    -- 2️⃣ 位面伤害加成
+    -- -----------------------------
+    local item = target.components.inventory and target.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+    local planar_bonus = 0
+
+    if item
+        and item:IsValid()
+        and item.components.planardamage
+        and item.components.planardamage:GetDamage() > 0
+        and not item:HasTag("magicweapon") then
+        if hunger_percent >= 0.9 then
+            planar_bonus = 25
+        else
+            planar_bonus = (hunger_percent / 0.9) * 25
         end
+
+        -- 添加 bonus
+        item.components.planardamage:AddBonus(target, planar_bonus, "potatotorte_buff")
+
+        -- 移除旧武器 bonus
+        if target._potato_planar_weapon and target._potato_planar_weapon:IsValid()
+            and target._potato_planar_weapon ~= item
+            and target._potato_planar_weapon.components.planardamage then
+            target._potato_planar_weapon.components.planardamage:RemoveBonus(target, "potatotorte_buff")
+        end
+
+        target._potato_planar_weapon = item
+    else
+        -- 如果当前没有有效武器，移除旧 bonus
+        if target._potato_planar_weapon and target._potato_planar_weapon:IsValid()
+            and target._potato_planar_weapon.components.planardamage then
+            target._potato_planar_weapon.components.planardamage:RemoveBonus(target, "potatotorte_buff")
+        end
+        target._potato_planar_weapon = nil
     end
 end
 

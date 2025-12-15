@@ -198,7 +198,7 @@ local function MakeChefPack(name, perish_time)
         inst.components.inventoryitem.atlasname = "images/inventoryimages3.xml"
 
         inst:AddComponent("equippable")
-        inst.components.equippable.equipslot = EQUIPSLOTS.BODY
+        inst.components.equippable.equipslot = EQUIPSLOTS.BACK or EQUIPSLOTS.BODY
         inst.components.equippable:SetOnEquip(onequip)
         inst.components.equippable:SetOnUnequip(onunequip)
         inst.components.equippable:SetOnEquipToModel(onequiptomodel)

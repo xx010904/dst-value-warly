@@ -60,7 +60,7 @@ configuration_options =
     Subtitle(isCh and "吃独食" or "Selfish Eater"),
     {
         name = "selfishEaterBuffDuration",
-        label = isCh and "吃独食BUFF持续时间" or "Selfish Eater Buff Duration",
+        label = isCh and "吃独食BUFF持续时间" or "Selfish Buff Duration",
         hover = isCh and "设置吃独食BUFF的持续时间（秒）"
             or "Set the duration (in seconds) of the Selfish Eater Buff",
         options =
@@ -97,7 +97,7 @@ configuration_options =
     },
     {
         name = "boneBouillonShieldChance",
-        label = isCh and "骨头汤护盾概率" or "Bone Bouillon Shield Chance",
+        label = isCh and "骨头汤护盾概率" or "Bone Shield Chance",
         hover = isCh and "设置食用骨头汤时触发无敌护盾的概率"
             or "Set the chance to trigger an invincibility shield when eating Bone Bouillon",
         options =
@@ -134,7 +134,7 @@ configuration_options =
     },
     {
         name = "fruitCrepeMaxSan",
-        label = isCh and "鲜果可丽饼最高回理智比例" or "Fruit Crepe Max SAN",
+        label = isCh and "可丽饼最高理智" or "Crepe Max SAN",
         hover = isCh and "设置食用鲜果可丽饼时能回的最大理智比例"
             or "Set the maximum SAN restored by eating a Fruit Crepe",
         options =
@@ -168,6 +168,43 @@ configuration_options =
             },
         },
         default = 0.9,
+    },
+    {
+        name = "potatoMaxDamage",
+        label = isCh and "土豆最高攻击倍率" or "Potato Max ATK",
+        hover = isCh and "设置食用蓬松土豆蛋奶酥时能获得的最高攻击倍率"
+            or "Set the maximum attack multiplier granted by consuming Fluffy Potato Soufflé",
+        options =
+        {
+            {
+                description = isCh and "较低" or "Low",
+                data = 1.5,
+                hover = isCh and "攻击倍率1.5倍"
+                    or "ATK multiplier 1.5x"
+            },
+
+            {
+                description = isCh and "正常" or "Normal",
+                data = 2.0,
+                hover = isCh and "攻击倍率2.0倍"
+                    or "ATK multiplier 2.0x"
+            },
+
+            {
+                description = isCh and "较高" or "High",
+                data = 2.5,
+                hover = isCh and "攻击倍率2.5倍"
+                    or "ATK multiplier 2.5x"
+            },
+
+            {
+                description = isCh and "离谱" or "Absurd",
+                data = 3.0,
+                hover = isCh and "攻击倍率3.0倍"
+                    or "ATK multiplier 3.0x"
+            },
+        },
+        default = 2.0,
     },
     {
         name = "moquecaTorrentDamage",
