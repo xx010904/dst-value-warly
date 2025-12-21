@@ -351,7 +351,14 @@ local function ShareFoodEffects(eater, food)
                     dummy.components.edible.healthvalue = 0
                     dummy.components.edible.hungervalue = 0
                     dummy.components.edible.sanityvalue = 0
-                    dummy.components.edible.foodtype = FOODTYPE.GOODIES
+                    -- 先检查主/副类型是否有任意一个已经是 GOODIES
+                    local hasGoodiesType = (dummy.components.edible.foodtype == FOODTYPE.GOODIES) or
+                        (dummy.components.edible.secondaryfoodtype == FOODTYPE.GOODIES)
+                    -- 只有当两者都不是 GOODIES 时，才修改（优先改主类型，副类型保持原值）
+                    if not hasGoodiesType then
+                        -- 把主类型设为 GOODIES，副类型保留原有值（避免重复）
+                        dummy.components.edible.foodtype = FOODTYPE.GOODIES
+                    end
                     dummy:AddTag("dummyfood")
                 end
 
