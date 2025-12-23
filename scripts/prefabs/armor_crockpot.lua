@@ -60,7 +60,8 @@ local function OnTakeDamage(inst, damage_amount)
     -- print("护甲承受了多少伤害：", damage_amount)
 
     -- 自身受伤低概率触发替罪羊，技能树控制
-    local hasSkill = owner and owner.components.skilltreeupdater and owner.components.skilltreeupdater:IsActivated("warly_crockpot_scapegoat")
+    local hasSkill = owner and owner.components.skilltreeupdater and
+        owner.components.skilltreeupdater:IsActivated("warly_crockpot_scapegoat")
     if hasSkill then
         local base_fraction = (damage_amount or 0) / ARMOR_DURABILITY
         local random_fraction = base_fraction * 1.0
@@ -131,10 +132,11 @@ local function ApplyDamageRedirect(inst, teammate)
             end
 
             -- 技能树控制
-            local hasSkill = owner and owner.components.skilltreeupdater and owner.components.skilltreeupdater:IsActivated("warly_crockpot_scapegoat")
+            local hasSkill = owner and owner.components.skilltreeupdater and
+                owner.components.skilltreeupdater:IsActivated("warly_crockpot_scapegoat")
             if hasSkill then
                 local base_fraction = (damage or 0) / ARMOR_DURABILITY -- 每次累计本次收到的伤害占护甲的总比例
-                local random_fraction = base_fraction * 0.5   -- 替队友可以得0.5的额外累计
+                local random_fraction = base_fraction * 0.5            -- 替队友可以得0.5的额外累计
                 -- print("替队友承伤，累计概率", inst.accumulating_goat_chance,"加上", random_fraction)
                 inst.accumulating_goat_chance = inst.accumulating_goat_chance + random_fraction
                 if inst.accumulating_goat_chance > 1 then
@@ -170,7 +172,7 @@ local function ScanNearbyPlayers(inst)
     if not owner or not owner:IsValid() then return end
 
     local x, y, z = owner.Transform:GetWorldPosition()
-    local players = TheSim:FindEntities(x, y, z, SCAN_RADIUS, {"player"}, {"playerghost"})
+    local players = TheSim:FindEntities(x, y, z, SCAN_RADIUS, { "player" }, { "playerghost" })
 
     if inst._teammates == nil then inst._teammates = {} end
 
@@ -178,7 +180,10 @@ local function ScanNearbyPlayers(inst)
     for p, _ in pairs(inst._teammates) do
         local still_near = false
         for _, pl in ipairs(players) do
-            if pl == p then still_near = true break end
+            if pl == p then
+                still_near = true
+                break
+            end
         end
         if not still_near then
             RemoveDamageRedirect(p)
@@ -214,9 +219,17 @@ end
 -- 破碎逻辑：向6个方向甩锅，可控制是否二段甩，方向带随机旋转偏移，锅有概率敲坏掉落材料
 local function OnArmorBroke(owner, data)
     local inst = data.armor
-    if not (inst and inst:IsValid()) then return end
+    if not (inst and inst:IsValid()) then
+        return
+    end
 
-    local hasFlungSkill = owner and owner.components.skilltreeupdater and owner.components.skilltreeupdater:IsActivated("warly_crockpot_flung")
+    -- 只处理 armor_crockpot
+    if inst.prefab ~= "armor_crockpot" then
+        return
+    end
+
+    local hasFlungSkill = owner and owner.components.skilltreeupdater and
+        owner.components.skilltreeupdater:IsActivated("warly_crockpot_flung")
     -- print("甩锅技能树：", hasFlungSkill)
     if not hasFlungSkill then -- 技能树控制是否开启
         return
@@ -272,7 +285,8 @@ local function OnArmorBroke(owner, data)
             second_bomb._throw_dir = bomb_inst._throw_dir
             second_bomb.should_spawn_pot = true -- 第二段一定生成锅
 
-            local second_old_onhit = second_bomb.components.complexprojectile and second_bomb.components.complexprojectile.onhitfn or nil
+            local second_old_onhit = second_bomb.components.complexprojectile and
+                second_bomb.components.complexprojectile.onhitfn or nil
 
             -- 第二段 OnHit
             local function SecondOnHit(sec_inst, att2, tgt2)
@@ -382,6 +396,8 @@ local function fn()
     inst.AnimState:PlayAnimation("anim")
     inst.entity:SetPristine()
 
+    inst:AddTag("armor")
+
     if not TheWorld.ismastersim then return inst end
 
     inst:AddComponent("inspectable")
@@ -394,7 +410,7 @@ local function fn()
     inst.components.armor.ontakedamage = OnTakeDamage
 
     inst:AddComponent("planardefense")
-	inst.components.planardefense:SetBaseDefense(ARMOR_DURABILITY)
+    inst.components.planardefense:SetBaseDefense(ARMOR_DURABILITY)
 
     inst:AddComponent("passpottool")
 

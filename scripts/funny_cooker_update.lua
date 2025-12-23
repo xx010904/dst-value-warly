@@ -1306,6 +1306,13 @@ local function RemoveDecorIfFood(inst, worker, workleft, numworks) --(self.inst,
         if decor and decor:IsValid() and decor.prefab == "decor_food" then
             inst.components.workable.workleft = workleft + numworks -- 补回次数
             SpawnPrefab("small_puff").Transform:SetPosition(decor.Transform:GetWorldPosition())
+            -- 给腐烂物
+            local rot = SpawnPrefab("spoiled_food")
+            rot.Transform:SetPosition(decor.Transform:GetWorldPosition())
+            if decor.uses_left and decor.uses_left > 0 and rot.components.stackable then
+                rot.components.stackable:SetStackSize(decor.uses_left or 1)
+            end
+            Launch(rot, decor, 1)
             decor:Remove()
         end
     end

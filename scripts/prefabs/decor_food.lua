@@ -109,6 +109,10 @@ local function EatMimicFood(inst, owner)
         return
     end
 
+    if not inst or not inst:IsValid() then
+        return
+    end
+
     local foodname = inst.mimic_food or "meatballs"
     local food = SpawnPrefab(foodname)
     if not food then
@@ -205,7 +209,14 @@ local function EatMimicFood(inst, owner)
     if food then
         food:Remove()
     end
-    inst:Remove()
+    -- 安全删除，延迟一点给客户端感知的机会
+    if inst and inst:IsValid() then
+        inst:DoTaskInTime(FRAMES, function()
+            if inst:IsValid() then
+                inst:Remove()
+            end
+        end)
+    end
 end
 
 local function OnPutInInventory(inst, owner)
@@ -220,11 +231,20 @@ end
 
 local function OnDropped(inst)
     inst._already_consumed = false
-    inst:DoTaskInTime(0, function()
-        if inst:IsValid() then
-            inst:Remove()
-        end
-    end)
+    -- 安全删除，延迟一点给客户端感知的机会
+    if inst and inst:IsValid() then
+        inst:DoTaskInTime(1, function()
+            if inst:IsValid() then
+                local rot = SpawnPrefab("spoiled_food")
+                rot.Transform:SetPosition(inst.Transform:GetWorldPosition())
+                if inst.uses_left and inst.uses_left > 0 and rot.components.stackable then
+                    rot.components.stackable:SetStackSize(inst.uses_left or 1)
+                end
+                Launch(rot, inst, 1)
+                inst:Remove()
+            end
+        end)
+    end
 end
 
 local function OnSave(inst, data)
@@ -272,7 +292,6 @@ local function InitName(inst)
 
             realName = subfmt(spice_str, { food = food_str })
             -- print("[SetName] 设置自定义名字（有调料）", realName)
-
         else
             local food_key = string.upper(inst.mimic_food)
             local food_str = STRINGS.NAMES[food_key] or inst.mimic_food
