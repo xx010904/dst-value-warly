@@ -1,3 +1,5 @@
+local decorFoodInitialUses = warlyvalueconfig.decorFoodInitialUses or 0.5
+
 local function CloneDecorFoodAppearance(src)
     if not (src and src.mimic_food) then
         print("[DecorFoodClone] 没有 mimic_food，复制失败")
@@ -401,19 +403,46 @@ local function fn()
     inst.food_basename = ""
     inst.spicename = ""
 
+    -- p: 每次“继续增加 1 次使用次数”的成功概率（0 ~ 1）
+    -- 机制说明：
+    --   从 1 次使用开始，只要判定成功，就继续 +1
+    --   每增加一次，都会再次以同样的概率 p 进行判定
+    --   一旦失败，立刻停止
+    --
+    -- 概率示例（以 max_uses = 4 为例）：
+    --   p = 0.5 时：
+    --     1 次使用概率 ≈ 50%
+    --     2 次使用概率 ≈ 25%
+    --     3 次使用概率 ≈ 12.5%
+    --     4 次使用概率 ≈ 12.5%
+    --     平均期望值 ≈ 1.88 次
+    --
+    --   p = 0.7 时：
+    --     1 次使用概率 ≈ 30%
+    --     2 次使用概率 ≈ 21%
+    --     3 次使用概率 ≈ 14.7%
+    --     4 次使用概率 ≈ 34.3%
+    --     平均期望值 ≈ 2.53 次
+    --
+    --   p = 0.9 时：
+    --     1 次使用概率 ≈ 10%
+    --     2 次使用概率 ≈ 9%
+    --     3 次使用概率 ≈ 8.1%
+    --     4 次使用概率 ≈ 72.9%
+    --     平均期望值 ≈ 3.61 次
+    -- max_uses: 最大可获得的使用次数上限，用于防止无限增长
     local function GetUsesLeft()
-        local uses = 1                      -- 保底 1
-        if math.random() < 0.5 then         -- 50%概率触发 2
-            uses = 2
-            if math.random() < 0.5 then     -- 25% 概率触发 3 （0.5*0.5）
-                uses = 3
-                if math.random() < 0.5 then -- 12.5% 概率触发 4 （0.5*0.5*0.5）
-                    uses = 4
-                end
-            end
+        local uses = 1      -- 至少保证 1 次使用
+        local max_uses = 4  -- 默认最多 4 次
+
+        -- 只要没到上限，并且随机判定成功，就继续增加次数
+        while uses < max_uses and math.random() < decorFoodInitialUses do
+            uses = uses + 1
         end
+
         return uses
     end
+
     inst.uses_left = GetUsesLeft()
 
     inst:AddComponent("inspectable")

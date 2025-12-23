@@ -316,6 +316,40 @@ configuration_options =
 
     Subtitle(isCh and "真香警告" or "True Duration Warning"),
     {
+        name = "decorFoodInitialUses",
+        label = isCh and "首次摆盘期望" or "Initial Plate Food Stacks",
+        hover = isCh and "首次摆盘会随机获得 1~4 份食物，可配置其整体期望值"
+            or "Randomly get 1~4 stacks on first decor placement, configure expected total stacks",
+        options =
+        {
+            {
+                description = isCh and "较低" or "Low",
+                data = 0.3,
+                hover = isCh and "首次摆盘平均期望约 1.58 份食物"
+                    or "Expected total stacks ≈ 1.58"
+            },
+            {
+                description = isCh and "正常" or "Normal",
+                data = 0.5,
+                hover = isCh and "首次摆盘平均期望约 1.88 份食物"
+                    or "Expected total stacks ≈ 1.88"
+            },
+            {
+                description = isCh and "较高" or "High",
+                data = 0.7,
+                hover = isCh and "首次摆盘平均期望约 2.53 份食物"
+                    or "Expected total stacks ≈ 2.53"
+            },
+            {
+                description = isCh and "离谱" or "Absurd",
+                data = 0.9,
+                hover = isCh and "首次摆盘平均期望约 3.61 份食物"
+                    or "Expected total stacks ≈ 3.61"
+            },
+        },
+        default = 0.5,
+    },
+    {
         name = "lingeringFlavorBuffRange",
         label = isCh and "余香犹在持续时间" or "Lingering Taste Duration",
         hover = isCh and "设置余香犹在buff的持续时间上下限，实际时间会根据吃摆盘料理时的饥饿度计算，越饿持续时间越长"

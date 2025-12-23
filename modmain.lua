@@ -102,25 +102,33 @@ elseif GetModConfigData("LanguageSetting") == "english" then
     modimport("languages/en")
 end
 
+-- 吃独食
 GLOBAL.warlyvalueconfig.selfishEaterBuffDuration = GetModConfigData("selfishEaterBuffDuration")
 GLOBAL.warlyvalueconfig.boneBouillonShieldChance = GetModConfigData("boneBouillonShieldChance")
 GLOBAL.warlyvalueconfig.fruitCrepeMaxSan = GetModConfigData("fruitCrepeMaxSan")
 GLOBAL.warlyvalueconfig.potatoMaxDamage = GetModConfigData("potatoMaxDamage")
 GLOBAL.warlyvalueconfig.moquecaTorrentDamage = GetModConfigData("moquecaTorrentDamage")
+-- 梦想料理
 GLOBAL.warlyvalueconfig.dreamDishChance = GetModConfigData("dreamDishChance")
 GLOBAL.warlyvalueconfig.flyingPieMaxCount = GetModConfigData("flyingPieMaxCount")
+-- 真香警告
+GLOBAL.warlyvalueconfig.decorFoodInitialUses = GetModConfigData("decorFoodInitialUses")
 GLOBAL.warlyvalueconfig.lingeringFlavorBuffRange = GetModConfigData("lingeringFlavorBuffRange")
+-- 下饭操作
 GLOBAL.warlyvalueconfig.shockReoveryMultiplier = GetModConfigData("shockReoveryMultiplier")
 GLOBAL.warlyvalueconfig.cookingPowerChanceMultiplier = GetModConfigData("cookingPowerChanceMultiplier")
 GLOBAL.warlyvalueconfig.warlyNoobSlow = GetModConfigData("warlyNoobSlow")
+-- 背锅锅
 GLOBAL.warlyvalueconfig.burdenPotDurability = GetModConfigData("burdenPotDurability")
 GLOBAL.warlyvalueconfig.burdenPotDamageLoss = GetModConfigData("burdenPotDamageLoss")
 GLOBAL.warlyvalueconfig.flungPotImpactDamage = GetModConfigData("flungPotImpactDamage")
 GLOBAL.warlyvalueconfig.scapegoatHornDropChance = GetModConfigData("scapegoatHornDropChance")
+-- 多用厨具
 GLOBAL.warlyvalueconfig.chefPouchBuffDuration = GetModConfigData("chefPouchBuffDuration")
 GLOBAL.warlyvalueconfig.chefPouchSpiceSanMultiplier = GetModConfigData("chefPouchSpiceSanMultiplier")
 GLOBAL.warlyvalueconfig.chefPouchSlotCount = GetModConfigData("chefPouchSlotCount")
 GLOBAL.warlyvalueconfig.grinderDigCooldown = GetModConfigData("grinderDigCooldown")
+-- 亲和
 GLOBAL.warlyvalueconfig.youthShadowMaceDurability = GetModConfigData("youthShadowMaceDurability")
 GLOBAL.warlyvalueconfig.rottenCloudDurationPerRot = GetModConfigData("rottenCloudDurationPerRot")
 GLOBAL.warlyvalueconfig.pigmanRotCloudFX = GetModConfigData("pigmanRotCloudFX")
