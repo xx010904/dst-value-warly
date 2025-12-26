@@ -108,21 +108,42 @@ end
 
 local function EatMimicFood(inst, owner)
     if not (owner and owner.components and owner.components.eater) then
+        print(string.format(
+            "[MIMIC_FOOD][ERROR] Invalid owner or eater. inst=%s owner=%s",
+            tostring(inst),
+            owner and owner.prefab or "nil"
+        ))
+        inst:Remove()
         return
     end
 
     if not inst or not inst:IsValid() then
+        print(string.format(
+            "[MIMIC_FOOD][ERROR] Inst invalid before processing. owner=%s",
+            owner and owner.prefab or "nil"
+        ))
+        if inst then inst:Remove() end
         return
     end
 
     local foodname = inst.mimic_food or "meatballs"
     local food = SpawnPrefab(foodname)
     if not food then
-        -- 如果没有对应prefab，生成一个空壳dummy防报错
+        print(string.format(
+            "[MIMIC_FOOD][ERROR] Failed to spawn mimic food prefab: %s",
+            tostring(foodname)
+        ))
         food = SpawnPrefab("meatballs")
     end
 
-    if not food.components.edible then
+
+    if food and not food.components.edible then
+        print(string.format(
+            "[MIMIC_FOOD][ERROR] Food has no edible component. prefab=%s",
+            food.prefab
+        ))
+        inst:Remove()
+        food:Remove()
         return
     end
 
@@ -147,6 +168,14 @@ local function EatMimicFood(inst, owner)
     food.persists = false
 
     local success = owner.components.eater:PrefersToEat(food)
+    if not success then
+        print(string.format(
+            "[MIMIC_FOOD][ERROR] PrefersToEat failed. owner=%s food=%s foodtype=%s",
+            owner.prefab,
+            food.prefab,
+            food.components.edible.foodtype
+        ))
+    end
     if success then
         -- 直接加属性，而不是吃，解决一切挑食问题
         ApplyFoodDirectly(owner, food)
@@ -175,6 +204,12 @@ local function EatMimicFood(inst, owner)
         end
         -- 技能树控制食物是否有持续buff
         if inst.restore_skill then
+            if not owner.components.skilltreeupdater then
+                print(string.format(
+                    "[MIMIC_FOOD][ERROR] restore_skill=true but no skilltreeupdater. owner=%s",
+                    owner.prefab
+                ))
+            end
             local hasSkill = owner.components.skilltreeupdater and
                 owner.components.skilltreeupdater:IsActivated("warly_true_delicious_restore")
             if hasSkill then
@@ -184,11 +219,27 @@ local function EatMimicFood(inst, owner)
                 local truedelicious_buff = owner:GetDebuff(buff_name)
                 if truedelicious_buff then
                     truedelicious_buff.foodPrefab = buff_food
+                else
+                    print(string.format(
+                        "[MIMIC_FOOD][ERROR] Buff not found after AddDebuff. buff=%s owner=%s",
+                        buff_name,
+                        owner.prefab
+                    ))
                 end
                 SpawnPrefab("spider_heal_target_fx").entity:SetParent(owner.entity)
             end
         end
-        inst.uses_left = inst.uses_left - 1
+        if inst.uses_left == nil then
+            print("[MIMIC_FOOD][ERROR] inst.uses_left is nil")
+        else
+            inst.uses_left = inst.uses_left - 1
+            if inst.uses_left < 0 then
+                print(string.format(
+                    "[MIMIC_FOOD][ERROR] uses_left < 0. inst=%s",
+                    tostring(inst)
+                ))
+            end
+        end
     else
         -- print("餐桌模拟食物使用失败", owner.prefab, food.prefab)
         if owner.components.talker then
@@ -199,14 +250,13 @@ local function EatMimicFood(inst, owner)
     -- 尝试放回桌子
     if inst.uses_left > 0 then
         local isback = TryFindNearbyTable(inst, owner)
-        -- if not isback then
-        --     local newDecor = CloneDecorFoodAppearance(inst)
-        --     if newDecor then
-        --         -- print("没找到桌子，重新生成一个丢地上", newDecor.mimic_food)
-        --         newDecor.Transform:SetPosition(owner.Transform:GetWorldPosition())
-        --         Launch(newDecor, owner)
-        --     end
-        -- end
+        if not isback then
+            print(string.format(
+                "[MIMIC_FOOD][ERROR] No nearby table found. owner=%s inst=%s",
+                owner.prefab,
+                tostring(inst)
+            ))
+        end
     end
     if food then
         food:Remove()
@@ -214,25 +264,24 @@ local function EatMimicFood(inst, owner)
     -- 安全删除，延迟一点给客户端感知的机会
     if inst and inst:IsValid() then
         inst:DoTaskInTime(FRAMES, function()
-            if inst:IsValid() then
-                inst:Remove()
+            if not inst:IsValid() then
+                print("[MIMIC_FOOD][ERROR] Inst invalid before delayed remove")
+                return
             end
+            inst:Remove()
         end)
+    else
+        print("[MIMIC_FOOD][ERROR] Inst already invalid before delayed remove")
     end
 end
 
 local function OnPutInInventory(inst, owner)
-    if inst._already_consumed then
-        return
-    end
-    inst._already_consumed = true
     inst:DoTaskInTime(0, function()
         EatMimicFood(inst, owner)
     end)
 end
 
 local function OnDropped(inst)
-    inst._already_consumed = false
     -- 安全删除，延迟一点给客户端感知的机会
     if inst and inst:IsValid() then
         inst:DoTaskInTime(1, function()
@@ -432,8 +481,8 @@ local function fn()
     --     平均期望值 ≈ 3.61 次
     -- max_uses: 最大可获得的使用次数上限，用于防止无限增长
     local function GetUsesLeft()
-        local uses = 1      -- 至少保证 1 次使用
-        local max_uses = 4  -- 默认最多 4 次
+        local uses = 1     -- 至少保证 1 次使用
+        local max_uses = 4 -- 默认最多 4 次
 
         -- 只要没到上限，并且随机判定成功，就继续增加次数
         while uses < max_uses and math.random() < decorFoodInitialUses do
@@ -452,7 +501,8 @@ local function fn()
     -- inst.components.inventoryitem.atlasname = "images/inventoryimages2.xml"
 
     -- 监听进入物品栏事件
-    inst:ListenForEvent("onputininventory", function(inst, owner)
+    inst:ListenForEvent("onputininventory", function(inst, data)
+        local owner = data.owner or (inst.components.inventoryitem ~= nil and inst.components.inventoryitem:GetGrandOwner())
         OnPutInInventory(inst, owner)
     end)
 
