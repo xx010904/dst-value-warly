@@ -131,6 +131,7 @@ GLOBAL.warlyvalueconfig.grinderDigCooldown = GetModConfigData("grinderDigCooldow
 -- 亲和
 GLOBAL.warlyvalueconfig.youthShadowMaceDurability = GetModConfigData("youthShadowMaceDurability")
 GLOBAL.warlyvalueconfig.rottenCloudDurationPerRot = GetModConfigData("rottenCloudDurationPerRot")
+GLOBAL.warlyvalueconfig.spoiledCloudUseMode = GetModConfigData("spoiledCloudUseMode")
 GLOBAL.warlyvalueconfig.pigmanRotCloudFX = GetModConfigData("pigmanRotCloudFX")
 
 -- 这将执行 xxx.lua 中的所有代码

@@ -1,71 +1,117 @@
 local rottenCloudDurationPerRot = warlyvalueconfig.rottenCloudDurationPerRot or 2.5
+-- 0 = 腐烂物 → 桶
+-- 1 = 桶 → 腐烂物
+local spoiledCloudUseMode = warlyvalueconfig.spoiledCloudUseMode or 0
 
-AddPrefabPostInit("spoiled_food", function(inst)
-    inst:AddComponent("activespoiledcloudtool")
-end)
-AddPrefabPostInit("spoiled_fish", function(inst)
-    inst:AddComponent("activespoiledcloudtool")
-end)
-AddPrefabPostInit("spoiled_fish_small", function(inst)
-    inst:AddComponent("activespoiledcloudtool")
-end)
-AddPrefabPostInit("rottenegg", function(inst)
-    inst:AddComponent("activespoiledcloudtool")
-end)
+if spoiledCloudUseMode == 0 then
+    AddPrefabPostInit("spoiled_food", function(inst)
+        inst:AddComponent("activespoiledcloudtool")
+    end)
+    AddPrefabPostInit("spoiled_fish", function(inst)
+        inst:AddComponent("activespoiledcloudtool")
+    end)
+    AddPrefabPostInit("spoiled_fish_small", function(inst)
+        inst:AddComponent("activespoiledcloudtool")
+    end)
+    AddPrefabPostInit("rottenegg", function(inst)
+        inst:AddComponent("activespoiledcloudtool")
+    end)
+else
+    AddPrefabPostInit("beargerfur_sack", function(inst)
+        inst:AddComponent("activespoiledcloudtool")
+    end)
+    AddPrefabPostInit("coonfur_sack", function(inst)
+        inst:AddComponent("activespoiledcloudtool")
+    end)
+end
+
 
 
 --========================================================
 -- 释放腐烂云雾
 --========================================================
+local function ApplySpoiledCloud(doer, rot, sack)
+    if not (doer and sack and rot) then
+        print("[ApplySpoiledCloud] Abort: invalid params")
+        return false
+    end
+
+    if not doer:HasTag("warly_allegiance_lunar") then
+        print("[ApplySpoiledCloud] Abort: doer has no warly_allegiance_lunar")
+        return false
+    end
+
+    local damage = 0
+    if sack.prefab == "beargerfur_sack" then
+        damage = 5.2
+    elseif sack.prefab == "coonfur_sack" then
+        damage = 2.6
+    else
+        print("[ApplySpoiledCloud] Abort: invalid sack prefab =", sack.prefab)
+        return false
+    end
+
+    local stacksize = rot.components.stackable and rot.components.stackable.stacksize or 1
+
+    local buffname = "spoiled_cloud_buff"
+
+    if not sack:HasDebuff(buffname) then
+        sack:AddDebuff(buffname, buffname)
+    else
+        print("[ApplySpoiledCloud] Refresh buff =", buffname)
+    end
+
+    local buff_inst = sack:GetDebuff(buffname)
+    if buff_inst and buff_inst.components.timer then
+        buff_inst.damage = damage
+
+        local time_left = buff_inst.components.timer:GetTimeLeft("lifetime") or 0
+        local add_time = stacksize * rottenCloudDurationPerRot
+        local final_time = time_left + add_time
+        buff_inst.components.timer:SetTimeLeft("lifetime", final_time)
+
+        if buff_inst.PlusFxLastTime then
+            buff_inst:PlusFxLastTime()
+        end
+    else
+        print("[ApplySpoiledCloud] Warning: buff_inst or timer missing")
+    end
+
+    rot:Remove()
+
+    return true
+end
+
+
 local SPOILED_ON_SACK = Action({ priority = 1, mount_valid = true })
 SPOILED_ON_SACK.id = "SPOILED_ON_SACK"
 SPOILED_ON_SACK.str = STRINGS.ACTIONS.SPOILED_ON_SACK
 SPOILED_ON_SACK.fn = function(act)
-    local target = act.target
-    local item = act.invobject
-    local doer = act.doer
-
-    if doer and doer:HasTag("warly_allegiance_lunar") and target and item then
-        local damage = 0
-        if target.prefab == "beargerfur_sack" then
-            damage = 5.2
-        elseif target.prefab == "coonfur_sack" then
-            damage = 2.6
-        else
-            return
-        end
-        local stacksize = item.components.stackable and item.components.stackable.stacksize or 1
-        local buffname = "spoiled_cloud_buff"
-
-        -- 添加或刷新 buff
-        if not target:HasDebuff(buffname) then
-            target:AddDebuff(buffname, buffname)
-        end
-
-        -- 获取 buff 实例并设置持续时间
-        local buff_inst = target:GetDebuff(buffname)
-        if buff_inst and buff_inst.components.timer then
-            buff_inst.damage = damage
-            local time_left = buff_inst.components.timer:GetTimeLeft("lifetime")
-            buff_inst.components.timer:SetTimeLeft("lifetime", stacksize * rottenCloudDurationPerRot + time_left)
-            buff_inst:PlusFxLastTime()
-        end
-
-        -- 消耗腐烂物
-        item:Remove()
-
-        return true
+    if spoiledCloudUseMode == 0 then
+        -- 模式=0，腐烂物invobject → 桶target
+        return ApplySpoiledCloud(act.doer, act.invobject, act.target)
+    else
+        -- 模式=1，桶invobject → 腐烂物target
+        return ApplySpoiledCloud(act.doer, act.target, act.invobject)
     end
-    return false
 end
 AddAction(SPOILED_ON_SACK)
 
-AddComponentAction("USEITEM", "activespoiledcloudtool", function(inst, doer, target, actions)
-    if doer:HasTag("warly_allegiance_lunar") and (target.prefab == "beargerfur_sack" or target.prefab == "coonfur_sack") then
-        table.insert(actions, ACTIONS.SPOILED_ON_SACK)
-    end
-end)
-
+if spoiledCloudUseMode == 0 then
+    AddComponentAction("USEITEM", "activespoiledcloudtool", function(inst, doer, target, actions)
+        if doer:HasTag("warly_allegiance_lunar") and target
+            and (target.prefab == "beargerfur_sack" or target.prefab == "coonfur_sack") then
+            table.insert(actions, ACTIONS.SPOILED_ON_SACK)
+        end
+    end)
+else
+    AddComponentAction("USEITEM", "activespoiledcloudtool", function(inst, doer, target, actions)
+        if doer:HasTag("warly_allegiance_lunar") and target and
+            (target.prefab == "spoiled_food" or target.prefab == "spoiled_fish" or target.prefab == "spoiled_fish_small" or target.prefab == "rottenegg") then
+            table.insert(actions, ACTIONS.SPOILED_ON_SACK)
+        end
+    end)
+end
 -- 加个新的SG
 local warlyIdleState = State {
     name = "spoiled_on_sack", -- 新状态名称
@@ -212,7 +258,7 @@ AddRecipe2("coonfur_sack",
         image = "coonfur_sack.tex",
         builder_tag = "masterchef",
         builder_skill = "warly_allegiance_lunar", -- 指定技能树才能做
-        description = "coonfur_sack",    -- 描述的id，而非本身
+        description = "coonfur_sack",             -- 描述的id，而非本身
         numtogive = 1,
     }
 )
@@ -225,11 +271,11 @@ params.coonfur_sack =
 {
     widget =
     {
-        slotpos = {},
-        slotbg  = {},
-        animbank  = "ui_icepack_2x3",
-        animbuild = "ui_icepack_2x3",
-        pos = Vector3(75, 195, 0),
+        slotpos        = {},
+        slotbg         = {},
+        animbank       = "ui_icepack_2x3",
+        animbuild      = "ui_icepack_2x3",
+        pos            = Vector3(75, 195, 0),
         side_align_tip = 160,
     },
     acceptsstacks = false,
@@ -238,7 +284,7 @@ params.coonfur_sack =
 
 for y = 0, 2 do
     for x = 0, 1 do
-        table.insert(params.coonfur_sack.widget.slotpos, Vector3(-163 + (75 * x),   -75 * y + 73,   0))
+        table.insert(params.coonfur_sack.widget.slotpos, Vector3(-163 + (75 * x), -75 * y + 73, 0))
         table.insert(params.coonfur_sack.widget.slotbg, { image = "preparedfood_slot.tex", atlas = "images/hud2.xml" })
     end
 end

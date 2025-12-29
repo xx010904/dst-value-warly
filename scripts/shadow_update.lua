@@ -182,7 +182,7 @@ USESHADOWHOOK.fn = function(act)
                 if target and target:IsValid() then
                     inst:DoAttackEffects(doer, target)
                     -- 只有非 companion 且非 leader 的目标才受伤害
-                    if not target:HasTag("companion") and not (doer.components.leader and doer.components.leader:IsFollower(target)) then
+                    if not target:HasTag("companion") and not target:HasTag("player") and not (doer.components.leader and doer.components.leader:IsFollower(target)) then
                         local health_delta = inst.level * 12 - 11
                         -- 不会致死
                         if target.components.health.currenthealth > health_delta then
@@ -225,7 +225,7 @@ USESHADOWHOOK.fn = function(act)
                             if doer.components.leader and doer.components.leader:IsFollower(target) then
                                 -- leader的followers不会被扣血
                             else
-                                if target:HasTag("companion") then
+                                if target:HasTag("companion") or target:HasTag("player") then
                                     if doer.components.rider and target.components.rideable then
                                         doer.components.rider:Mount(target, false)
                                     end

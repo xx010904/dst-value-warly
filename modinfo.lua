@@ -1,5 +1,5 @@
 local isCh = locale == "zh" or locale == "zhr"
-version = "1.1.1"
+version = "1.1.2"
 name = isCh and "数值怪沃利" or "The Value Monster: Warly"
 description = isCh and
     "大厨有三弱，一是食物buff共享，因此我不加新料理，而是加了很多自己才能用的食物buff和战斗生活技能" ..
@@ -851,6 +851,29 @@ configuration_options =
             },
         },
         default = 2.5,
+    },
+
+    {
+        name = "spoiledCloudUseMode",
+        label = isCh and "腐烂云雾使用模式" or "Spoiled Cloud Use Mode",
+        hover = isCh and "设置腐烂云雾的使用方式"
+            or "Set the use mode for spoiled cloud.",
+        options =
+        {
+            {
+                description = isCh and "正常" or "Normal",
+                data = 0,
+                hover = isCh and "腐烂物 → 桶，拿着腐烂物对桶使用即可触发"
+                    or "Rotten Item → Sack, use rotten items on sacks to trigger"
+            },
+            {
+                description = isCh and "逆向" or "Reverse",
+                data = 1,
+                hover = isCh and "桶 → 腐烂物，拿着桶对腐烂物使用即可触发"
+                    or "Sack → Rotten Item, use sacks on rotten items to trigger"
+            }
+        },
+        default = 0,
     },
 
     {
