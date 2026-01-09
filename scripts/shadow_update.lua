@@ -216,6 +216,8 @@ USESHADOWHOOK.fn = function(act)
                     -- ✅ 如果是物品，直接捡起来
                     if target.components.inventoryitem and not target.components.inventoryitem:IsHeld() and doer.components.inventory then
                         if target.components.health and not target.components.health:IsDead() then
+                            target:PushEvent("ontrapped")
+                            target.components.health:SetVal(math.max(1, target.components.health.currenthealth))
                             doer.components.inventory:GiveItem(target)
                         end
                     else
