@@ -112,6 +112,13 @@ local function GetRandomSpicedFoodFromAll(best_food)
     return best_food
 end
 
+local function GetLuckMultiplier(chef)
+    if chef and chef.components.luckuser then
+        local luck = math.max(0, chef.components.luckuser:GetLuck() or 0)
+        return 1 + math.sqrt(luck / 3)
+    end
+    return 1
+end
 
 local function MakeSpicedFood(inst, cooker, chef)
     local prefab_to_spawn = "ash"
@@ -133,8 +140,13 @@ local function MakeSpicedFood(inst, cooker, chef)
             -- 平均值计算逆推随机上限，让整个区间平均为 avg
             -- 区间平均：(lower + upper) / 2 = avg
             local lower = 0.01
-            local upper = 2 * avg - lower  -- 反推 upper 值
+            local upper = 2 * avg - lower -- 反推 upper 值
             local increment = math.random() * (upper - lower) + lower
+
+            -- ⭐ 应用幸运值
+            local luck_mult = GetLuckMultiplier(chef)
+            increment = increment * luck_mult
+
             chef.warly_skypie_accum_chance = chef.warly_skypie_accum_chance + increment
 
             -- 累积触发
@@ -150,8 +162,8 @@ local function MakeSpicedFood(inst, cooker, chef)
 
                 -- ✅ 给附近随机幸运儿生成最爱的食物
                 local x, y, z = inst.Transform:GetWorldPosition()
-                local targets = {}  -- 最终参与随机的对象列表
-                local nearby = TheSim:FindEntities(x, y, z, 12, {"character"})
+                local targets = {} -- 最终参与随机的对象列表
+                local nearby = TheSim:FindEntities(x, y, z, 12, { "character" })
                 for _, ent in ipairs(nearby) do
                     if ent ~= chef then -- ❌ 不要把沃利本人算进去
                         if ent:HasTag("player") and not ent:HasTag("playerghost") then
@@ -227,7 +239,7 @@ local function fn()
 
     inst:AddTag("warly_sky_pie")
     inst:AddTag("cookable")
-    inst:AddTag("furnituredecor") 
+    inst:AddTag("furnituredecor")
 
     inst.entity:SetPristine()
 

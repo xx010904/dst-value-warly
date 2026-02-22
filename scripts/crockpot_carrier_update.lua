@@ -138,7 +138,7 @@ AddPrefabPostInit("lightninggoat", function(goat)
             goat:AddComponent("named")
             goat.components.named:SetName(STRINGS.NAMES.SCAPEGOAT)
 
-            -- 玩家攻击加倍伤害 + 死亡额外掉落羊角
+            -- 玩家攻击加倍伤害
             goat:ListenForEvent("attacked", function(goat, data)
                 if data and data.attacker and data.attacker:HasTag("player") then
                     if goat.components.health and not goat.components.health:IsDead() then
@@ -148,15 +148,26 @@ AddPrefabPostInit("lightninggoat", function(goat)
                 end
             end)
 
+            --  替罪羊被击杀后可能掉落羊角
             local x, y, z = goat.Transform:GetWorldPosition()
-            -- 替罪羊被击杀后可能掉落羊角
             goat:ListenForEvent("death", function(goat, data)
-                if math.random() < scapegoatHornDropChance then
-                    -- 掉落一个羊角
-                    local horn = SpawnPrefab("lightninggoathorn")
-                    if horn then
-                        horn.Transform:SetPosition(x, y, z)
+                local baseChance = scapegoatHornDropChance or 0
+                -- ⭐ 搜索附近玩家
+                local radius = 12
+                local nearby = TheSim:FindEntities(x, y, z, radius, { "player" }, { "playerghost" })
+                local total_luck = 0
+                for _, player in ipairs(nearby) do
+                    if player.components.luckuser then
+                        total_luck = total_luck + (player.components.luckuser:GetLuck() or 0)
                     end
+                end
+                -- ⭐ 非线性递减收益（群体版）
+                -- 3点总幸运 ≈ 双倍
+                local multiplier = 1 + math.sqrt(math.max(total_luck, 0) / 3)
+                local finalChance = math.min(1, baseChance * multiplier)
+                if math.random() < finalChance then
+                    local x, y, z = goat.Transform:GetWorldPosition()
+                    SpawnPrefab("lightninggoathorn").Transform:SetPosition(x, y, z)
                 end
             end)
 
@@ -169,7 +180,7 @@ AddPrefabPostInit("lightninggoat", function(goat)
     local old_OnSave = goat.OnSave
     goat.OnSave = function(goat, data)
         if old_OnSave then old_OnSave(goat, data) end
-        if goat:HasTag("scapegoat") then
+        if goat:IsValid() and goat:HasTag("scapegoat") then
             data.is_scapegoat = true
         end
     end
@@ -178,7 +189,7 @@ AddPrefabPostInit("lightninggoat", function(goat)
     local old_OnLoad = goat.OnLoad
     goat.OnLoad = function(goat, data)
         if old_OnLoad then old_OnLoad(goat, data) end
-        if data and data.is_scapegoat then
+        if data and data.is_scapegoat and goat:IsValid() then
             goat:AddTag("scapegoat")
             if goat.components.herdmember then
                 goat:RemoveComponent("herdmember")
@@ -346,7 +357,7 @@ local function create_spicepack_params(name, chefPouchSlotCount)
     params[name] = pack_params
 end
 -- 创建四个厨师袋
-for _, spice in ipairs({"spicepack_chili", "spicepack_salt", "spicepack_garlic", "spicepack_sugar"}) do
+for _, spice in ipairs({ "spicepack_chili", "spicepack_salt", "spicepack_garlic", "spicepack_sugar" }) do
     create_spicepack_params(spice, chefPouchSlotCount)
 end
 
